@@ -180,9 +180,10 @@ onUnmounted(() => {
               :src="artwork.src"
               :alt="artwork.title"
               width="560"
-              height="740"
+              height="760"
+              sizes="280px"
               format="webp"
-              quality="80"
+              quality="85"
               class="card-image transition-opacity duration-500"
               :class="loadedImages.has(artwork.id) ? 'opacity-100' : 'opacity-0'"
               draggable="false"
@@ -218,7 +219,7 @@ onUnmounted(() => {
 
 .carousel-scene {
   width: 100%;
-  height: 480px;
+  height: 520px;
   perspective: 1600px;
   overflow: visible;
   cursor: grab;
@@ -241,32 +242,37 @@ onUnmounted(() => {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 260px;
-  height: 350px;
-  margin-left: -130px;
-  margin-top: -175px;
+  width: 280px;
+  height: 380px;
+  margin-left: -140px;
+  margin-top: -190px;
   transform-style: preserve-3d;
 }
 
 .card-inner {
   width: 100%;
   height: 100%;
-  border-radius: 16px;
+  border-radius: 14px;
   overflow: hidden;
   position: relative;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+  box-shadow:
+    0 25px 50px -12px rgba(0, 0, 0, 0.6),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06);
   transition: box-shadow 0.3s ease;
   cursor: pointer;
 }
 
 .card-inner:hover {
-  box-shadow: 0 25px 60px -8px rgba(237, 84, 77, 0.25);
+  box-shadow:
+    0 25px 60px -8px rgba(237, 84, 77, 0.25),
+    inset 0 0 0 1px rgba(237, 84, 77, 0.15);
 }
 
 .card-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center top;
   pointer-events: none;
   user-select: none;
 }
@@ -320,14 +326,14 @@ onUnmounted(() => {
 
 @media (max-width: 768px) {
   .carousel-scene {
-    height: 380px;
+    height: 420px;
   }
 
   .carousel-card {
-    width: 200px;
-    height: 270px;
-    margin-left: -100px;
-    margin-top: -135px;
+    width: 220px;
+    height: 300px;
+    margin-left: -110px;
+    margin-top: -150px;
   }
 }
 </style>
