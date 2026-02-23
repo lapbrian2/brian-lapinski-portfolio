@@ -26,6 +26,23 @@ function openLightbox(index: number) {
   lightbox.open(items, index)
 }
 
+// Masonry-style varied column spans for visual rhythm
+// Pattern: large(7) + medium(5), then small(4) + small(4) + small(4), repeat with variation
+const spanPatterns = [
+  'col-span-12 md:col-span-7',
+  'col-span-12 md:col-span-5',
+  'col-span-12 md:col-span-4',
+  'col-span-12 md:col-span-4',
+  'col-span-12 md:col-span-4',
+  'col-span-12 md:col-span-5',
+  'col-span-12 md:col-span-7',
+  'col-span-12 md:col-span-6',
+]
+
+function getSpanClass(index: number): string {
+  return spanPatterns[index % spanPatterns.length]
+}
+
 // Scroll velocity skew
 let currentSkew = 0
 const skewTarget = ref(0)
@@ -138,8 +155,7 @@ onUnmounted(() => {
 <template>
   <div
     ref="gridEl"
-    class="grid gap-6"
-    style="grid-template-columns: repeat(auto-fill, minmax(300px, 1fr))"
+    class="grid grid-cols-12 gap-4"
   >
     <GalleryCard
       v-for="(artwork, index) in filteredArtworks"
@@ -147,6 +163,7 @@ onUnmounted(() => {
       :artwork="artwork"
       :index="index"
       class="gallery-card"
+      :class="getSpanClass(index)"
       @click="openLightbox(index)"
     />
   </div>

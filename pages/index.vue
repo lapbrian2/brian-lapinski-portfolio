@@ -2,13 +2,13 @@
   <div>
     <AppLoader @complete="onLoaderComplete" />
     <HeroSection :ready="heroReady" />
-    <SectionDivider />
+    <ScrollMarquee text="Selected Works" />
     <GallerySection />
-    <SectionDivider variant="accent" />
+    <ScrollMarquee text="About the Artist" direction="right" />
     <AboutSection />
     <SectionDivider />
     <ProcessSection />
-    <SectionDivider variant="accent" />
+    <ScrollMarquee text="Let's Create" />
     <ContactSection />
   </div>
 </template>

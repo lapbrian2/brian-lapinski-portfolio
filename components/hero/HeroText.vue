@@ -110,11 +110,12 @@ onUnmounted(() => {
 
 <template>
   <div ref="containerEl" class="flex flex-col items-center justify-center text-center px-4">
-    <!-- Role label -->
+    <!-- Role label with accent dot -->
     <p
       ref="roleEl"
-      class="font-body text-xs uppercase tracking-[0.2em] text-lavender-400 mb-4 opacity-0"
+      class="flex items-center gap-2 font-body text-xs uppercase tracking-[0.25em] text-lavender-400 mb-6 opacity-0"
     >
+      <span class="w-1.5 h-1.5 rounded-full bg-accent-red inline-block" />
       AI Artist & Educator
     </p>
 
@@ -130,7 +131,7 @@ onUnmounted(() => {
     <!-- Tagline with word splitting -->
     <p
       ref="taglineEl"
-      class="font-body text-lg md:text-xl text-lavender-300 font-light mt-4 tracking-wide"
+      class="font-body text-lg md:text-xl text-lavender-300/80 font-light mt-6 tracking-wide max-w-lg"
     >
       Exploring what it means to be human through images
     </p>

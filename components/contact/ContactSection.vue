@@ -1,6 +1,11 @@
 <template>
   <section id="contact" ref="sectionEl" class="section">
-    <div class="max-w-4xl mx-auto text-center">
+    <div class="max-w-5xl mx-auto">
+      <!-- Label -->
+      <p ref="labelEl" class="font-body text-xs uppercase tracking-[0.2em] text-lavender-400 mb-8 opacity-0">
+        Get in touch
+      </p>
+
       <!-- Large CTA heading with character animation -->
       <h2
         ref="headingEl"
@@ -9,11 +14,30 @@
       >
         Let's Create Together
       </h2>
-      <p ref="subtitleEl" class="font-body text-lg text-lavender-300 mb-16 opacity-0">
+      <p ref="subtitleEl" class="font-body text-lg text-lavender-300 mb-20 max-w-2xl opacity-0">
         Have a project, collaboration, or just want to talk about AI art?
       </p>
+
+      <!-- Large email CTA — Noomo-style oversized link -->
+      <a
+        ref="emailCtaEl"
+        href="mailto:brian@lapinski.art"
+        class="group relative inline-flex items-center gap-6 opacity-0"
+        data-cursor-text="Email"
+      >
+        <span class="font-display text-section md:text-hero font-bold text-lavender-200 group-hover:text-accent-red transition-colors duration-500 leading-none">
+          brian@lapinski.art
+        </span>
+        <span class="inline-block text-lavender-400 group-hover:text-accent-red group-hover:translate-x-3 transition-all duration-500 text-3xl md:text-5xl">
+          &rarr;
+        </span>
+      </a>
     </div>
-    <ContactLinks />
+
+    <!-- Social links below -->
+    <div class="mt-20">
+      <ContactLinks />
+    </div>
   </section>
 </template>
 
@@ -24,8 +48,10 @@ import { useSectionTransition } from '~/composables/useSectionTransition'
 import Splitting from 'splitting'
 
 const sectionEl = ref<HTMLElement | null>(null)
+const labelEl = ref<HTMLElement | null>(null)
 const headingEl = ref<HTMLElement | null>(null)
 const subtitleEl = ref<HTMLElement | null>(null)
+const emailCtaEl = ref<HTMLElement | null>(null)
 
 useSectionTransition(sectionEl, { scaleFrom: 0.95 })
 
@@ -47,6 +73,15 @@ onMounted(() => {
         start: 'top 80%',
         once: true,
         onEnter: () => {
+          // Label slides in first
+          if (labelEl.value) {
+            gsap.to(labelEl.value, {
+              opacity: 1,
+              duration: 0.5,
+              ease: 'power2.out',
+            })
+          }
+
           gsap.to(chars, {
             opacity: 1,
             y: 0,
@@ -65,6 +100,17 @@ onMounted(() => {
             delay: 0.5,
             ease: 'power2.out',
           })
+
+          // Email CTA slides in
+          if (emailCtaEl.value) {
+            gsap.to(emailCtaEl.value, {
+              opacity: 1,
+              y: 0,
+              duration: 0.8,
+              delay: 0.7,
+              ease: 'power3.out',
+            })
+          }
         },
       })
     }

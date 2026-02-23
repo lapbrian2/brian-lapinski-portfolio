@@ -1,9 +1,4 @@
 <script setup lang="ts">
-/**
- * ScrollIndicator.vue
- * A small downward arrow + "Scroll" label that fades out
- * once the user scrolls past 100px.
- */
 const visible = ref(true)
 
 function onScroll() {
@@ -12,7 +7,6 @@ function onScroll() {
 
 onMounted(() => {
   window.addEventListener('scroll', onScroll, { passive: true })
-  // Initial check in case page is already scrolled on mount
   onScroll()
 })
 
@@ -23,26 +17,39 @@ onUnmounted(() => {
 
 <template>
   <div
-    class="scroll-indicator flex flex-col items-center gap-2 select-none transition-opacity duration-500"
+    class="scroll-indicator flex flex-col items-center gap-3 select-none transition-opacity duration-700"
     :class="visible ? 'opacity-100' : 'opacity-0 pointer-events-none'"
   >
-    <!-- Bouncing chevron arrow -->
-    <span class="arrow animate-bounce-slow" aria-hidden="true" />
-
-    <!-- Label -->
-    <span class="text-xs uppercase tracking-widest text-lavender-400 font-body">
+    <span class="text-[10px] uppercase tracking-[0.3em] text-lavender-400/60 font-body">
       Scroll
     </span>
+    <!-- Animated vertical line -->
+    <div class="scroll-line" aria-hidden="true" />
   </div>
 </template>
 
 <style scoped>
-.arrow {
-  display: block;
-  width: 12px;
-  height: 12px;
-  border-right: 2px solid theme('colors.lavender.300');
-  border-bottom: 2px solid theme('colors.lavender.300');
-  transform: rotate(45deg);
+.scroll-line {
+  width: 1px;
+  height: 48px;
+  background: linear-gradient(to bottom, theme('colors.lavender.300'), transparent);
+  position: relative;
+  overflow: hidden;
+}
+
+.scroll-line::after {
+  content: '';
+  position: absolute;
+  top: -100%;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, transparent, theme('colors.accent.red'), transparent);
+  animation: scroll-pulse 2s ease-in-out infinite;
+}
+
+@keyframes scroll-pulse {
+  0% { top: -100%; }
+  100% { top: 100%; }
 }
 </style>
