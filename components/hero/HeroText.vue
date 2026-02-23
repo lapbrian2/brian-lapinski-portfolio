@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import Splitting from 'splitting'
-
 const props = defineProps<{
   ready?: boolean
 }>()
@@ -15,9 +13,11 @@ const taglineEl = ref<HTMLElement | null>(null)
 let ctx: gsap.Context | null = null
 let hasPlayed = false
 
-function playEntrance() {
+async function playEntrance() {
   if (hasPlayed || !nameEl.value || !taglineEl.value || !roleEl.value) return
   hasPlayed = true
+
+  const { default: Splitting } = await import('splitting')
 
   ctx = gsap.context(() => {
     // Split name into characters

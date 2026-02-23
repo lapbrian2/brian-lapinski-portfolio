@@ -3,8 +3,6 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useSectionTransition } from '~/composables/useSectionTransition'
 import { useScrollReveal } from '~/composables/useScrollReveal'
-import Splitting from 'splitting'
-
 const sectionEl = ref<HTMLElement | null>(null)
 const pullquoteEl = ref<HTMLElement | null>(null)
 const credentialsEl = ref<HTMLElement | null>(null)
@@ -15,8 +13,10 @@ useSectionTransition(sectionEl, { opacityFrom: 0.2 })
 
 let ctx: gsap.Context | null = null
 
-onMounted(() => {
+onMounted(async () => {
   if (!pullquoteEl.value) return
+
+  const { default: Splitting } = await import('splitting')
 
   ctx = gsap.context(() => {
     // Pullquote: scroll-scrubbed word opacity (Noomo-style progressive reveal)

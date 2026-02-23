@@ -45,8 +45,6 @@
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useSectionTransition } from '~/composables/useSectionTransition'
-import Splitting from 'splitting'
-
 const sectionEl = ref<HTMLElement | null>(null)
 const labelEl = ref<HTMLElement | null>(null)
 const headingEl = ref<HTMLElement | null>(null)
@@ -57,8 +55,10 @@ useSectionTransition(sectionEl, { scaleFrom: 0.95 })
 
 let ctx: gsap.Context | null = null
 
-onMounted(() => {
+onMounted(async () => {
   if (!headingEl.value) return
+
+  const { default: Splitting } = await import('splitting')
 
   ctx = gsap.context(() => {
     // Character-level split animation from center
