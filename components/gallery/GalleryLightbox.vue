@@ -205,15 +205,15 @@ onUnmounted(() => {
       <!-- Content area — image fills viewport -->
       <div
         v-if="lightbox.currentItem.value"
-        class="relative flex items-center justify-center w-full h-full px-4 md:px-20 py-14"
+        class="lightbox-content"
         @click.stop="toggleCaption"
       >
         <!-- Image -->
-        <div ref="imageEl" class="relative flex items-center justify-center w-full h-full">
+        <div ref="imageEl" class="lightbox-image-wrap">
           <!-- Loading indicator -->
           <div
             v-if="!imageLoaded && lightbox.currentItem.value.src"
-            class="absolute inset-0 flex flex-col items-center justify-center gap-4"
+            class="absolute inset-0 flex flex-col items-center justify-center gap-4 z-10"
           >
             <div class="relative w-12 h-12">
               <div class="absolute inset-0 rounded-full border border-lavender-400/10" />
@@ -232,7 +232,7 @@ onUnmounted(() => {
             height="1800"
             format="webp"
             quality="92"
-            class="lightbox-image max-w-full max-h-full w-auto h-auto object-contain select-none"
+            class="lightbox-image select-none"
             :class="imageLoaded ? 'opacity-100' : 'opacity-0'"
             draggable="false"
             @load="onImageLoad"
@@ -308,8 +308,41 @@ onUnmounted(() => {
   transform: translateY(10px);
 }
 
+/* Content area fills viewport with room for controls */
+.lightbox-content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 56px 64px 0;
+}
+
+@media (max-width: 768px) {
+  .lightbox-content {
+    padding: 56px 12px 0;
+  }
+}
+
+/* Image wrapper fills available space */
+.lightbox-image-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+/* Image fills container while maintaining aspect ratio */
 .lightbox-image {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
   transition: opacity 0.3s ease;
   box-shadow: 0 0 80px rgba(0, 0, 0, 0.6);
+  border-radius: 2px;
 }
 </style>
