@@ -1,10 +1,15 @@
 <script setup lang="ts">
 import gsap from 'gsap'
-import { categories } from '~/data/artworks'
+import { categories, artworks } from '~/data/artworks'
 
 defineProps<{
   modelValue: string
 }>()
+
+function getCount(catId: string): number {
+  if (catId === 'all') return artworks.length
+  return artworks.filter((a) => a.category === catId).length
+}
 
 const emit = defineEmits<{
   'update:modelValue': [value: string]
@@ -56,7 +61,7 @@ onMounted(() => {
       :key="cat.id"
       :data-filter="cat.id"
       :class="[
-        'relative z-10 px-5 py-2 rounded-full text-sm font-body uppercase tracking-wider transition-colors duration-300 cursor-hover',
+        'relative z-10 px-5 py-2 rounded-full text-sm font-body uppercase tracking-wider transition-colors duration-300 cursor-hover inline-flex items-center gap-2',
         modelValue === cat.id
           ? 'text-accent-red font-medium'
           : 'text-lavender-400 hover:text-lavender-200',
@@ -64,6 +69,12 @@ onMounted(() => {
       @click="selectFilter(cat.id)"
     >
       {{ cat.label }}
+      <span
+        :class="[
+          'text-[10px] tabular-nums transition-colors duration-300',
+          modelValue === cat.id ? 'text-accent-red/60' : 'text-lavender-500/40',
+        ]"
+      >{{ getCount(cat.id) }}</span>
     </button>
   </div>
 </template>

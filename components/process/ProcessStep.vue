@@ -1,5 +1,5 @@
 <template>
-  <div class="process-card glass rounded-xl p-8 h-full flex flex-col relative overflow-hidden group">
+  <div class="process-card glass rounded-xl p-8 h-full flex flex-col relative overflow-hidden group hover:-translate-y-1 transition-transform duration-500">
     <!-- Background number watermark -->
     <span class="absolute -top-4 -right-2 font-display text-[8rem] font-bold text-lavender-100/[0.02] leading-none select-none pointer-events-none">
       {{ step.number }}

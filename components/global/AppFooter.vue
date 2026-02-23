@@ -73,13 +73,16 @@
         <!-- Back to top -->
         <button
           ref="topBtnEl"
-          class="group flex items-center gap-2 text-xs text-lavender-400 hover:text-lavender-100 transition-colors duration-300 uppercase tracking-wider font-body"
+          class="group flex items-center gap-3 text-xs text-lavender-400 hover:text-lavender-100 transition-colors duration-300 uppercase tracking-wider font-body"
           aria-label="Back to top"
           @click="scrollToTop"
         >
           Back to top
-          <span class="inline-block w-8 h-8 rounded-full border border-dark-600 flex items-center justify-center group-hover:border-accent-red group-hover:bg-accent-red/10 transition-all duration-300">
-            <span class="text-sm">&uarr;</span>
+          <span class="w-9 h-9 rounded-full border border-dark-600 flex items-center justify-center group-hover:border-accent-red group-hover:bg-accent-red/10 transition-all duration-300">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="group-hover:-translate-y-0.5 transition-transform duration-300">
+              <line x1="7" y1="12" x2="7" y2="2" />
+              <polyline points="3 6 7 2 11 6" />
+            </svg>
           </span>
         </button>
       </div>
