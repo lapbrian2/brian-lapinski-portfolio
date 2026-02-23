@@ -1,6 +1,7 @@
 import { ref, computed } from 'vue'
 
 export interface LightboxItem {
+  id?: string
   src: string
   title: string
   medium?: string
@@ -35,6 +36,9 @@ export function useLightbox() {
     direction.value = 'next'
     isOpen.value = true
     getLenis()?.stop()
+    // Track artwork view
+    const item = allItems[startIndex]
+    if (item?.id) trackView(item.id)
   }
 
   function close() {
@@ -46,6 +50,8 @@ export function useLightbox() {
     if (hasNext.value) {
       direction.value = 'next'
       currentIndex.value++
+      const item = items.value[currentIndex.value]
+      if (item?.id) trackView(item.id)
     }
   }
 
@@ -53,7 +59,14 @@ export function useLightbox() {
     if (hasPrev.value) {
       direction.value = 'prev'
       currentIndex.value--
+      const item = items.value[currentIndex.value]
+      if (item?.id) trackView(item.id)
     }
+  }
+
+  function trackView(artworkId: string) {
+    if (typeof window === 'undefined') return
+    $fetch(`/api/artworks/${artworkId}/view`, { method: 'POST' }).catch(() => {})
   }
 
   function handleKeydown(e: KeyboardEvent) {

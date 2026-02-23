@@ -20,6 +20,7 @@ const filteredArtworks = computed<Artwork[]>(() => {
 
 function openLightbox(index: number) {
   const items = filteredArtworks.value.map((a) => ({
+    id: a.id,
     src: a.src,
     title: a.title,
     medium: a.medium,
