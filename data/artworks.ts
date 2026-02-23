@@ -28,6 +28,7 @@ export const artworks: Artwork[] = [
     src: '/images/artworks/the-watcher.webp',
     aspect: 'square',
     year: 2025,
+    dominantColor: '#4a7a8c',
   },
   {
     id: 'bloom-of-decay',
@@ -38,6 +39,7 @@ export const artworks: Artwork[] = [
     src: '/images/artworks/bloom-of-decay.webp',
     aspect: 'wide',
     year: 2025,
+    dominantColor: '#c45a6e',
   },
   // --- Portraits block: identity, masks, humanity ---
   {
@@ -49,6 +51,7 @@ export const artworks: Artwork[] = [
     src: '/images/artworks/the-nobleman.webp',
     aspect: 'square',
     year: 2025,
+    dominantColor: '#b8963e',
   },
   {
     id: 'peeling-away',
@@ -59,6 +62,7 @@ export const artworks: Artwork[] = [
     src: '/images/artworks/peeling-away.webp',
     aspect: 'square',
     year: 2025,
+    dominantColor: '#c4a882',
   },
   // --- Abstract intensity ---
   {
@@ -70,6 +74,7 @@ export const artworks: Artwork[] = [
     src: '/images/artworks/primal-scream.webp',
     aspect: 'square',
     year: 2025,
+    dominantColor: '#e04040',
   },
   {
     id: 'chromatic-grief',
@@ -80,6 +85,7 @@ export const artworks: Artwork[] = [
     src: '/images/artworks/chromatic-grief.webp',
     aspect: 'square',
     year: 2025,
+    dominantColor: '#7b5ea7',
   },
   // --- Breathe: landscape + cosmos ---
   {
@@ -91,6 +97,7 @@ export const artworks: Artwork[] = [
     src: '/images/artworks/the-gathering.webp',
     aspect: 'wide',
     year: 2025,
+    dominantColor: '#d4a84b',
   },
   {
     id: 'first-light',
@@ -101,6 +108,7 @@ export const artworks: Artwork[] = [
     src: '/images/artworks/first-light.webp',
     aspect: 'wide',
     year: 2025,
+    dominantColor: '#e8b44c',
   },
   // --- Surreal creatures ---
   {
@@ -112,6 +120,7 @@ export const artworks: Artwork[] = [
     src: '/images/artworks/the-hatchlings.webp',
     aspect: 'wide',
     year: 2025,
+    dominantColor: '#5a8a5e',
   },
   {
     id: 'first-encounter',
@@ -122,6 +131,7 @@ export const artworks: Artwork[] = [
     src: '/images/artworks/first-encounter.webp',
     aspect: 'square',
     year: 2025,
+    dominantColor: '#d47a3a',
   },
   // --- Portraits: old masters reimagined ---
   {
@@ -133,6 +143,7 @@ export const artworks: Artwork[] = [
     src: '/images/artworks/the-offering.webp',
     aspect: 'tall',
     year: 2025,
+    dominantColor: '#b83a3a',
   },
   {
     id: 'the-weight',
@@ -143,6 +154,7 @@ export const artworks: Artwork[] = [
     src: '/images/artworks/the-weight.webp',
     aspect: 'square',
     year: 2025,
+    dominantColor: '#c8a855',
   },
   // --- Portraits: power and erasure ---
   {
@@ -154,6 +166,7 @@ export const artworks: Artwork[] = [
     src: '/images/artworks/unspoken.webp',
     aspect: 'square',
     year: 2025,
+    dominantColor: '#8899aa',
   },
   {
     id: 'the-admiral',
@@ -164,6 +177,7 @@ export const artworks: Artwork[] = [
     src: '/images/artworks/the-admiral.webp',
     aspect: 'square',
     year: 2025,
+    dominantColor: '#8b6b3a',
   },
   {
     id: 'the-intern',
@@ -174,6 +188,7 @@ export const artworks: Artwork[] = [
     src: '/images/artworks/the-intern.webp',
     aspect: 'tall',
     year: 2025,
+    dominantColor: '#5a5a6a',
   },
   // --- Portraits: character studies ---
   {
@@ -185,6 +200,7 @@ export const artworks: Artwork[] = [
     src: '/images/artworks/the-keeper.webp',
     aspect: 'square',
     year: 2025,
+    dominantColor: '#6a8a5a',
   },
   {
     id: 'old-soldier',
@@ -195,6 +211,7 @@ export const artworks: Artwork[] = [
     src: '/images/artworks/old-soldier.webp',
     aspect: 'tall',
     year: 2025,
+    dominantColor: '#7a6a55',
   },
   {
     id: 'the-companion',
@@ -205,6 +222,7 @@ export const artworks: Artwork[] = [
     src: '/images/artworks/the-companion.webp',
     aspect: 'square',
     year: 2025,
+    dominantColor: '#5c7a5a',
   },
   // --- Surreal: metamorphosis ---
   {
@@ -216,6 +234,7 @@ export const artworks: Artwork[] = [
     src: '/images/artworks/metamorphosis.webp',
     aspect: 'wide',
     year: 2025,
+    dominantColor: '#d4883a',
   },
   {
     id: 'the-pilgrim',
@@ -226,6 +245,7 @@ export const artworks: Artwork[] = [
     src: '/images/artworks/the-pilgrim.webp',
     aspect: 'tall',
     year: 2025,
+    dominantColor: '#c8b89a',
   },
   // --- Landscape: scale and wonder ---
   {
@@ -237,6 +257,7 @@ export const artworks: Artwork[] = [
     src: '/images/artworks/the-crossing.webp',
     aspect: 'wide',
     year: 2025,
+    dominantColor: '#6a8aaa',
   },
   // --- Abstract: rage ---
   {
@@ -248,6 +269,7 @@ export const artworks: Artwork[] = [
     src: '/images/artworks/gorgons-cry.webp',
     aspect: 'square',
     year: 2025,
+    dominantColor: '#7a8a7a',
   },
   // --- Surreal: worlds ---
   {
@@ -259,6 +281,7 @@ export const artworks: Artwork[] = [
     src: '/images/artworks/red-sun-garden.webp',
     aspect: 'wide',
     year: 2025,
+    dominantColor: '#c44a3a',
   },
   {
     id: 'signal-lost',
@@ -269,6 +292,7 @@ export const artworks: Artwork[] = [
     src: '/images/artworks/signal-lost.webp',
     aspect: 'square',
     year: 2025,
+    dominantColor: '#4a6a7a',
   },
   {
     id: 'the-broadcast',
@@ -279,6 +303,7 @@ export const artworks: Artwork[] = [
     src: '/images/artworks/the-broadcast.webp',
     aspect: 'square',
     year: 2025,
+    dominantColor: '#aa7a44',
   },
   // --- Portraits: tenderness ---
   {
@@ -290,6 +315,7 @@ export const artworks: Artwork[] = [
     src: '/images/artworks/the-travelers.webp',
     aspect: 'square',
     year: 2025,
+    dominantColor: '#c4a055',
   },
   {
     id: 'the-executive',
@@ -300,6 +326,7 @@ export const artworks: Artwork[] = [
     src: '/images/artworks/the-executive.webp',
     aspect: 'tall',
     year: 2025,
+    dominantColor: '#4a4a5a',
   },
   // --- Dystopian cluster ---
   {
@@ -311,6 +338,7 @@ export const artworks: Artwork[] = [
     src: '/images/artworks/the-assembly.webp',
     aspect: 'square',
     year: 2025,
+    dominantColor: '#7a7a6a',
   },
   {
     id: 'city-vortex',
@@ -321,6 +349,7 @@ export const artworks: Artwork[] = [
     src: '/images/artworks/city-vortex.webp',
     aspect: 'wide',
     year: 2025,
+    dominantColor: '#5a7a9a',
   },
   // --- Closing: watchers ---
   {
@@ -332,6 +361,7 @@ export const artworks: Artwork[] = [
     src: '/images/artworks/the-watchers.webp',
     aspect: 'wide',
     year: 2025,
+    dominantColor: '#6a9aaa',
   },
   {
     id: 'opening-night',
@@ -342,5 +372,6 @@ export const artworks: Artwork[] = [
     src: '/images/artworks/opening-night.webp',
     aspect: 'wide',
     year: 2025,
+    dominantColor: '#d4884a',
   },
 ]

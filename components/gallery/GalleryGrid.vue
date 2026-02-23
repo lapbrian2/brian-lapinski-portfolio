@@ -89,41 +89,42 @@ onMounted(() => {
     const cards = gridEl.value!.querySelectorAll('.gallery-card')
     if (!cards.length) return
 
-    gsap.set(cards, { opacity: 0, y: 60, scale: 0.92 })
+    // Clip-path curtain reveal — each card unveils like a curtain
+    gsap.set(cards, { clipPath: 'inset(100% 0 0 0)', opacity: 1 })
+
+    // Inner images counter-move for parallax unmask
+    const imgs = gridEl.value!.querySelectorAll('.card-img')
+    gsap.set(imgs, { y: 40 })
+
+    const revealCards = () => {
+      hasRevealed = true
+      gsap.to(cards, {
+        clipPath: 'inset(0% 0 0 0)',
+        duration: 1,
+        stagger: { each: 0.1, from: 'start' },
+        ease: 'power3.inOut',
+        force3D: true,
+      })
+      // Image slides up as the frame opens
+      gsap.to(imgs, {
+        y: 0,
+        duration: 1.2,
+        stagger: { each: 0.1, from: 'start' },
+        ease: 'power3.out',
+        force3D: true,
+      })
+    }
 
     ScrollTrigger.create({
       trigger: gridEl.value!,
       start: 'top 90%',
       once: true,
-      onEnter: () => {
-        hasRevealed = true
-        gsap.to(cards, {
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          duration: 0.8,
-          stagger: { each: 0.08, from: 'start' },
-          ease: 'power3.out',
-          force3D: true,
-        })
-      },
+      onEnter: revealCards,
     })
 
     // Safety net: if ScrollTrigger hasn't fired after 2.5s, reveal cards anyway
-    // This handles edge cases where the section is already in view on load
     setTimeout(() => {
-      if (!hasRevealed) {
-        hasRevealed = true
-        gsap.to(cards, {
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          duration: 0.8,
-          stagger: { each: 0.08, from: 'start' },
-          ease: 'power3.out',
-          force3D: true,
-        })
-      }
+      if (!hasRevealed) revealCards()
     }, 2500)
   }, gridEl.value)
 
@@ -140,13 +141,11 @@ watch(
     if (!gridEl.value || !hasRevealed) return
     const cards = gridEl.value.querySelectorAll('.gallery-card')
 
-    // Quick exit
+    // Quick exit — curtain closes upward
     await gsap.to(cards, {
-      opacity: 0,
-      scale: 0.95,
-      y: -20,
-      duration: 0.25,
-      stagger: 0.02,
+      clipPath: 'inset(0 0 100% 0)',
+      duration: 0.35,
+      stagger: 0.03,
       ease: 'power2.in',
     })
 
@@ -156,12 +155,19 @@ watch(
 
     const newCards = gridEl.value!.querySelectorAll('.gallery-card')
     if (newCards.length) {
-      gsap.set(newCards, { opacity: 0, y: 40, scale: 0.95 })
+      const newImgs = gridEl.value!.querySelectorAll('.card-img')
+      gsap.set(newCards, { clipPath: 'inset(100% 0 0 0)', opacity: 1 })
+      gsap.set(newImgs, { y: 30 })
       gsap.to(newCards, {
-        opacity: 1,
+        clipPath: 'inset(0% 0 0 0)',
+        duration: 0.7,
+        stagger: { each: 0.06, from: 'start' },
+        ease: 'power3.inOut',
+        force3D: true,
+      })
+      gsap.to(newImgs, {
         y: 0,
-        scale: 1,
-        duration: 0.5,
+        duration: 0.9,
         stagger: { each: 0.06, from: 'start' },
         ease: 'power3.out',
         force3D: true,

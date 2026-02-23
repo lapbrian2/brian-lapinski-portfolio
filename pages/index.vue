@@ -4,6 +4,7 @@
     <HeroSection :ready="heroReady" />
     <ScrollMarquee text="Selected Works" />
     <GallerySection />
+    <GalleryShowcase />
     <ScrollMarquee text="About the Artist" direction="right" />
     <AboutSection />
     <SectionDivider />

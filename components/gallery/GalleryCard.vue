@@ -58,7 +58,13 @@ onMounted(() => {
 
 function onMouseEnter() {
   if (!cardEl.value) return
-  gsap.to(cardEl.value, { scale: 1.02, duration: 0.6, ease: 'power2.out' })
+  const glowColor = props.artwork.dominantColor || '#ed544d'
+  gsap.to(cardEl.value, {
+    scale: 1.02,
+    boxShadow: `0 0 50px ${glowColor}40, 0 0 100px ${glowColor}18`,
+    duration: 0.6,
+    ease: 'power2.out',
+  })
   // Zoom the image itself
   const img = cardEl.value.querySelector('.card-img')
   if (img) gsap.to(img, { scale: 1.08, duration: 0.8, ease: 'power2.out' })
@@ -72,7 +78,7 @@ function onMouseEnter() {
 
 function onMouseLeave() {
   if (!cardEl.value) return
-  gsap.to(cardEl.value, { scale: 1, duration: 0.5, ease: 'power2.out' })
+  gsap.to(cardEl.value, { scale: 1, boxShadow: '0 0 0 transparent', duration: 0.5, ease: 'power2.out' })
   const img = cardEl.value.querySelector('.card-img')
   if (img) gsap.to(img, { scale: 1, duration: 0.6, ease: 'power2.out' })
 }
@@ -145,10 +151,13 @@ onUnmounted(() => {
       <div class="shimmer absolute inset-0" />
     </div>
 
-    <!-- Hover overlay -->
+    <!-- Hover overlay — tinted with artwork's dominant color -->
     <div
       ref="overlayEl"
-      class="absolute inset-0 bg-gradient-to-t from-dark-900/90 via-dark-900/20 to-transparent opacity-0 transition-opacity duration-400 group-hover:opacity-100 flex items-end"
+      class="absolute inset-0 opacity-0 transition-opacity duration-400 group-hover:opacity-100 flex items-end"
+      :style="{
+        background: `linear-gradient(to top, ${artwork.dominantColor || '#181520'}dd 0%, ${artwork.dominantColor || '#181520'}30 40%, transparent 100%)`,
+      }"
     >
       <div class="p-5 md:p-6 w-full">
         <div class="flex items-start justify-between gap-3">

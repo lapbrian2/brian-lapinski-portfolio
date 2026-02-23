@@ -1,13 +1,95 @@
 <script setup lang="ts">
+import gsap from 'gsap'
+
 defineProps<{
   ready?: boolean
 }>()
+
+// Hero artwork cycle — 4 signature pieces as immersive background
+const heroImages = [
+  '/images/artworks/the-watcher.webp',
+  '/images/artworks/bloom-of-decay.webp',
+  '/images/artworks/metamorphosis.webp',
+  '/images/artworks/the-crossing.webp',
+]
+
+const activeIndex = ref(0)
+const imgEls = ref<HTMLElement[]>([])
+let cycleTl: gsap.core.Timeline | null = null
+let kenBurnsTween: gsap.core.Tween | null = null
+
+onMounted(() => {
+  if (imgEls.value.length < 2) return
+
+  // Set initial state: first image visible, rest hidden
+  imgEls.value.forEach((el, i) => {
+    gsap.set(el, { opacity: i === 0 ? 0.4 : 0, scale: 1 })
+  })
+
+  // Ken Burns on first image
+  kenBurnsTween = gsap.to(imgEls.value[0], { scale: 1.06, duration: 7, ease: 'none' })
+
+  // Start crossfade cycle after initial display
+  const scheduleNext = () => {
+    cycleTl = gsap.timeline()
+    cycleTl.call(crossfade, [], '+=5.5')
+  }
+
+  const crossfade = () => {
+    const current = activeIndex.value
+    const next = (current + 1) % heroImages.length
+    const currentEl = imgEls.value[current]
+    const nextEl = imgEls.value[next]
+    if (!currentEl || !nextEl) return
+
+    // Reset next image scale
+    gsap.set(nextEl, { scale: 1, opacity: 0 })
+
+    const tl = gsap.timeline({
+      onComplete: () => {
+        activeIndex.value = next
+        scheduleNext()
+      },
+    })
+
+    // Crossfade
+    tl.to(currentEl, { opacity: 0, duration: 1.8, ease: 'power2.inOut' }, 0)
+    tl.to(nextEl, { opacity: 0.4, duration: 1.8, ease: 'power2.inOut' }, 0)
+    // Ken Burns on incoming image
+    tl.to(nextEl, { scale: 1.06, duration: 7, ease: 'none' }, 0)
+  }
+
+  scheduleNext()
+})
+
+onUnmounted(() => {
+  cycleTl?.kill()
+  kenBurnsTween?.kill()
+})
 </script>
 
 <template>
   <section class="hero-section relative h-screen w-full overflow-hidden bg-dark-900">
-    <!-- Ambient gradient orbs — subtle, cinematic -->
-    <div class="hero-glow absolute inset-0 z-0 pointer-events-none" />
+    <!-- Artwork background layer — crossfading Ken Burns cycle -->
+    <div class="absolute inset-0 z-[1]">
+      <img
+        v-for="(src, i) in heroImages"
+        :key="src"
+        :ref="(el) => { if (el) imgEls[i] = el as HTMLElement }"
+        :src="src"
+        alt=""
+        class="absolute inset-0 w-full h-full object-cover will-change-transform"
+        style="opacity: 0"
+        loading="eager"
+        draggable="false"
+      />
+    </div>
+
+    <!-- Gradient overlay — protects text legibility -->
+    <div class="absolute inset-0 z-[2] pointer-events-none hero-overlay" />
+
+    <!-- Ambient gradient orbs — subtle color accents on top -->
+    <div class="hero-glow absolute inset-0 z-[3] pointer-events-none" />
 
     <!-- Horizontal rule accent — thin line at ~70% down -->
     <div class="absolute left-0 right-0 z-10 pointer-events-none" style="top: 68%">
@@ -27,10 +109,20 @@ defineProps<{
 </template>
 
 <style scoped>
+.hero-overlay {
+  background:
+    linear-gradient(to bottom,
+      rgba(24, 21, 32, 0.7) 0%,
+      rgba(24, 21, 32, 0.3) 35%,
+      rgba(24, 21, 32, 0.25) 50%,
+      rgba(24, 21, 32, 0.4) 70%,
+      rgba(24, 21, 32, 0.85) 100%
+    );
+}
+
 .hero-glow {
   background:
-    radial-gradient(ellipse 60% 50% at 25% 35%, rgba(237, 84, 77, 0.05) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 60% at 75% 65%, rgba(0, 122, 255, 0.035) 0%, transparent 60%),
-    radial-gradient(ellipse 80% 40% at 50% 100%, rgba(35, 27, 53, 0.8) 0%, transparent 50%);
+    radial-gradient(ellipse 60% 50% at 25% 35%, rgba(237, 84, 77, 0.04) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 60% at 75% 65%, rgba(0, 122, 255, 0.025) 0%, transparent 60%);
 }
 </style>

@@ -7,6 +7,7 @@ export interface Artwork {
   src: string
   aspect: 'tall' | 'wide' | 'square'
   year: number
+  dominantColor?: string
   sortOrder?: number
   featured?: boolean | null
   createdAt?: string | null
