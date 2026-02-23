@@ -6,6 +6,7 @@ const imageEl = ref<HTMLElement | null>(null)
 const captionEl = ref<HTMLElement | null>(null)
 const containerEl = ref<HTMLElement | null>(null)
 const imageLoaded = ref(false)
+const showCaption = ref(true)
 
 // Touch / swipe state
 let touchStartX = 0
@@ -17,6 +18,10 @@ function onBackdropClick(e: MouseEvent) {
   if (e.target === e.currentTarget) {
     lightbox.close()
   }
+}
+
+function toggleCaption() {
+  showCaption.value = !showCaption.value
 }
 
 function onTouchStart(e: TouchEvent) {
@@ -64,14 +69,12 @@ function animateImageTransition() {
 
   tl.fromTo(imageEl.value, {
     opacity: 0,
-    x: 80 * dir,
-    scale: 0.92,
-    rotation: 2 * dir,
+    x: 60 * dir,
+    scale: 0.95,
   }, {
     opacity: 1,
     x: 0,
     scale: 1,
-    rotation: 0,
     duration: 0.5,
     ease: 'power3.out',
   })
@@ -79,7 +82,7 @@ function animateImageTransition() {
   if (captionEl.value) {
     tl.fromTo(captionEl.value, {
       opacity: 0,
-      y: 16,
+      y: 12,
     }, {
       opacity: 1,
       y: 0,
@@ -95,8 +98,8 @@ function onEnter() {
     if (imageEl.value) {
       gsap.fromTo(imageEl.value, {
         opacity: 0,
-        scale: 0.85,
-        y: 40,
+        scale: 0.9,
+        y: 30,
       }, {
         opacity: 1,
         scale: 1,
@@ -106,7 +109,7 @@ function onEnter() {
       })
     }
     if (captionEl.value) {
-      gsap.fromTo(captionEl.value, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4, delay: 0.2, ease: 'power2.out' })
+      gsap.fromTo(captionEl.value, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4, delay: 0.3, ease: 'power2.out' })
     }
   })
 }
@@ -129,7 +132,7 @@ onUnmounted(() => {
     <div
       v-if="lightbox.isOpen.value"
       ref="containerEl"
-      class="fixed inset-0 z-[60] bg-dark-900/95 backdrop-blur-md flex items-center justify-center"
+      class="fixed inset-0 z-[60] bg-black/95 backdrop-blur-xl flex items-center justify-center"
       role="dialog"
       aria-modal="true"
       aria-label="Artwork lightbox"
@@ -138,29 +141,47 @@ onUnmounted(() => {
       @touchmove.passive="onTouchMove"
       @touchend="onTouchEnd"
     >
-      <!-- Close button -->
-      <button
-        class="absolute top-6 right-6 w-10 h-10 flex items-center justify-center rounded-full glass text-lavender-300 hover:text-lavender-100 transition-colors duration-200 z-10 cursor-hover"
-        aria-label="Close lightbox"
-        @click="lightbox.close()"
-      >
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-          <line x1="2" y1="2" x2="14" y2="14" />
-          <line x1="14" y1="2" x2="2" y2="14" />
-        </svg>
-      </button>
+      <!-- Top bar -->
+      <div class="absolute top-0 left-0 right-0 flex items-center justify-between px-5 md:px-8 py-5 z-10">
+        <!-- Counter -->
+        <div class="font-body text-xs text-lavender-400/60 tracking-wider tabular-nums">
+          <span class="text-lavender-200">{{ String(lightbox.currentIndex.value + 1).padStart(2, '0') }}</span>
+          <span class="mx-1.5">/</span>
+          <span>{{ String(lightbox.total.value).padStart(2, '0') }}</span>
+        </div>
 
-      <!-- Counter -->
-      <div class="absolute top-6 left-6 font-body text-xs text-lavender-400/60 tracking-wider tabular-nums z-10">
-        <span class="text-lavender-200">{{ String(lightbox.currentIndex.value + 1).padStart(2, '0') }}</span>
-        <span class="mx-1.5">/</span>
-        <span>{{ String(lightbox.total.value).padStart(2, '0') }}</span>
+        <div class="flex items-center gap-3">
+          <!-- Info toggle -->
+          <button
+            class="w-10 h-10 flex items-center justify-center rounded-full text-lavender-400 hover:text-lavender-100 transition-colors duration-200 cursor-hover"
+            :class="showCaption ? 'bg-white/10' : 'bg-white/5'"
+            aria-label="Toggle info"
+            @click="toggleCaption"
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+              <circle cx="8" cy="8" r="6.5" />
+              <line x1="8" y1="7" x2="8" y2="11" />
+              <circle cx="8" cy="5" r="0.5" fill="currentColor" stroke="none" />
+            </svg>
+          </button>
+          <!-- Close button -->
+          <button
+            class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 text-lavender-400 hover:text-lavender-100 hover:bg-white/10 transition-all duration-200 cursor-hover"
+            aria-label="Close lightbox"
+            @click="lightbox.close()"
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+              <line x1="2" y1="2" x2="14" y2="14" />
+              <line x1="14" y1="2" x2="2" y2="14" />
+            </svg>
+          </button>
+        </div>
       </div>
 
       <!-- Previous arrow -->
       <button
         v-if="lightbox.hasPrev.value"
-        class="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center rounded-full glass text-lavender-300 hover:text-lavender-100 transition-all duration-200 z-10 cursor-hover group"
+        class="absolute left-3 md:left-6 top-1/2 -translate-y-1/2 w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-lavender-300 hover:text-lavender-100 transition-all duration-200 z-10 cursor-hover group"
         aria-label="Previous artwork"
         @click="lightbox.prev()"
       >
@@ -172,7 +193,7 @@ onUnmounted(() => {
       <!-- Next arrow -->
       <button
         v-if="lightbox.hasNext.value"
-        class="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center rounded-full glass text-lavender-300 hover:text-lavender-100 transition-all duration-200 z-10 cursor-hover group"
+        class="absolute right-3 md:right-6 top-1/2 -translate-y-1/2 w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-lavender-300 hover:text-lavender-100 transition-all duration-200 z-10 cursor-hover group"
         aria-label="Next artwork"
         @click="lightbox.next()"
       >
@@ -181,20 +202,20 @@ onUnmounted(() => {
         </svg>
       </button>
 
-      <!-- Content area -->
+      <!-- Content area — image fills viewport -->
       <div
         v-if="lightbox.currentItem.value"
-        class="flex flex-col items-center px-6 md:px-20 max-w-6xl w-full"
-        @click.stop
+        class="relative flex items-center justify-center w-full h-full px-16 md:px-24 py-20"
+        @click.stop="toggleCaption"
       >
-        <!-- Image with transition -->
-        <div ref="imageEl" class="relative">
+        <!-- Image -->
+        <div ref="imageEl" class="relative flex items-center justify-center max-w-full max-h-full">
           <!-- Loading spinner -->
           <div
             v-if="!imageLoaded && lightbox.currentItem.value.src"
             class="absolute inset-0 flex items-center justify-center"
           >
-            <div class="w-8 h-8 border-2 border-lavender-400/30 border-t-lavender-100 rounded-full animate-spin" />
+            <div class="w-10 h-10 border-2 border-lavender-400/20 border-t-lavender-100 rounded-full animate-spin" />
           </div>
 
           <NuxtImg
@@ -202,11 +223,12 @@ onUnmounted(() => {
             :key="lightbox.currentIndex.value"
             :src="lightbox.currentItem.value.src"
             :alt="lightbox.currentItem.value.title"
-            width="1200"
-            height="900"
+            width="1800"
+            height="1400"
             format="webp"
             quality="90"
-            class="max-w-full max-h-[70vh] w-auto h-auto rounded-lg object-contain select-none shadow-2xl shadow-black/30"
+            class="lightbox-image max-w-full max-h-[88vh] w-auto h-auto rounded-lg object-contain select-none"
+            :class="imageLoaded ? 'opacity-100' : 'opacity-0'"
             draggable="false"
             @load="onImageLoad"
           />
@@ -214,7 +236,7 @@ onUnmounted(() => {
           <!-- Fallback if no image -->
           <div
             v-else
-            class="max-w-4xl w-full max-h-[78vh] bg-gradient-to-br from-dark-700 to-dark-800 rounded-lg flex items-center justify-center aspect-[4/3]"
+            class="w-full max-h-[88vh] bg-gradient-to-br from-dark-700 to-dark-800 rounded-lg flex items-center justify-center aspect-[4/3]"
           >
             <span class="font-display text-lg text-lavender-400 select-none">
               {{ lightbox.currentItem.value.title }}
@@ -222,24 +244,33 @@ onUnmounted(() => {
           </div>
         </div>
 
-        <!-- Caption -->
-        <div ref="captionEl" class="mt-6 text-center max-w-xl mx-auto">
-          <h3 class="font-display text-xl md:text-2xl text-lavender-100">
-            {{ lightbox.currentItem.value.title }}
-          </h3>
-          <p
-            v-if="lightbox.currentItem.value.medium"
-            class="text-xs text-lavender-400 mt-2 uppercase tracking-[0.15em]"
+        <!-- Caption overlay — anchored to bottom of viewport -->
+        <Transition name="caption-fade">
+          <div
+            v-if="showCaption"
+            ref="captionEl"
+            class="absolute bottom-0 left-0 right-0 px-6 md:px-24 pb-6 pt-16 pointer-events-none"
+            style="background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 60%, transparent 100%)"
           >
-            {{ lightbox.currentItem.value.medium }}<span v-if="lightbox.currentItem.value.year"> &middot; {{ lightbox.currentItem.value.year }}</span>
-          </p>
-          <p
-            v-if="lightbox.currentItem.value.description"
-            class="text-sm text-lavender-300/70 mt-3 leading-relaxed font-body"
-          >
-            {{ lightbox.currentItem.value.description }}
-          </p>
-        </div>
+            <div class="max-w-2xl mx-auto text-center pointer-events-auto">
+              <h3 class="font-display text-xl md:text-2xl lg:text-3xl text-white font-semibold">
+                {{ lightbox.currentItem.value.title }}
+              </h3>
+              <p
+                v-if="lightbox.currentItem.value.medium"
+                class="text-xs text-lavender-300/70 mt-2 uppercase tracking-[0.15em]"
+              >
+                {{ lightbox.currentItem.value.medium }}<span v-if="lightbox.currentItem.value.year"> &middot; {{ lightbox.currentItem.value.year }}</span>
+              </p>
+              <p
+                v-if="lightbox.currentItem.value.description"
+                class="text-sm text-lavender-200/60 mt-3 leading-relaxed font-body max-w-lg mx-auto"
+              >
+                {{ lightbox.currentItem.value.description }}
+              </p>
+            </div>
+          </div>
+        </Transition>
       </div>
     </div>
   </Transition>
@@ -255,5 +286,25 @@ onUnmounted(() => {
 .lightbox-enter-from,
 .lightbox-leave-to {
   opacity: 0;
+}
+
+.caption-fade-enter-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.caption-fade-leave-active {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.caption-fade-enter-from {
+  opacity: 0;
+  transform: translateY(10px);
+}
+.caption-fade-leave-to {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.lightbox-image {
+  transition: opacity 0.3s ease;
+  box-shadow: 0 0 80px rgba(0, 0, 0, 0.6);
 }
 </style>
