@@ -5,27 +5,24 @@
     class="fixed inset-0 z-[100] bg-dark-900 flex flex-col items-center justify-center cursor-pointer"
     @click="skip"
   >
-    <span ref="brandEl" class="font-display text-6xl font-bold text-lavender-100 mb-8">
+    <!-- Brand mark with letter-spacing animation -->
+    <span ref="brandEl" class="font-display text-5xl md:text-6xl font-bold text-lavender-100 mb-10 tracking-[0.2em] opacity-0">
       BL
     </span>
 
-    <!-- Loading bar -->
-    <div class="w-48 h-[2px] bg-dark-700 rounded-full overflow-hidden">
+    <!-- Minimal loading bar -->
+    <div class="w-32 h-px bg-dark-700 overflow-hidden">
       <div
         ref="barEl"
-        class="h-full bg-accent-red rounded-full origin-left"
+        class="h-full bg-accent-red origin-left"
         style="transform: scaleX(0)"
       />
     </div>
 
-    <span class="font-body text-xs text-lavender-400 mt-3 tabular-nums">
-      {{ Math.round(progress) }}
-    </span>
-
     <!-- Skip hint -->
     <span
       ref="skipHintEl"
-      class="absolute bottom-8 font-body text-[11px] text-lavender-500 uppercase tracking-widest opacity-0"
+      class="absolute bottom-8 font-body text-[10px] text-lavender-500/60 uppercase tracking-[0.3em] opacity-0"
     >
       Click to skip
     </span>
@@ -41,7 +38,6 @@ const barEl = ref<HTMLElement | null>(null)
 const skipHintEl = ref<HTMLElement | null>(null)
 
 const hidden = ref(false)
-const progress = ref(0)
 let loadTween: gsap.core.Tween | null = null
 let exiting = false
 
@@ -54,8 +50,6 @@ function exitSequence() {
   exiting = true
   loadTween?.kill()
 
-  // Snap progress to 100
-  progress.value = 100
   if (barEl.value) barEl.value.style.transform = 'scaleX(1)'
 
   const tl = gsap.timeline({
@@ -65,24 +59,28 @@ function exitSequence() {
     },
   })
 
+  // Bar fades
   tl.to(barEl.value, {
     scaleY: 0,
     opacity: 0,
-    duration: 0.25,
+    duration: 0.2,
     ease: 'power2.in',
   })
 
+  // Brand scales up and fades
   tl.to(
     brandEl.value,
     {
-      scale: 1.3,
+      scale: 1.2,
+      letterSpacing: '0.5em',
       opacity: 0,
-      duration: 0.4,
+      duration: 0.5,
       ease: 'power2.in',
     },
-    '-=0.15',
+    '-=0.1',
   )
 
+  // Curtain wipe up
   tl.to(
     loaderEl.value,
     {
@@ -90,7 +88,7 @@ function exitSequence() {
       duration: 0.7,
       ease: 'power3.inOut',
     },
-    '-=0.25',
+    '-=0.3',
   )
 }
 
@@ -107,19 +105,33 @@ onMounted(() => {
     return
   }
 
+  // Entrance: brand fades in with tracking
+  if (brandEl.value) {
+    gsap.fromTo(brandEl.value, {
+      opacity: 0,
+      letterSpacing: '0.6em',
+      y: 8,
+    }, {
+      opacity: 1,
+      letterSpacing: '0.2em',
+      y: 0,
+      duration: 0.6,
+      ease: 'power2.out',
+    })
+  }
+
   // Show skip hint after a beat
   if (skipHintEl.value) {
-    gsap.to(skipHintEl.value, { opacity: 1, duration: 0.4, delay: 0.8 })
+    gsap.to(skipHintEl.value, { opacity: 1, duration: 0.4, delay: 1 })
   }
 
   const proxy = { value: 0 }
 
   loadTween = gsap.to(proxy, {
     value: 100,
-    duration: 1.6,
+    duration: 1.8,
     ease: 'power2.inOut',
     onUpdate: () => {
-      progress.value = proxy.value
       if (barEl.value) {
         barEl.value.style.transform = `scaleX(${proxy.value / 100})`
       }
