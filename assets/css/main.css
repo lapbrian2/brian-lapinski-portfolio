@@ -116,22 +116,28 @@ img {
   outline-offset: 4px;
 }
 
-/* Scrollbar styling */
+/* Scrollbar styling — minimal */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 4px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--color-bg-primary);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-bg-card);
+  background: rgba(201, 210, 231, 0.1);
   border-radius: var(--radius-full);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-text-muted);
+  background: rgba(201, 210, 231, 0.2);
+}
+
+/* Firefox scrollbar */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(201, 210, 231, 0.1) transparent;
 }
 
 /* Reduced motion */
@@ -148,10 +154,11 @@ img {
 
 /* Glass morphism utility */
 .glass {
-  background: rgba(42, 34, 64, 0.4);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(201, 210, 231, 0.08);
+  background: rgba(42, 34, 64, 0.35);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(201, 210, 231, 0.06);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
 }
 
 /* Film grain overlay for cinematic texture (Noomo-style) */
@@ -175,11 +182,11 @@ img {
   inset: 0;
   background: radial-gradient(
     ellipse at center,
-    transparent 50%,
-    rgba(0, 0, 0, 0.35) 100%
+    transparent 55%,
+    rgba(0, 0, 0, 0.3) 100%
   );
   pointer-events: none;
-  z-index: var(--z-overlay);
+  z-index: 9997;
 }
 
 /* Scroll progress bar */
@@ -187,11 +194,13 @@ img {
   position: fixed;
   top: 0;
   left: 0;
+  width: 100%;
   height: 2px;
   background: var(--color-accent-red);
   transform-origin: left;
   transform: scaleX(0);
   z-index: calc(var(--z-nav) + 1);
+  will-change: transform;
 }
 
 /* Custom cursor (desktop only) */
