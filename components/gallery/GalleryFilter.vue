@@ -57,7 +57,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div ref="containerEl" class="relative flex flex-wrap gap-2">
+  <div ref="containerEl" class="relative flex flex-wrap gap-2" role="tablist" aria-label="Gallery category filters">
     <!-- Sliding pill indicator -->
     <div
       ref="pillEl"

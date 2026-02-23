@@ -117,16 +117,20 @@ onUnmounted(() => {
     @mousemove="onMouseMove"
   >
     <!-- Real image with zoom on hover -->
-    <img
+    <NuxtImg
       v-if="artwork.src"
       :src="artwork.src"
       :alt="artwork.title"
+      width="800"
+      height="600"
+      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+      format="webp"
+      quality="80"
       class="card-img absolute inset-0 w-full h-full object-cover transition-opacity duration-500"
       :class="imgLoaded ? 'opacity-100' : 'opacity-0'"
       loading="eager"
-      fetchpriority="low"
       @load="imgLoaded = true"
-    >
+    />
 
     <!-- Shimmer loading placeholder -->
     <div

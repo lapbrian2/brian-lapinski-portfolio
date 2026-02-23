@@ -56,9 +56,14 @@
             @click="openLightbox(artwork)"
           >
             <div class="aspect-[4/3] overflow-hidden">
-              <img
+              <NuxtImg
                 :src="artwork.src"
                 :alt="artwork.title"
+                width="800"
+                height="600"
+                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                format="webp"
+                quality="80"
                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 loading="lazy"
               />

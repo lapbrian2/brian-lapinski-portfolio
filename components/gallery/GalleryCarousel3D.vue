@@ -159,9 +159,13 @@ onUnmounted(() => {
           @click.stop="openArtwork(i)"
         >
           <div class="card-inner">
-            <img
+            <NuxtImg
               :src="artwork.src"
               :alt="artwork.title"
+              width="560"
+              height="740"
+              format="webp"
+              quality="80"
               class="card-image"
               draggable="false"
             />

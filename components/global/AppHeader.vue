@@ -11,13 +11,14 @@
       <a
         href="#"
         class="font-display font-bold text-2xl text-lavender-100 hover:text-accent-red transition-colors duration-200"
+        aria-label="Brian Lapinski — back to top"
         @click.prevent="scrollToTop"
       >
         BL
       </a>
 
       <!-- Desktop Navigation -->
-      <nav class="hidden md:flex items-center gap-8">
+      <nav class="hidden md:flex items-center gap-8" aria-label="Main navigation">
         <a
           v-for="link in navLinks"
           :key="link.id"
@@ -28,6 +29,7 @@
               ? 'text-lavender-100'
               : 'text-lavender-400 hover:text-lavender-200',
           ]"
+          :aria-current="activeSection === link.id ? 'true' : undefined"
           @click.prevent="scrollToSection(link.id)"
         >
           {{ link.label }}
@@ -74,8 +76,10 @@
       ref="mobileOverlayEl"
       class="fixed inset-0 z-40 bg-dark-900 flex items-center justify-center"
       style="clip-path: circle(0% at calc(100% - 40px) 28px)"
+      role="dialog"
+      aria-label="Mobile navigation"
     >
-      <nav ref="mobileNavEl" class="flex flex-col items-center gap-10">
+      <nav ref="mobileNavEl" class="flex flex-col items-center gap-10" aria-label="Mobile navigation">
         <a
           v-for="(link, i) in navLinks"
           :key="link.id"

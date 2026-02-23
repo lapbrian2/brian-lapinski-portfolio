@@ -197,15 +197,19 @@ onUnmounted(() => {
             <div class="w-8 h-8 border-2 border-lavender-400/30 border-t-lavender-100 rounded-full animate-spin" />
           </div>
 
-          <img
+          <NuxtImg
             v-if="lightbox.currentItem.value.src"
             :key="lightbox.currentIndex.value"
             :src="lightbox.currentItem.value.src"
             :alt="lightbox.currentItem.value.title"
+            width="1200"
+            height="900"
+            format="webp"
+            quality="90"
             class="max-w-full max-h-[70vh] w-auto h-auto rounded-lg object-contain select-none shadow-2xl shadow-black/30"
             draggable="false"
             @load="onImageLoad"
-          >
+          />
 
           <!-- Fallback if no image -->
           <div
