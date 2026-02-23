@@ -107,11 +107,16 @@ onUnmounted(() => {
 <template>
   <div
     ref="cardEl"
-    class="group relative overflow-hidden rounded-lg cursor-pointer"
+    class="group relative overflow-hidden rounded-lg cursor-pointer focus-visible:ring-2 focus-visible:ring-accent-red/60 focus-visible:ring-offset-2 focus-visible:ring-offset-dark-900 outline-none"
     :class="fullWidth ? 'aspect-[21/9]' : aspectClasses[artwork.aspect]"
     style="perspective: 600px; transform-style: preserve-3d"
+    role="button"
+    :tabindex="0"
+    :aria-label="`View ${artwork.title}`"
     data-cursor-text="View"
     @click="$emit('click')"
+    @keydown.enter="$emit('click')"
+    @keydown.space.prevent="$emit('click')"
     @mouseenter="onMouseEnter"
     @mouseleave="onMouseLeaveReset"
     @mousemove="onMouseMove"
@@ -128,7 +133,7 @@ onUnmounted(() => {
       quality="80"
       class="card-img absolute inset-0 w-full h-full object-cover transition-opacity duration-500"
       :class="imgLoaded ? 'opacity-100' : 'opacity-0'"
-      loading="eager"
+      :loading="index < 4 ? 'eager' : 'lazy'"
       @load="imgLoaded = true"
     />
 

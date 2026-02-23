@@ -238,10 +238,23 @@ onUnmounted(() => {
   ctx?.revert()
 })
 
+const ogImage = computed(() => {
+  const first = categoryArtworks.value[0]
+  return first?.src || '/images/artworks/the-watcher.webp'
+})
+
 useHead({
   title: `${categoryLabel.value} | Brian Lapinski`,
   meta: [
     { name: 'description', content: categoryDescription.value },
+    { property: 'og:title', content: `${categoryLabel.value} — AI Art by Brian Lapinski` },
+    { property: 'og:description', content: categoryDescription.value },
+    { property: 'og:image', content: ogImage.value },
+    { property: 'og:type', content: 'website' },
+    { name: 'twitter:card', content: 'summary_large_image' },
+    { name: 'twitter:title', content: `${categoryLabel.value} | Brian Lapinski` },
+    { name: 'twitter:description', content: categoryDescription.value },
+    { name: 'twitter:image', content: ogImage.value },
   ],
 })
 </script>

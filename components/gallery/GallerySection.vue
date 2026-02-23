@@ -65,20 +65,31 @@ useScrollReveal(headingEl, { y: 30, stagger: 0.1, children: true })
     <!-- Grid -->
     <GalleryGrid :category="activeCategory" :artworks="selectedWorks" />
 
-    <!-- Explore all categories -->
-    <div class="mt-16 text-center">
-      <p class="font-body text-sm text-lavender-400/60 mb-5">
-        Explore the full collection across {{ artworks.length }} works
-      </p>
-      <div class="flex flex-wrap justify-center gap-3">
-        <NuxtLink
-          v-for="cat in ['portraits', 'landscapes', 'abstract', 'surreal']"
-          :key="cat"
-          :to="`/${cat}`"
-          class="px-5 py-2.5 rounded-full border border-lavender-400/20 text-lavender-400 hover:border-accent-red/40 hover:text-accent-red font-body text-sm uppercase tracking-wider transition-all duration-300"
-        >
-          {{ cat }}
-        </NuxtLink>
+    <!-- Explore full collection -->
+    <div class="mt-20 pt-12 border-t border-lavender-400/10">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
+        <div>
+          <p class="font-body text-xs uppercase tracking-[0.2em] text-lavender-400/60 mb-2">
+            Full Collection
+          </p>
+          <p class="font-display text-xl md:text-2xl font-semibold text-lavender-100">
+            Explore all {{ artworks.length }} works by category
+          </p>
+        </div>
+        <div class="flex flex-wrap gap-3">
+          <NuxtLink
+            v-for="cat in ['portraits', 'landscapes', 'abstract', 'surreal']"
+            :key="cat"
+            :to="`/${cat}`"
+            class="group px-5 py-2.5 rounded-full border border-lavender-400/20 text-lavender-400 hover:border-accent-red/40 hover:text-accent-red hover:bg-accent-red/5 font-body text-sm uppercase tracking-wider transition-all duration-300 inline-flex items-center gap-2"
+          >
+            {{ cat }}
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" class="opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
+              <line x1="1" y1="6" x2="11" y2="6" />
+              <polyline points="7 2 11 6 7 10" />
+            </svg>
+          </NuxtLink>
+        </div>
       </div>
     </div>
   </section>
