@@ -15,9 +15,9 @@ export default defineNuxtConfig({
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { name: 'description', content: 'AI Art Portfolio by Brian Lapinski — exploring the intersection of artificial intelligence and creative vision.' },
+        { name: 'description', content: 'Brian Lapinski — exploring what it means to be human through images. AI artist, educator, and Creative Partner.' },
         { property: 'og:title', content: 'Brian Lapinski | AI Art Portfolio' },
-        { property: 'og:description', content: 'Exploring the intersection of artificial intelligence and creative vision.' },
+        { property: 'og:description', content: 'Exploring what it means to be human through images.' },
         { property: 'og:type', content: 'website' },
         { name: 'theme-color', content: '#181520' },
       ],

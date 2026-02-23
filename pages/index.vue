@@ -15,7 +15,7 @@ useHead({
   meta: [
     {
       name: 'description',
-      content: 'AI Art Portfolio by Brian Lapinski — exploring the intersection of artificial intelligence and creative vision.',
+      content: 'Brian Lapinski — exploring what it means to be human through images. AI artist, educator, and Creative Partner.',
     },
   ],
 })

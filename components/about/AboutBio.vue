@@ -5,23 +5,25 @@
     </h2>
     <div class="space-y-6">
       <p class="font-body text-base leading-relaxed text-lavender-200">
-        I'm Brian Lapinski — an AI artist exploring the intersection of artificial
-        intelligence and creative vision. My work lives at the boundary where
-        technology becomes art, where algorithms dream, and where prompts become
-        portals to unseen worlds.
+        I use images as a way to explore what it means to be human. My work is
+        rooted in personal exploration, emotion, and connection — not trends or
+        technique for its own sake.
       </p>
       <p class="font-body text-base leading-relaxed text-lavender-300">
-        Through tools like Midjourney, Stable Diffusion, and DALL-E, I craft
-        images that challenge perception and invite viewers to question what is
-        real and what is imagined. Each piece begins with an idea — a feeling, a
-        concept, a fragment of a dream — and evolves through iterative dialogue
-        with AI systems.
+        I'm interested in images that speak without words and create a quiet
+        connection between people. Through creating and teaching, I see
+        image-making as a form of self-discovery and shared understanding.
       </p>
       <p class="font-body text-base leading-relaxed text-lavender-300">
-        My practice combines prompt engineering with traditional post-processing
-        techniques, blending the raw output of neural networks with intentional
-        artistic direction. The result is work that feels both alien and deeply
-        human.
+        As AI Architect at The House of Curiosity, Creative Partner at ImagineArt
+        and Caimera, and a contributor to Creativa Magazine Volume 7, my practice
+        bridges art and education — using my Style DNA methodology to treat image
+        generation as a reproducible craft rather than random experimentation.
+      </p>
+      <p class="font-body text-base leading-relaxed text-lavender-300">
+        My work has been exhibited internationally including Dream AI Gallery (NJ),
+        Fundaci&oacute;n Nestl&eacute; Barcelona, FNAC Asturias, and Art Innovation
+        Gallery New York.
       </p>
     </div>
   </div>

@@ -54,27 +54,27 @@ interface ProcessStepData {
 const steps: ProcessStepData[] = [
   {
     number: '01',
-    title: 'Concept & Prompt Engineering',
+    title: 'Intention & Feeling',
     description:
-      'Every piece begins with an idea. I craft detailed prompts that capture mood, composition, style, and narrative — translating vision into language that AI systems can interpret.',
+      'Every piece starts with a feeling or a question about what it means to be human. I don\'t chase trends — I follow what resonates emotionally and personally.',
   },
   {
     number: '02',
-    title: 'Generation & Iteration',
+    title: 'Style DNA & Prompt Craft',
     description:
-      'Through iterative generation cycles, I explore variations and push the AI in unexpected directions. Each batch reveals new possibilities, guiding the creative dialogue forward.',
+      'Using my Style DNA methodology, I treat prompt engineering as a reproducible craft. Detailed prompts capture mood, composition, and narrative — translating inner vision into language AI can interpret.',
   },
   {
     number: '03',
-    title: 'Curation & Selection',
+    title: 'Generation & Dialogue',
     description:
-      'From hundreds of generations, I curate the pieces that resonate most — selecting for emotional impact, technical quality, and artistic coherence.',
+      'Through Midjourney and ImagineArt, I generate and iterate — not randomly, but systematically. Each batch reveals new possibilities, guiding a creative dialogue between human intent and machine capability.',
   },
   {
     number: '04',
-    title: 'Post-Processing & Refinement',
+    title: 'Curation & Connection',
     description:
-      'The final stage involves careful refinement in Photoshop and Topaz AI — enhancing details, correcting artifacts, and bringing the piece to its fullest expression.',
+      'From hundreds of generations, I select the images that speak without words — the ones that create a quiet connection between people. The final piece is about emotional truth, not technical perfection.',
   },
 ]
 </script>

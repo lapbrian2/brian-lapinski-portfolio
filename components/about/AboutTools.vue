@@ -21,11 +21,11 @@ import { useScrollReveal } from '~/composables/useScrollReveal'
 
 const tools = [
   { name: 'Midjourney', icon: '🎨' },
-  { name: 'Stable Diffusion', icon: '🖼️' },
-  { name: 'DALL-E', icon: '🤖' },
-  { name: 'ComfyUI', icon: '⚡' },
-  { name: 'Photoshop', icon: '✨' },
-  { name: 'Topaz AI', icon: '💎' },
+  { name: 'ImagineArt', icon: '✨' },
+  { name: 'Caimera', icon: '📸' },
+  { name: 'Style DNA', icon: '🧬' },
+  { name: 'House of Curiosity', icon: '🏛️' },
+  { name: 'Creativa Mag', icon: '📖' },
 ]
 
 const toolsRef = ref<HTMLElement | null>(null)

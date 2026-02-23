@@ -35,10 +35,8 @@ interface ContactLink {
 }
 
 const links: ContactLink[] = [
-  { type: 'Email', label: 'hello@brianlapinski.com', href: 'mailto:hello@brianlapinski.com' },
-  { type: 'LinkedIn', label: 'Brian Lapinski', href: 'https://linkedin.com/in/brianlapinski' },
-  { type: 'Instagram', label: '@brianlapinski', href: 'https://instagram.com/brianlapinski' },
-  { type: 'Twitter', label: '@brianlapinski', href: 'https://x.com/brianlapinski' },
+  { type: 'LinkedIn', label: 'Brian Lapinski', href: 'https://www.linkedin.com/in/brian-lapinski-a65238352' },
+  { type: 'X / Twitter', label: '@Lapbrian2', href: 'https://x.com/Lapbrian2' },
 ]
 
 const linksRef = ref<HTMLElement | null>(null)

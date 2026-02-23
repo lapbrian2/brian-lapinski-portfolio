@@ -27,7 +27,7 @@
       <div class="border-t border-dark-700 pt-6">
         <!-- Bottom Row -->
         <p class="text-sm text-lavender-400 font-body">
-          &copy; 2025 Brian Lapinski. All rights reserved.
+          &copy; 2026 Brian Lapinski. All rights reserved.
         </p>
       </div>
     </div>
@@ -41,10 +41,8 @@ interface SocialLink {
 }
 
 const socialLinks: SocialLink[] = [
-  { label: 'LinkedIn', href: '#' },
-  { label: 'Instagram', href: '#' },
-  { label: 'Twitter/X', href: '#' },
-  { label: 'Behance', href: '#' },
+  { label: 'LinkedIn', href: 'https://www.linkedin.com/in/brian-lapinski-a65238352' },
+  { label: 'X / Twitter', href: 'https://x.com/Lapbrian2' },
 ]
 </script>
 

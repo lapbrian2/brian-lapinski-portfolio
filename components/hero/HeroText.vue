@@ -54,7 +54,7 @@ onMounted(() => {
       ref="taglineEl"
       class="font-body text-lg md:text-xl text-lavender-300 font-light mt-4 tracking-wide opacity-0"
     >
-      AI Art &amp; Creative Vision
+      Exploring what it means to be human through images
     </p>
   </div>
 </template>
