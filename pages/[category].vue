@@ -1,7 +1,7 @@
 <template>
-  <div class="min-h-screen bg-dark-900 overflow-x-hidden">
+  <div class="min-h-screen bg-dark-900 vignette grain-overlay overflow-x-hidden">
     <!-- Back navigation -->
-    <header class="fixed top-0 left-0 right-0 z-50 px-6 md:px-12 py-5">
+    <header class="fixed top-0 left-0 right-0 z-50 px-6 md:px-12 py-5 backdrop-blur-md bg-dark-900/70">
       <div class="flex items-center justify-between">
         <NuxtLink
           to="/#work"
@@ -21,12 +21,12 @@
     </header>
 
     <!-- Hero -->
-    <section ref="heroEl" class="pt-32 pb-12 px-6 md:px-12">
-      <div class="max-w-5xl mx-auto text-center">
+    <section class="pt-32 pb-12 px-6 md:px-12">
+      <div ref="heroEl" class="max-w-5xl mx-auto text-center">
         <p class="font-body text-xs uppercase tracking-[0.3em] text-accent-red mb-4">
           {{ categoryArtworks.length }} Works
         </p>
-        <h1 ref="titleEl" class="font-display text-hero font-bold text-lavender-100 leading-none mb-6 capitalize">
+        <h1 class="font-display text-hero font-bold text-lavender-100 leading-none mb-6 capitalize">
           {{ categoryLabel }}
         </h1>
         <p class="font-body text-lg text-lavender-300 max-w-xl mx-auto">
@@ -45,14 +45,14 @@
     <!-- Artwork Details Grid -->
     <section class="px-6 md:px-12 pb-24">
       <div class="max-w-6xl mx-auto">
-        <h2 class="font-display text-heading font-bold text-lavender-100 mb-10 text-center">
+        <h2 ref="gridHeadingEl" class="font-display text-heading font-bold text-lavender-100 mb-10 text-center">
           All {{ categoryLabel }}
         </h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div ref="gridEl" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div
             v-for="artwork in categoryArtworks"
             :key="artwork.id"
-            class="group bg-dark-800/50 border border-lavender-400/10 rounded-2xl overflow-hidden hover:border-accent-red/30 transition-colors duration-300 cursor-pointer"
+            class="artwork-card group bg-dark-800/50 border border-lavender-400/10 rounded-2xl overflow-hidden hover:border-accent-red/30 transition-all duration-300 cursor-pointer"
             @click="openLightbox(artwork)"
           >
             <div class="aspect-[4/3] overflow-hidden">
@@ -60,6 +60,7 @@
                 :src="artwork.src"
                 :alt="artwork.title"
                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                loading="lazy"
               />
             </div>
             <div class="p-5">
@@ -73,7 +74,7 @@
     </section>
 
     <!-- Category Navigation -->
-    <section class="px-6 md:px-12 pb-24">
+    <section ref="navEl" class="px-6 md:px-12 pb-24">
       <div class="max-w-4xl mx-auto">
         <h3 class="font-body text-xs uppercase tracking-[0.2em] text-lavender-400/60 text-center mb-6">
           Explore More
@@ -100,6 +101,8 @@
 </template>
 
 <script setup lang="ts">
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import type { Artwork } from '~/types/artwork'
 
 definePageMeta({ layout: false })
@@ -116,6 +119,11 @@ if (!validCategories.includes(category.value)) {
 
 const { artworks } = useArtworks()
 const lightbox = useLightbox()
+
+const heroEl = ref<HTMLElement | null>(null)
+const gridHeadingEl = ref<HTMLElement | null>(null)
+const gridEl = ref<HTMLElement | null>(null)
+const navEl = ref<HTMLElement | null>(null)
 
 const categoryArtworks = computed(() =>
   artworks.value.filter((a: Artwork) => a.category === category.value)
@@ -154,6 +162,76 @@ function openLightbox(artwork: Artwork) {
   }))
   lightbox.open(items, index >= 0 ? index : 0)
 }
+
+// GSAP scroll reveals
+let ctx: gsap.Context | null = null
+
+onMounted(() => {
+  if (typeof window === 'undefined') return
+  gsap.registerPlugin(ScrollTrigger)
+
+  ctx = gsap.context(() => {
+    // Hero reveal
+    if (heroEl.value) {
+      gsap.from(heroEl.value.children, {
+        y: 40,
+        opacity: 0,
+        duration: 0.8,
+        stagger: 0.15,
+        ease: 'power3.out',
+        delay: 0.2,
+      })
+    }
+
+    // Grid heading
+    if (gridHeadingEl.value) {
+      gsap.from(gridHeadingEl.value, {
+        y: 30,
+        opacity: 0,
+        duration: 0.7,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: gridHeadingEl.value,
+          start: 'top 85%',
+        },
+      })
+    }
+
+    // Grid cards stagger
+    if (gridEl.value) {
+      const cards = gridEl.value.querySelectorAll('.artwork-card')
+      gsap.from(cards, {
+        y: 50,
+        opacity: 0,
+        duration: 0.7,
+        stagger: 0.1,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: gridEl.value,
+          start: 'top 80%',
+        },
+      })
+    }
+
+    // Nav section
+    if (navEl.value) {
+      gsap.from(navEl.value, {
+        y: 20,
+        opacity: 0,
+        duration: 0.6,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: navEl.value,
+          start: 'top 90%',
+        },
+      })
+    }
+  })
+})
+
+onUnmounted(() => {
+  ctx?.revert()
+})
 
 useHead({
   title: `${categoryLabel.value} | Brian Lapinski`,
