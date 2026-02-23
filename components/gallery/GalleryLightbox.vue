@@ -151,8 +151,10 @@ onUnmounted(() => {
       </button>
 
       <!-- Counter -->
-      <div class="absolute top-6 left-6 font-body text-xs text-lavender-400 tracking-wider tabular-nums z-10">
-        {{ lightbox.currentIndex.value + 1 }} / {{ lightbox.total.value }}
+      <div class="absolute top-6 left-6 font-body text-xs text-lavender-400/60 tracking-wider tabular-nums z-10">
+        <span class="text-lavender-200">{{ String(lightbox.currentIndex.value + 1).padStart(2, '0') }}</span>
+        <span class="mx-1.5">/</span>
+        <span>{{ String(lightbox.total.value).padStart(2, '0') }}</span>
       </div>
 
       <!-- Previous arrow -->
@@ -200,7 +202,7 @@ onUnmounted(() => {
             :key="lightbox.currentIndex.value"
             :src="lightbox.currentItem.value.src"
             :alt="lightbox.currentItem.value.title"
-            class="max-w-full max-h-[78vh] w-auto h-auto rounded-lg object-contain select-none"
+            class="max-w-full max-h-[70vh] w-auto h-auto rounded-lg object-contain select-none shadow-2xl shadow-black/30"
             draggable="false"
             @load="onImageLoad"
           >
@@ -217,15 +219,21 @@ onUnmounted(() => {
         </div>
 
         <!-- Caption -->
-        <div ref="captionEl" class="mt-5 text-center">
-          <h3 class="font-display text-xl text-lavender-100">
+        <div ref="captionEl" class="mt-6 text-center max-w-xl mx-auto">
+          <h3 class="font-display text-xl md:text-2xl text-lavender-100">
             {{ lightbox.currentItem.value.title }}
           </h3>
           <p
             v-if="lightbox.currentItem.value.medium"
-            class="text-sm text-lavender-400 mt-1"
+            class="text-xs text-lavender-400 mt-2 uppercase tracking-[0.15em]"
           >
-            {{ lightbox.currentItem.value.medium }}
+            {{ lightbox.currentItem.value.medium }}<span v-if="lightbox.currentItem.value.year"> &middot; {{ lightbox.currentItem.value.year }}</span>
+          </p>
+          <p
+            v-if="lightbox.currentItem.value.description"
+            class="text-sm text-lavender-300/70 mt-3 leading-relaxed font-body"
+          >
+            {{ lightbox.currentItem.value.description }}
           </p>
         </div>
       </div>

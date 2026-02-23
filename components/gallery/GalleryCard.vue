@@ -50,6 +50,9 @@ onMounted(() => {
 function onMouseEnter() {
   if (!cardEl.value) return
   gsap.to(cardEl.value, { scale: 1.02, duration: 0.6, ease: 'power2.out' })
+  // Zoom the image itself
+  const img = cardEl.value.querySelector('.card-img')
+  if (img) gsap.to(img, { scale: 1.08, duration: 0.8, ease: 'power2.out' })
   if (titleEl.value) {
     gsap.fromTo(titleEl.value, { y: '100%', opacity: 0 }, { y: '0%', opacity: 1, duration: 0.4, ease: 'power3.out' })
   }
@@ -61,6 +64,8 @@ function onMouseEnter() {
 function onMouseLeave() {
   if (!cardEl.value) return
   gsap.to(cardEl.value, { scale: 1, duration: 0.5, ease: 'power2.out' })
+  const img = cardEl.value.querySelector('.card-img')
+  if (img) gsap.to(img, { scale: 1, duration: 0.6, ease: 'power2.out' })
 }
 
 function onMouseMove(e: MouseEvent) {
@@ -102,40 +107,70 @@ onUnmounted(() => {
     @mouseleave="onMouseLeaveReset"
     @mousemove="onMouseMove"
   >
-    <!-- Real image -->
+    <!-- Real image with zoom on hover -->
     <img
       v-if="artwork.src"
       :src="artwork.src"
       :alt="artwork.title"
-      class="absolute inset-0 w-full h-full object-cover transition-opacity duration-500"
+      class="card-img absolute inset-0 w-full h-full object-cover transition-opacity duration-500"
       :class="imgLoaded ? 'opacity-100' : 'opacity-0'"
       loading="lazy"
       @load="imgLoaded = true"
     >
 
-    <!-- Placeholder (shows while image loads or if no src) -->
+    <!-- Shimmer loading placeholder -->
     <div
       v-if="!imgLoaded"
-      class="absolute inset-0 w-full h-full bg-dark-700 bg-gradient-to-br from-dark-700 to-dark-800 flex items-center justify-center"
+      class="absolute inset-0 w-full h-full bg-dark-700 overflow-hidden"
     >
-      <span class="font-display text-sm text-lavender-400 text-center px-4 select-none">
-        {{ artwork.title }}
-      </span>
+      <div class="shimmer absolute inset-0" />
     </div>
 
     <!-- Hover overlay -->
     <div
       ref="overlayEl"
-      class="absolute inset-0 bg-gradient-to-t from-dark-900/80 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 flex items-end"
+      class="absolute inset-0 bg-gradient-to-t from-dark-900/90 via-dark-900/20 to-transparent opacity-0 transition-opacity duration-400 group-hover:opacity-100 flex items-end"
     >
-      <div class="p-6">
-        <h3 ref="titleEl" class="font-display text-lg text-lavender-100">
-          {{ artwork.title }}
-        </h3>
-        <p ref="mediumEl" class="text-sm text-lavender-300 mt-1 opacity-0">
-          {{ artwork.medium }}
-        </p>
+      <div class="p-5 md:p-6 w-full">
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <h3 ref="titleEl" class="font-display text-base md:text-lg text-lavender-100 leading-tight">
+              {{ artwork.title }}
+            </h3>
+            <p ref="mediumEl" class="text-xs text-lavender-400 mt-1.5 opacity-0 tracking-wide uppercase">
+              {{ artwork.medium }} &middot; {{ artwork.year }}
+            </p>
+          </div>
+          <span class="flex-shrink-0 w-8 h-8 rounded-full border border-lavender-400/30 flex items-center justify-center text-lavender-300 group-hover:border-accent-red/50 group-hover:text-accent-red transition-all duration-300 mt-0.5">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+              <line x1="2" y1="10" x2="10" y2="2" />
+              <polyline points="4 2 10 2 10 8" />
+            </svg>
+          </span>
+        </div>
       </div>
     </div>
   </div>
 </template>
+
+<style scoped>
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(42, 34, 64, 0) 0%,
+    rgba(42, 34, 64, 0.4) 50%,
+    rgba(42, 34, 64, 0) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.card-img {
+  will-change: transform;
+}
+</style>

@@ -49,9 +49,17 @@ const repeated = computed(() => {
   <div ref="containerEl" class="overflow-hidden py-12 md:py-20">
     <div
       ref="stripEl"
-      class="whitespace-nowrap font-display text-[4rem] md:text-[7rem] lg:text-[9rem] font-bold text-lavender-100/[0.04] leading-none select-none uppercase tracking-tight"
+      class="marquee-text whitespace-nowrap font-display text-[4rem] md:text-[7rem] lg:text-[9rem] font-bold leading-none select-none uppercase tracking-tight"
     >
       {{ repeated }}
     </div>
   </div>
 </template>
+
+<style scoped>
+.marquee-text {
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(201, 210, 231, 0.06);
+  text-stroke: 1px rgba(201, 210, 231, 0.06);
+}
+</style>

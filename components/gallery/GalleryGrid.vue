@@ -22,21 +22,26 @@ function openLightbox(index: number) {
     src: a.src,
     title: a.title,
     medium: a.medium,
+    description: a.description,
+    year: a.year,
   }))
   lightbox.open(items, index)
 }
 
 // Masonry-style varied column spans for visual rhythm
-// Pattern: large(7) + medium(5), then small(4) + small(4) + small(4), repeat with variation
+// 11-item pattern: large/medium pairs, triple row, asymmetric pair, then featured
 const spanPatterns = [
-  'col-span-12 md:col-span-7',
-  'col-span-12 md:col-span-5',
-  'col-span-12 md:col-span-4',
-  'col-span-12 md:col-span-4',
-  'col-span-12 md:col-span-4',
-  'col-span-12 md:col-span-5',
-  'col-span-12 md:col-span-7',
-  'col-span-12 md:col-span-6',
+  'col-span-12 md:col-span-7',   // 1: dominant left
+  'col-span-12 md:col-span-5',   // 2: medium right
+  'col-span-12 md:col-span-5',   // 3: medium left
+  'col-span-12 md:col-span-7',   // 4: dominant right
+  'col-span-12 md:col-span-4',   // 5: triple row
+  'col-span-12 md:col-span-4',   // 6: triple row
+  'col-span-12 md:col-span-4',   // 7: triple row
+  'col-span-12 md:col-span-8',   // 8: wide featured
+  'col-span-12 md:col-span-4',   // 9: aside
+  'col-span-12 md:col-span-6',   // 10: balanced pair
+  'col-span-12 md:col-span-6',   // 11: balanced pair
 ]
 
 function getSpanClass(index: number): string {
@@ -155,7 +160,7 @@ onUnmounted(() => {
 <template>
   <div
     ref="gridEl"
-    class="grid grid-cols-12 gap-4"
+    class="grid grid-cols-12 gap-3 md:gap-5"
   >
     <GalleryCard
       v-for="(artwork, index) in filteredArtworks"

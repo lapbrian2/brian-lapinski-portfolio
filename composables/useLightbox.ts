@@ -4,6 +4,8 @@ export interface LightboxItem {
   src: string
   title: string
   medium?: string
+  description?: string
+  year?: number
 }
 
 const isOpen = ref(false)
