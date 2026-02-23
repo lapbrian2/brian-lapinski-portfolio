@@ -24,12 +24,10 @@
       </div>
 
       <div class="h-screen flex items-center">
-        <div ref="stripEl" class="flex gap-8 pl-12">
-          <div v-for="step in steps" :key="step.number" class="w-[380px] flex-shrink-0">
+        <div ref="stripEl" class="flex gap-6 pl-6 pr-6 md:pl-12 md:pr-12 md:gap-8">
+          <div v-for="step in steps" :key="step.number" class="process-card-wrap flex-shrink-0" style="width: calc(25vw - 48px); min-width: 280px; max-width: 380px">
             <ProcessStep :step="step" />
           </div>
-          <!-- Spacer so last card can fully enter view -->
-          <div class="w-12 flex-shrink-0" />
         </div>
       </div>
     </div>
@@ -134,30 +132,27 @@ function setupDesktopScroll() {
   if (!desktopEl.value || !stripEl.value) return
 
   ctx = gsap.context(() => {
-    const stripWidth = stripEl.value!.scrollWidth
-    const viewWidth = window.innerWidth
-    // How far the strip needs to move so the last card is fully visible
-    const maxTranslate = Math.max(0, stripWidth - viewWidth + 60)
-    // Scroll distance should feel natural — 1:1 ratio with some padding
-    const scrollEnd = Math.max(maxTranslate + 300, viewWidth * 0.8)
+    // Calculate how far the strip overflows the viewport
+    const getScrollAmount = () => {
+      return -(stripEl.value!.scrollWidth - window.innerWidth)
+    }
 
-    ScrollTrigger.create({
-      trigger: desktopEl.value!,
-      start: 'top top',
-      end: `+=${scrollEnd}`,
-      pin: true,
-      scrub: 1,
-      invalidateOnRefresh: true,
-      onUpdate: (self) => {
-        const currentStripWidth = stripEl.value!.scrollWidth
-        const currentViewWidth = window.innerWidth
-        const currentMaxTranslate = Math.max(0, currentStripWidth - currentViewWidth + 60)
-        gsap.set(stripEl.value!, {
-          x: -self.progress * currentMaxTranslate,
-        })
-        if (progressEl.value) {
-          progressEl.value.style.transform = `scaleX(${self.progress})`
-        }
+    // Use a standard GSAP tween with scrub — most reliable approach
+    gsap.to(stripEl.value!, {
+      x: getScrollAmount,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: desktopEl.value!,
+        start: 'top top',
+        end: () => `+=${Math.abs(getScrollAmount())}`,
+        pin: true,
+        scrub: 1,
+        invalidateOnRefresh: true,
+        onUpdate: (self) => {
+          if (progressEl.value) {
+            progressEl.value.style.transform = `scaleX(${self.progress})`
+          }
+        },
       },
     })
   }, desktopEl.value)
