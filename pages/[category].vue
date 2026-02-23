@@ -38,7 +38,7 @@
     <!-- 3D Carousel -->
     <section class="pb-16">
       <ClientOnly>
-        <GalleryCarousel3D :artworks="categoryArtworks" />
+        <GalleryCarousel3D :artworks="carouselArtworks" />
       </ClientOnly>
     </section>
 
@@ -145,6 +145,9 @@ const gridLoadedImages = reactive(new Set<string>())
 const categoryArtworks = computed(() =>
   artworks.value.filter((a: Artwork) => a.category === category.value)
 )
+
+// Cap carousel to 8 items max — keeps the 3D ring clean and performant
+const carouselArtworks = computed(() => categoryArtworks.value.slice(0, 8))
 
 const categoryLabel = computed(() => {
   return category.value.charAt(0).toUpperCase() + category.value.slice(1)
