@@ -2,29 +2,13 @@
 defineProps<{
   ready?: boolean
 }>()
-
-const imgLoaded = ref(false)
 </script>
 
 <template>
   <section class="hero-section relative h-screen w-full overflow-hidden bg-dark-900">
-    <!-- Background artwork image — subtle, atmospheric -->
-    <div class="absolute inset-0 z-0">
-      <img
-        src="/images/hero-bg.jpg"
-        alt=""
-        aria-hidden="true"
-        class="absolute inset-0 w-full h-full object-cover transition-opacity duration-[2s]"
-        :class="imgLoaded ? 'opacity-20' : 'opacity-0'"
-        @load="imgLoaded = true"
-      >
-      <!-- Desaturate + darken layer -->
-      <div class="absolute inset-0 bg-dark-900/40 mix-blend-color" />
-    </div>
-
-    <!-- 3D Particle Canvas floats above the image -->
+    <!-- 3D Particle Canvas (client-only since Three.js needs DOM) -->
     <ClientOnly>
-      <div class="absolute inset-0 z-[1]">
+      <div class="absolute inset-0 z-0">
         <HeroCanvas />
       </div>
     </ClientOnly>
@@ -48,8 +32,8 @@ const imgLoaded = ref(false)
 .hero-gradient {
   background: radial-gradient(
     ellipse at center,
-    rgba(24, 21, 32, 0.2) 0%,
-    rgba(24, 21, 32, 0.85) 60%,
+    rgba(24, 21, 32, 0.3) 0%,
+    rgba(24, 21, 32, 0.9) 70%,
     #181520 100%
   );
 }
