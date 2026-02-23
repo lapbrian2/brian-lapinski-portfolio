@@ -2,7 +2,6 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-01-01',
 
   modules: [
-    '@tresjs/nuxt',
     '@nuxtjs/tailwindcss',
     '@nuxt/image',
   ],
@@ -36,12 +35,12 @@ export default defineNuxtConfig({
   ],
 
   build: {
-    transpile: ['gsap', 'three'],
+    transpile: ['gsap'],
   },
 
   vite: {
     optimizeDeps: {
-      include: ['three', 'gsap'],
+      include: ['gsap'],
     },
   },
 
