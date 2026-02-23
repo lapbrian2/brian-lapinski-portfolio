@@ -20,8 +20,8 @@ const featuredIds = [
   'gorgons-cry',
   'first-encounter',
   'the-offering',
-  'red-sun-garden',
-  'city-vortex',
+  'the-deep-one',
+  'the-procession',
 ]
 
 const selectedWorks = computed<Artwork[]>(() => {
