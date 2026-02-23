@@ -10,6 +10,7 @@ const lightbox = useLightbox()
 
 const containerEl = ref<HTMLElement | null>(null)
 const trackEl = ref<HTMLElement | null>(null)
+const sceneEl = ref<HTMLElement | null>(null)
 const currentAngle = ref(0)
 const isDragging = ref(false)
 const autoRotate = ref(true)
@@ -20,15 +21,21 @@ const loadedImages = reactive(new Set<string>())
 const count = computed(() => props.artworks.length)
 const angleStep = computed(() => count.value > 0 ? 360 / count.value : 360)
 
-// Radius — sized so cards don't overlap but never balloon past viewport
+// Radius — ensures cards never overlap: arc between adjacent cards >= cardWidth + gap
 const radius = computed(() => {
   const n = count.value
-  if (n <= 3) return 300
-  if (n <= 6) return 380
-  if (n <= 10) return 450
-  // For large counts, use circumference math: C = n * cardWidth, r = C / (2*PI)
-  return Math.min(700, Math.round((n * 200) / (2 * Math.PI)))
+  if (n <= 1) return 300
+  // Card width is 280px desktop. We need each card's arc-length > cardWidth + gap.
+  // Arc = 2 * PI * r / n, so r = n * (cardWidth + gap) / (2 * PI)
+  const cardWidth = 280
+  const gap = 40 // minimum 40px gap between cards
+  const minRadius = Math.round((n * (cardWidth + gap)) / (2 * Math.PI))
+  // Clamp: at least 300, no upper limit — let the 3D perspective handle it
+  return Math.max(300, minRadius)
 })
+
+// Perspective scales with radius so depth effect stays proportional
+const perspective = computed(() => Math.max(1600, radius.value * 2.2))
 
 // Active card index based on current rotation
 const activeIndex = computed(() => {
@@ -148,7 +155,9 @@ onUnmounted(() => {
 <template>
   <div class="carousel-wrapper" ref="containerEl">
     <div
+      ref="sceneEl"
       class="carousel-scene"
+      :style="{ perspective: `${perspective}px` }"
       @pointerdown="onPointerDown"
       @pointermove="onPointerMove"
       @pointerup="onPointerUp"
@@ -220,7 +229,6 @@ onUnmounted(() => {
 .carousel-scene {
   width: 100%;
   height: 520px;
-  perspective: 1600px;
   overflow: visible;
   cursor: grab;
   touch-action: pan-y;
