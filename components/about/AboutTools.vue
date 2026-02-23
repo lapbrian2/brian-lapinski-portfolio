@@ -7,10 +7,15 @@
       Platforms & Practice
     </h3>
     <div ref="gridRef" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-      <div
+      <component
+        :is="tool.href ? 'a' : 'div'"
         v-for="(tool, i) in tools"
         :key="tool.name"
+        :href="tool.href || undefined"
+        :target="tool.href ? '_blank' : undefined"
+        :rel="tool.href ? 'noopener noreferrer' : undefined"
         class="tool-card group glass rounded-lg px-5 py-4 flex items-center gap-4 transition-all duration-300 hover:border-accent-red/20"
+        :class="tool.href ? 'cursor-pointer' : ''"
         @mouseenter="onCardEnter($event.currentTarget as HTMLElement)"
         @mouseleave="onCardLeave($event.currentTarget as HTMLElement)"
       >
@@ -19,11 +24,16 @@
             <path :d="tool.icon" />
           </svg>
         </span>
-        <div>
+        <div class="flex-1 min-w-0">
           <span class="font-body text-sm text-lavender-200 block leading-tight">{{ tool.name }}</span>
           <span class="font-body text-xs text-lavender-400/60 leading-tight">{{ tool.role }}</span>
         </div>
-      </div>
+        <!-- External link indicator -->
+        <svg v-if="tool.href" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" class="flex-shrink-0 text-lavender-500/40 group-hover:text-accent-red/60 transition-colors duration-300">
+          <line x1="2" y1="10" x2="10" y2="2" />
+          <polyline points="4 2 10 2 10 8" />
+        </svg>
+      </component>
     </div>
   </div>
 </template>
@@ -33,12 +43,12 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 const tools = [
-  { name: 'Midjourney', role: 'Primary medium', icon: 'M3 3l10 10M13 3L3 13' },
-  { name: 'ImagineArt', role: 'Creative Partner', icon: 'M8 2L2 8l6 6 6-6z' },
-  { name: 'Caimera', role: 'Creative Partner', icon: 'M2 4h12v8H2zM5 4V2M11 4V2' },
-  { name: 'Style DNA', role: 'Methodology', icon: 'M4 2c0 6 8 6 8 12M12 2c0 6-8 6-8 12' },
-  { name: 'House of Curiosity', role: 'AI Architect', icon: 'M8 2L2 6v8l6 0 6 0V6z' },
-  { name: 'Creativa Magazine', role: 'Contributor', icon: 'M3 2h10v12H3zM6 2v12M6 5h4M6 8h3' },
+  { name: 'Midjourney', role: 'Primary medium', icon: 'M3 3l10 10M13 3L3 13', href: 'https://www.midjourney.com' },
+  { name: 'ImagineArt', role: 'Creative Partner', icon: 'M8 2L2 8l6 6 6-6z', href: 'https://www.imagineart.ai' },
+  { name: 'Caimera', role: 'Creative Partner', icon: 'M2 4h12v8H2zM5 4V2M11 4V2', href: 'https://caimera.ai' },
+  { name: 'Style DNA', role: 'Methodology', icon: 'M4 2c0 6 8 6 8 12M12 2c0 6-8 6-8 12', href: 'https://styledna.ai' },
+  { name: 'House of Curiosity', role: 'AI Architect', icon: 'M8 2L2 6v8l6 0 6 0V6z', href: '' },
+  { name: 'Creativa Magazine', role: 'Contributor', icon: 'M3 2h10v12H3zM6 2v12M6 5h4M6 8h3', href: 'https://www.creativamagazine.com' },
 ]
 
 const toolsRef = ref<HTMLElement | null>(null)
