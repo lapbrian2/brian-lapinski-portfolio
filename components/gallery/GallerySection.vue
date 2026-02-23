@@ -1,11 +1,19 @@
 <script setup lang="ts">
+import { useSectionTransition } from '~/composables/useSectionTransition'
+import { useScrollReveal } from '~/composables/useScrollReveal'
+
 const activeCategory = ref('all')
+const sectionEl = ref<HTMLElement | null>(null)
+const headingEl = ref<HTMLElement | null>(null)
+
+useSectionTransition(sectionEl, { parallaxIntensity: 0.2, scaleFrom: 0.98 })
+useScrollReveal(headingEl, { y: 30, stagger: 0.1, children: true })
 </script>
 
 <template>
-  <section id="work" class="section">
+  <section id="work" ref="sectionEl" class="section">
     <!-- Heading area -->
-    <div class="mb-12">
+    <div ref="headingEl" class="mb-12">
       <h2 class="font-display text-section font-bold text-lavender-100">
         Selected Works
       </h2>

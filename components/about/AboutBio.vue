@@ -6,7 +6,7 @@
     <div class="space-y-6">
       <p class="font-body text-base leading-relaxed text-lavender-200">
         I use images as a way to explore what it means to be human. My work is
-        rooted in personal exploration, emotion, and connection — not trends or
+        rooted in personal exploration, emotion, and connection &mdash; not trends or
         technique for its own sake.
       </p>
       <p class="font-body text-base leading-relaxed text-lavender-300">
@@ -17,7 +17,7 @@
       <p class="font-body text-base leading-relaxed text-lavender-300">
         As AI Architect at The House of Curiosity, Creative Partner at ImagineArt
         and Caimera, and a contributor to Creativa Magazine Volume 7, my practice
-        bridges art and education — using my Style DNA methodology to treat image
+        bridges art and education &mdash; using my Style DNA methodology to treat image
         generation as a reproducible craft rather than random experimentation.
       </p>
       <p class="font-body text-base leading-relaxed text-lavender-300">
@@ -30,13 +30,40 @@
 </template>
 
 <script setup lang="ts">
-import { useScrollReveal } from '~/composables/useScrollReveal'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 const bioRef = ref<HTMLElement | null>(null)
+let ctx: gsap.Context | null = null
 
-useScrollReveal(bioRef, {
-  y: 40,
-  stagger: 0.15,
-  children: true,
+onMounted(() => {
+  if (!bioRef.value) return
+
+  ctx = gsap.context(() => {
+    const paragraphs = bioRef.value!.querySelectorAll('p')
+
+    paragraphs.forEach((p, i) => {
+      gsap.set(p, { opacity: 0, y: 30 + i * 10 })
+      ScrollTrigger.create({
+        trigger: p,
+        start: 'top 88%',
+        once: true,
+        onEnter: () => {
+          gsap.to(p, {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            delay: i * 0.1,
+            ease: 'power2.out',
+            force3D: true,
+          })
+        },
+      })
+    })
+  }, bioRef.value)
+})
+
+onUnmounted(() => {
+  ctx?.revert()
 })
 </script>

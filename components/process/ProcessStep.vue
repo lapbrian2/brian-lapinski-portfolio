@@ -1,6 +1,9 @@
 <template>
-  <div class="glass rounded-xl p-8 h-full flex flex-col">
-    <span class="font-display text-5xl font-bold text-accent-red/40 mb-4">
+  <div class="glass rounded-xl p-8 h-full flex flex-col relative">
+    <!-- Accent dot -->
+    <div class="w-2 h-2 rounded-full bg-accent-red/60 mb-4" />
+
+    <span class="font-display text-5xl font-bold text-accent-red/40 mb-4 leading-none">
       {{ step.number }}
     </span>
     <h3 class="font-display text-xl font-semibold text-lavender-100 mb-4">

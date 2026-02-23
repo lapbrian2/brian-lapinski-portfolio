@@ -30,6 +30,7 @@ export default defineNuxtConfig({
   },
 
   css: [
+    'splitting/dist/splitting.css',
     '~/assets/css/typography.css',
     '~/assets/css/main.css',
     '~/assets/css/transitions.css',

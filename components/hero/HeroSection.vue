@@ -1,9 +1,7 @@
 <script setup lang="ts">
-/**
- * HeroSection.vue
- * Full-screen hero container that composites the 3D canvas,
- * gradient overlay, text overlay, and scroll indicator.
- */
+defineProps<{
+  ready?: boolean
+}>()
 </script>
 
 <template>
@@ -20,7 +18,7 @@
 
     <!-- Text overlay -->
     <div class="absolute inset-0 z-20 flex items-center justify-center">
-      <HeroText />
+      <HeroText :ready="ready" />
     </div>
 
     <!-- Scroll indicator pinned to bottom center -->

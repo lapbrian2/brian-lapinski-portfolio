@@ -218,6 +218,29 @@ img {
     background: rgba(255, 255, 255, 0.04);
     mix-blend-mode: difference;
   }
+
+  .custom-cursor.has-label {
+    transform: translate(-50%, -50%) scale(4);
+    background: rgba(237, 84, 77, 0.12);
+    border-color: rgba(237, 84, 77, 0.5);
+    mix-blend-mode: normal;
+  }
+
+  .cursor-label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: var(--font-body, 'Inter', sans-serif);
+    font-size: 3px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text-bright);
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+  }
 }
 
 /* Hover reveal underline for links */

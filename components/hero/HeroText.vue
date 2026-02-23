@@ -1,39 +1,106 @@
 <script setup lang="ts">
 import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import Splitting from 'splitting'
 
+const props = defineProps<{
+  ready?: boolean
+}>()
+
+const containerEl = ref<HTMLElement | null>(null)
+const roleEl = ref<HTMLElement | null>(null)
 const nameEl = ref<HTMLElement | null>(null)
 const taglineEl = ref<HTMLElement | null>(null)
-let ctx: gsap.Context | null = null
 
-onMounted(() => {
-  if (!nameEl.value || !taglineEl.value) return
+let ctx: gsap.Context | null = null
+let hasPlayed = false
+
+function playEntrance() {
+  if (hasPlayed || !nameEl.value || !taglineEl.value || !roleEl.value) return
+  hasPlayed = true
 
   ctx = gsap.context(() => {
+    // Split name into characters
+    const nameResult = Splitting({ target: nameEl.value!, by: 'chars' })
+    const chars = nameResult[0]?.chars || []
+
+    // Split tagline into words
+    const tagResult = Splitting({ target: taglineEl.value!, by: 'words' })
+    const words = tagResult[0]?.words || []
+
     const tl = gsap.timeline()
 
+    // Phase 1: Role label fades in
     tl.fromTo(
-      nameEl.value,
-      { clipPath: 'inset(100% 0 0 0)' },
-      {
-        clipPath: 'inset(0 0 0 0)',
-        duration: 0.8,
-        ease: 'power3.out',
-        delay: 0.5,
-      },
+      roleEl.value,
+      { opacity: 0, y: 10 },
+      { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' },
+      0.2,
     )
 
-    tl.fromTo(
-      taglineEl.value,
-      { opacity: 0, y: 20 },
-      {
-        opacity: 1,
-        y: 0,
-        duration: 0.6,
-        ease: 'power2.out',
+    // Phase 2: Name characters flip in with 3D rotation
+    if (chars.length) {
+      gsap.set(chars, { opacity: 0, y: 80, rotateX: -90 })
+      tl.to(
+        chars,
+        {
+          opacity: 1,
+          y: 0,
+          rotateX: 0,
+          duration: 0.9,
+          stagger: { each: 0.04, from: 'start' },
+          ease: 'power4.out',
+          force3D: true,
+        },
+        0.4,
+      )
+    }
+
+    // Phase 3: Tagline words blur in
+    if (words.length) {
+      gsap.set(words, { opacity: 0, y: 20, filter: 'blur(4px)' })
+      tl.to(
+        words,
+        {
+          opacity: 1,
+          y: 0,
+          filter: 'blur(0px)',
+          duration: 0.6,
+          stagger: { each: 0.06, from: 'start' },
+          ease: 'power2.out',
+        },
+        '-=0.5',
+      )
+    }
+
+    // Scroll parallax: hero text fades + lifts as user scrolls away
+    gsap.to(containerEl.value, {
+      y: -60,
+      opacity: 0,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: '.hero-section',
+        start: 'top top',
+        end: '40% top',
+        scrub: true,
       },
-      '-=0.3',
-    )
-  })
+    })
+  }, containerEl.value!)
+}
+
+// Play when ready signal arrives (from loader)
+watch(
+  () => props.ready,
+  (val) => {
+    if (val) nextTick(playEntrance)
+  },
+)
+
+onMounted(() => {
+  // Fallback: if ready is already true or not provided, play after short delay
+  if (props.ready !== false) {
+    setTimeout(playEntrance, 300)
+  }
 })
 
 onUnmounted(() => {
@@ -42,20 +109,47 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="flex flex-col items-center justify-center text-center px-4">
+  <div ref="containerEl" class="flex flex-col items-center justify-center text-center px-4">
+    <!-- Role label -->
+    <p
+      ref="roleEl"
+      class="font-body text-xs uppercase tracking-[0.2em] text-lavender-400 mb-4 opacity-0"
+    >
+      AI Artist & Educator
+    </p>
+
+    <!-- Name with character splitting -->
     <h1
       ref="nameEl"
       class="font-display font-bold text-hero text-lavender-100 uppercase tracking-tight leading-none"
-      style="clip-path: inset(100% 0 0 0)"
+      style="perspective: 400px"
     >
       Brian Lapinski
     </h1>
 
+    <!-- Tagline with word splitting -->
     <p
       ref="taglineEl"
-      class="font-body text-lg md:text-xl text-lavender-300 font-light mt-4 tracking-wide opacity-0"
+      class="font-body text-lg md:text-xl text-lavender-300 font-light mt-4 tracking-wide"
     >
       Exploring what it means to be human through images
     </p>
   </div>
 </template>
+
+<style scoped>
+:deep(.char) {
+  display: inline-block;
+  will-change: transform, opacity;
+}
+
+:deep(.word) {
+  display: inline-block;
+  will-change: transform, opacity, filter;
+}
+
+:deep(.word + .whitespace) {
+  width: 0.3em;
+  display: inline-block;
+}
+</style>
