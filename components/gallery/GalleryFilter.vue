@@ -13,11 +13,14 @@ const categories = [
 const props = defineProps<{
   modelValue: string
   artworks: Artwork[]
+  allArtworks?: Artwork[]
 }>()
 
 function getCount(catId: string): number {
   if (catId === 'all') return props.artworks.length
-  return props.artworks.filter((a) => a.category === catId).length
+  // Category links show full collection count when allArtworks is provided
+  const source = props.allArtworks || props.artworks
+  return source.filter((a) => a.category === catId).length
 }
 
 const emit = defineEmits<{
