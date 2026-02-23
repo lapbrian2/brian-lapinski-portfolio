@@ -22,10 +22,22 @@
           v-for="link in navLinks"
           :key="link.id"
           :href="`#${link.id}`"
-          class="font-body text-sm uppercase tracking-wider text-lavender-300 hover:text-lavender-100 transition-colors duration-200 hover-reveal"
+          :class="[
+            'relative font-body text-sm uppercase tracking-wider transition-colors duration-200 hover-reveal',
+            activeSection === link.id
+              ? 'text-lavender-100'
+              : 'text-lavender-400 hover:text-lavender-200',
+          ]"
           @click.prevent="scrollToSection(link.id)"
         >
           {{ link.label }}
+          <!-- Active dot indicator -->
+          <span
+            :class="[
+              'absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-accent-red transition-all duration-300',
+              activeSection === link.id ? 'opacity-100 scale-100' : 'opacity-0 scale-0',
+            ]"
+          />
         </a>
       </nav>
 
@@ -68,7 +80,10 @@
           v-for="(link, i) in navLinks"
           :key="link.id"
           :href="`#${link.id}`"
-          class="mobile-link font-display text-4xl font-semibold text-lavender-200 hover:text-accent-red transition-colors duration-200"
+          :class="[
+            'mobile-link font-display text-4xl font-semibold transition-colors duration-200',
+            activeSection === link.id ? 'text-accent-red' : 'text-lavender-200 hover:text-accent-red',
+          ]"
           @click.prevent="scrollToSection(link.id)"
         >
           <span class="inline-block overflow-hidden">
@@ -98,10 +113,12 @@ const navLinks: NavLink[] = [
 const scrolled = ref(false)
 const navHidden = ref(false)
 const mobileOpen = ref(false)
+const activeSection = ref('')
 const mobileOverlayEl = ref<HTMLElement | null>(null)
 const mobileNavEl = ref<HTMLElement | null>(null)
 
 let menuTl: gsap.core.Timeline | null = null
+let observer: IntersectionObserver | null = null
 
 function scrollToTop(): void {
   const { $lenis } = useNuxtApp()
@@ -211,13 +228,36 @@ function handleScroll(): void {
   lastScrollY = y
 }
 
+function setupSectionObserver() {
+  observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          activeSection.value = entry.target.id
+        }
+      })
+    },
+    {
+      rootMargin: '-20% 0px -60% 0px',
+      threshold: 0,
+    },
+  )
+
+  navLinks.forEach((link) => {
+    const section = document.querySelector(`#${link.id}`)
+    if (section) observer!.observe(section)
+  })
+}
+
 onMounted(() => {
   window.addEventListener('scroll', handleScroll, { passive: true })
   handleScroll()
+  nextTick(setupSectionObserver)
 })
 
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll)
   menuTl?.kill()
+  observer?.disconnect()
 })
 </script>
