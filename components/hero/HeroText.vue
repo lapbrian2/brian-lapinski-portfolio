@@ -1,42 +1,43 @@
 <script setup lang="ts">
-/**
- * HeroText.vue
- * Name + tagline overlay with a GSAP clip-path reveal animation on mount.
- */
 import gsap from 'gsap'
 
 const nameEl = ref<HTMLElement | null>(null)
 const taglineEl = ref<HTMLElement | null>(null)
+let ctx: gsap.Context | null = null
 
 onMounted(() => {
   if (!nameEl.value || !taglineEl.value) return
 
-  const tl = gsap.timeline()
+  ctx = gsap.context(() => {
+    const tl = gsap.timeline()
 
-  // 1. Name reveal: slide clip-path upward
-  tl.fromTo(
-    nameEl.value,
-    { clipPath: 'inset(100% 0 0 0)' },
-    {
-      clipPath: 'inset(0 0 0 0)',
-      duration: 0.8,
-      ease: 'power3.out',
-      delay: 0.5,
-    },
-  )
+    tl.fromTo(
+      nameEl.value,
+      { clipPath: 'inset(100% 0 0 0)' },
+      {
+        clipPath: 'inset(0 0 0 0)',
+        duration: 0.8,
+        ease: 'power3.out',
+        delay: 0.5,
+      },
+    )
 
-  // 2. Tagline fade-in (overlaps by 0.3s)
-  tl.fromTo(
-    taglineEl.value,
-    { opacity: 0, y: 20 },
-    {
-      opacity: 1,
-      y: 0,
-      duration: 0.6,
-      ease: 'power2.out',
-    },
-    '-=0.3',
-  )
+    tl.fromTo(
+      taglineEl.value,
+      { opacity: 0, y: 20 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.6,
+        ease: 'power2.out',
+      },
+      '-=0.3',
+    )
+  })
+})
+
+onUnmounted(() => {
+  ctx?.revert()
 })
 </script>
 

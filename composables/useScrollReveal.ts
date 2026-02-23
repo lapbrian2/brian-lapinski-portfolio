@@ -1,4 +1,4 @@
-import { ref, onMounted, onUnmounted, type Ref } from 'vue'
+import { onMounted, onUnmounted, type Ref } from 'vue'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
@@ -32,36 +32,38 @@ export function useScrollReveal(
     children = false,
   } = options
 
-  let trigger: ScrollTrigger | null = null
+  let ctx: gsap.Context | null = null
 
   onMounted(() => {
     if (!element.value) return
 
-    const targets = children ? element.value.children : element.value
+    ctx = gsap.context(() => {
+      const targets = children ? element.value!.children : element.value
 
-    gsap.set(targets, { opacity, y, x })
+      gsap.set(targets, { opacity, y, x })
 
-    trigger = ScrollTrigger.create({
-      trigger: element.value,
-      start,
-      once,
-      onEnter: () => {
-        gsap.to(targets, {
-          opacity: 1,
-          y: 0,
-          x: 0,
-          duration,
-          delay,
-          stagger,
-          ease,
-          force3D: true,
-        })
-      },
-    })
+      ScrollTrigger.create({
+        trigger: element.value,
+        start,
+        once,
+        onEnter: () => {
+          gsap.to(targets, {
+            opacity: 1,
+            y: 0,
+            x: 0,
+            duration,
+            delay,
+            stagger,
+            ease,
+            force3D: true,
+          })
+        },
+      })
+    }, element.value)
   })
 
   onUnmounted(() => {
-    trigger?.kill()
+    ctx?.revert()
   })
 
   return { element }

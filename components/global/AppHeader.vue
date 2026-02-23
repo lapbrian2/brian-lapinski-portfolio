@@ -3,6 +3,7 @@
     :class="[
       'fixed top-0 left-0 w-full z-50 transition-all duration-300 px-6 md:px-12 py-4',
       scrolled ? 'bg-dark-900/95 backdrop-blur-md shadow-lg' : 'bg-transparent',
+      navHidden ? '-translate-y-full' : 'translate-y-0',
     ]"
   >
     <div class="max-w-[1400px] mx-auto flex items-center justify-between">
@@ -21,7 +22,7 @@
           v-for="link in navLinks"
           :key="link.id"
           :href="`#${link.id}`"
-          class="font-body text-sm uppercase tracking-wider text-lavender-300 hover:text-lavender-100 transition-colors duration-200"
+          class="font-body text-sm uppercase tracking-wider text-lavender-300 hover:text-lavender-100 transition-colors duration-200 hover-reveal"
           @click.prevent="scrollToSection(link.id)"
         >
           {{ link.label }}
@@ -78,7 +79,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import gsap from 'gsap'
 
 interface NavLink {
   id: string
@@ -93,23 +94,48 @@ const navLinks: NavLink[] = [
 ]
 
 const scrolled = ref(false)
+const navHidden = ref(false)
 const mobileOpen = ref(false)
 
-function handleScroll(): void {
-  scrolled.value = window.scrollY > 80
-}
-
 function scrollToTop(): void {
-  window.scrollTo({ top: 0, behavior: 'smooth' })
+  const { $lenis } = useNuxtApp()
+  if ($lenis) {
+    ;($lenis as any).scrollTo(0)
+  } else {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
 }
 
 function scrollToSection(sectionId: string): void {
   mobileOpen.value = false
-  document.querySelector(`#${sectionId}`)?.scrollIntoView({ behavior: 'smooth' })
+  const { $lenis } = useNuxtApp()
+  const target = document.querySelector(`#${sectionId}`)
+  if (!target) return
+
+  if ($lenis) {
+    ;($lenis as any).scrollTo(target, { offset: -80 })
+  } else {
+    target.scrollIntoView({ behavior: 'smooth' })
+  }
 }
 
 function toggleMobile(): void {
   mobileOpen.value = !mobileOpen.value
+}
+
+let lastScrollY = 0
+
+function handleScroll(): void {
+  const y = window.scrollY
+  scrolled.value = y > 80
+
+  // Hide nav on scroll down, show on scroll up (desktop only)
+  if (y > 200 && y > lastScrollY && !mobileOpen.value) {
+    navHidden.value = true
+  } else {
+    navHidden.value = false
+  }
+  lastScrollY = y
 }
 
 onMounted(() => {

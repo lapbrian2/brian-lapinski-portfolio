@@ -39,6 +39,12 @@ export default defineNuxtConfig({
     transpile: ['gsap', 'three'],
   },
 
+  vite: {
+    optimizeDeps: {
+      include: ['three', 'gsap'],
+    },
+  },
+
   swiper: {},
 
   image: {
@@ -52,6 +58,12 @@ export default defineNuxtConfig({
       pathPrefix: false,
     },
   ],
+
+  routeRules: {
+    '/images/**': {
+      headers: { 'Cache-Control': 'public, max-age=31536000, immutable' },
+    },
+  },
 
   devtools: { enabled: true },
 })
