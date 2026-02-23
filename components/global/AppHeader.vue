@@ -2,7 +2,7 @@
   <header
     :class="[
       'fixed top-0 left-0 w-full z-50 transition-all duration-300 px-6 md:px-12 py-4',
-      scrolled ? 'bg-dark-900/95 backdrop-blur-md shadow-lg' : 'bg-transparent',
+      scrolled ? 'bg-dark-900/80 backdrop-blur-xl shadow-lg' : 'bg-transparent',
       navHidden ? '-translate-y-full' : 'translate-y-0',
     ]"
   >

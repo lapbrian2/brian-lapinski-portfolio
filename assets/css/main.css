@@ -243,7 +243,7 @@ img {
   }
 }
 
-/* Hover reveal underline for links */
+/* Hover reveal underline — Noomo-style translateX slide */
 .hover-reveal {
   position: relative;
   overflow: hidden;
@@ -256,26 +256,30 @@ img {
   left: 0;
   width: 100%;
   height: 1px;
-  background: var(--color-text-primary);
-  transform: scaleX(0);
-  transform-origin: right;
-  transition: transform 0.4s var(--ease-smooth);
+  background: currentColor;
+  transform: translateX(101%);
+  transition: transform 0.35s cubic-bezier(0.77, 0, 0.175, 1);
 }
 
 .hover-reveal:hover::after {
-  transform: scaleX(1);
-  transform-origin: left;
+  transform: translateX(0);
 }
 
-/* Section spacing */
+/* Section spacing — generous Noomo-level breathing room */
 .section {
-  padding: var(--space-12) var(--space-3);
+  padding: 6rem 1.5rem;
   max-width: 1400px;
   margin: 0 auto;
 }
 
 @media (min-width: 768px) {
   .section {
-    padding: var(--space-16) var(--space-6);
+    padding: 10rem 3rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .section {
+    padding: 12rem 3rem;
   }
 }

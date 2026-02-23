@@ -49,18 +49,18 @@ onMounted(() => {
 
 function onMouseEnter() {
   if (!cardEl.value) return
-  gsap.to(cardEl.value, { scale: 1.04, duration: 0.5, ease: 'power2.out' })
+  gsap.to(cardEl.value, { scale: 1.02, duration: 0.6, ease: 'power2.out' })
   if (titleEl.value) {
-    gsap.fromTo(titleEl.value, { clipPath: 'inset(100% 0 0 0)' }, { clipPath: 'inset(0 0 0 0)', duration: 0.4, ease: 'power3.out' })
+    gsap.fromTo(titleEl.value, { y: '100%', opacity: 0 }, { y: '0%', opacity: 1, duration: 0.4, ease: 'power3.out' })
   }
   if (mediumEl.value) {
-    gsap.fromTo(mediumEl.value, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.3, delay: 0.1, ease: 'power2.out' })
+    gsap.fromTo(mediumEl.value, { opacity: 0, y: 10 }, { opacity: 0.7, y: 0, duration: 0.35, delay: 0.08, ease: 'power2.out' })
   }
 }
 
 function onMouseLeave() {
   if (!cardEl.value) return
-  gsap.to(cardEl.value, { scale: 1, duration: 0.4, ease: 'power2.out' })
+  gsap.to(cardEl.value, { scale: 1, duration: 0.5, ease: 'power2.out' })
 }
 
 function onMouseMove(e: MouseEvent) {
@@ -68,8 +68,8 @@ function onMouseMove(e: MouseEvent) {
   const rect = cardEl.value.getBoundingClientRect()
   const centerX = rect.left + rect.width / 2
   const centerY = rect.top + rect.height / 2
-  const offsetX = (e.clientX - centerX) * 0.02
-  const offsetY = (e.clientY - centerY) * 0.02
+  const offsetX = (e.clientX - centerX) * 0.015
+  const offsetY = (e.clientY - centerY) * 0.015
 
   gsap.to(cardEl.value, {
     rotateY: offsetX,
@@ -81,7 +81,7 @@ function onMouseMove(e: MouseEvent) {
 
 function onMouseLeaveReset() {
   if (!cardEl.value) return
-  gsap.to(cardEl.value, { rotateY: 0, rotateX: 0, duration: 0.6, ease: 'elastic.out(1, 0.5)' })
+  gsap.to(cardEl.value, { rotateY: 0, rotateX: 0, duration: 0.5, ease: 'power3.out' })
   onMouseLeave()
 }
 

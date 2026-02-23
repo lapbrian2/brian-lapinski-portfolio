@@ -19,23 +19,20 @@ onMounted(() => {
   if (!pullquoteEl.value) return
 
   ctx = gsap.context(() => {
-    // Pullquote character reveal on scroll
-    const result = Splitting({ target: pullquoteEl.value!, by: 'chars' })
-    const chars = result[0]?.chars || []
-    if (chars.length) {
-      gsap.set(chars, { opacity: 0, y: 30 })
-      ScrollTrigger.create({
-        trigger: pullquoteEl.value!,
-        start: 'top 80%',
-        once: true,
-        onEnter: () => {
-          gsap.to(chars, {
-            opacity: 1,
-            y: 0,
-            duration: 0.7,
-            stagger: { each: 0.02, from: 'start' },
-            ease: 'power3.out',
-          })
+    // Pullquote: scroll-scrubbed word opacity (Noomo-style progressive reveal)
+    const result = Splitting({ target: pullquoteEl.value!, by: 'words' })
+    const words = result[0]?.words || []
+    if (words.length) {
+      gsap.set(words, { opacity: 0.12 })
+      gsap.to(words, {
+        opacity: 1,
+        stagger: { each: 0.06 },
+        ease: 'none',
+        scrollTrigger: {
+          trigger: pullquoteEl.value!,
+          start: 'top 80%',
+          end: 'bottom 50%',
+          scrub: true,
         },
       })
     }
@@ -107,7 +104,6 @@ const credentials = [
         <p
           ref="pullquoteEl"
           class="font-display text-heading font-semibold text-lavender-100 italic leading-snug"
-          style="perspective: 400px"
         >
           I use images as a way to explore what it means to be human.
         </p>
@@ -138,7 +134,8 @@ const credentials = [
 </template>
 
 <style scoped>
-:deep(.char) {
+:deep(.word) {
   display: inline-block;
+  transition: opacity 0.1s;
 }
 </style>

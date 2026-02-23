@@ -6,15 +6,8 @@ defineProps<{
 
 <template>
   <section class="hero-section relative h-screen w-full overflow-hidden bg-dark-900">
-    <!-- 3D Particle Canvas (client-only since Three.js needs DOM) -->
-    <ClientOnly>
-      <div class="absolute inset-0 z-0">
-        <HeroCanvas />
-      </div>
-    </ClientOnly>
-
-    <!-- Radial gradient overlay: transparent center fading to dark edges -->
-    <div class="hero-gradient absolute inset-0 z-10 pointer-events-none" />
+    <!-- Subtle ambient gradient — no particles, no 3D -->
+    <div class="hero-glow absolute inset-0 z-0 pointer-events-none" />
 
     <!-- Text overlay -->
     <div class="absolute inset-0 z-20 flex items-center justify-center">
@@ -29,12 +22,9 @@ defineProps<{
 </template>
 
 <style scoped>
-.hero-gradient {
-  background: radial-gradient(
-    ellipse at center,
-    rgba(24, 21, 32, 0.3) 0%,
-    rgba(24, 21, 32, 0.9) 70%,
-    #181520 100%
-  );
+.hero-glow {
+  background:
+    radial-gradient(ellipse 60% 50% at 30% 40%, rgba(237, 84, 77, 0.04) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 60% at 70% 60%, rgba(0, 122, 255, 0.03) 0%, transparent 70%);
 }
 </style>
