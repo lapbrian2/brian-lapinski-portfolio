@@ -3,11 +3,11 @@ import gsap from 'gsap'
 import type { Artwork } from '~/types/artwork'
 
 const categories = [
-  { id: 'all', label: 'All' },
-  { id: 'portraits', label: 'Portraits' },
-  { id: 'landscapes', label: 'Landscapes' },
-  { id: 'abstract', label: 'Abstract' },
-  { id: 'surreal', label: 'Surreal' },
+  { id: 'all', label: 'All', isLink: false },
+  { id: 'portraits', label: 'Portraits', isLink: true },
+  { id: 'landscapes', label: 'Landscapes', isLink: true },
+  { id: 'abstract', label: 'Abstract', isLink: true },
+  { id: 'surreal', label: 'Surreal', isLink: true },
 ]
 
 const props = defineProps<{
@@ -65,25 +65,43 @@ onMounted(() => {
       style="will-change: transform, width"
     />
 
-    <button
-      v-for="cat in categories"
-      :key="cat.id"
-      :data-filter="cat.id"
-      :class="[
-        'relative z-10 px-5 py-2 rounded-full text-sm font-body uppercase tracking-wider transition-colors duration-300 cursor-hover inline-flex items-center gap-2',
-        modelValue === cat.id
-          ? 'text-accent-red font-medium'
-          : 'text-lavender-400 hover:text-lavender-200',
-      ]"
-      @click="selectFilter(cat.id)"
-    >
-      {{ cat.label }}
-      <span
+    <template v-for="cat in categories" :key="cat.id">
+      <!-- ALL button stays as filter toggle -->
+      <button
+        v-if="!cat.isLink"
+        :data-filter="cat.id"
         :class="[
-          'text-[10px] tabular-nums transition-colors duration-300',
-          modelValue === cat.id ? 'text-accent-red/60' : 'text-lavender-500/40',
+          'relative z-10 px-5 py-2 rounded-full text-sm font-body uppercase tracking-wider transition-colors duration-300 cursor-hover inline-flex items-center gap-2',
+          modelValue === cat.id
+            ? 'text-accent-red font-medium'
+            : 'text-lavender-400 hover:text-lavender-200',
         ]"
-      >{{ getCount(cat.id) }}</span>
-    </button>
+        @click="selectFilter(cat.id)"
+      >
+        {{ cat.label }}
+        <span
+          :class="[
+            'text-[10px] tabular-nums transition-colors duration-300',
+            modelValue === cat.id ? 'text-accent-red/60' : 'text-lavender-500/40',
+          ]"
+        >{{ getCount(cat.id) }}</span>
+      </button>
+
+      <!-- Category buttons link to their own pages -->
+      <NuxtLink
+        v-else
+        :to="`/${cat.id}`"
+        :data-filter="cat.id"
+        :class="[
+          'relative z-10 px-5 py-2 rounded-full text-sm font-body uppercase tracking-wider transition-colors duration-300 cursor-hover inline-flex items-center gap-2',
+          'text-lavender-400 hover:text-lavender-200',
+        ]"
+        @mouseenter="movePill(cat.id)"
+        @mouseleave="movePill(modelValue)"
+      >
+        {{ cat.label }}
+        <span class="text-[10px] tabular-nums text-lavender-500/40">{{ getCount(cat.id) }}</span>
+      </NuxtLink>
+    </template>
   </div>
 </template>
