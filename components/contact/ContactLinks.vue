@@ -48,7 +48,7 @@ interface ContactLink {
 const links: ContactLink[] = [
   { type: 'LinkedIn', label: 'Brian Lapinski', href: 'https://www.linkedin.com/in/brian-lapinski-a65238352' },
   { type: 'X / Twitter', label: '@Lapbrian2', href: 'https://x.com/Lapbrian2' },
-  { type: 'Instagram', label: '@brianlapinski.art', href: 'https://www.instagram.com/brianlapinski.art' },
+  { type: 'Instagram', label: '@brian_lapinski1', href: 'https://www.instagram.com/brian_lapinski1/' },
 ]
 
 const linksRef = ref<HTMLElement | null>(null)
