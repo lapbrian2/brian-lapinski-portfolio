@@ -203,58 +203,35 @@ html {
   will-change: transform;
 }
 
-/* Custom cursor — dot + trailing ring (desktop only) */
+/* Custom cursor (desktop only) */
 @media (hover: hover) {
-  /* Inner dot — small, solid, follows tightly */
-  .cursor-dot {
+  .custom-cursor {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 6px;
-    height: 6px;
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
-    background: var(--color-accent-red);
+    border: 1px solid var(--color-text-primary);
     pointer-events: none;
     z-index: var(--z-cursor);
-    will-change: transform;
-    transition: width 0.3s ease, height 0.3s ease, background 0.3s ease, opacity 0.3s ease;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+    transform: translate(-50%, -50%);
+    opacity: 0;
   }
 
-  .cursor-dot.hovering {
-    width: 4px;
-    height: 4px;
-    background: var(--color-text-bright);
-    opacity: 0.6;
+  .custom-cursor.active {
+    opacity: 1;
   }
 
-  /* Outer ring — larger, hollow, trails behind with spring physics */
-  .cursor-ring {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    border: 1px solid rgba(201, 210, 231, 0.35);
-    pointer-events: none;
-    z-index: var(--z-cursor);
-    will-change: transform;
-    transition: width 0.35s ease, height 0.35s ease, border-color 0.3s ease, background 0.3s ease;
-  }
-
-  .cursor-ring.hovering {
-    width: 56px;
-    height: 56px;
-    border-color: rgba(201, 210, 231, 0.15);
-    background: rgba(255, 255, 255, 0.03);
+  .custom-cursor.hovering {
+    transform: translate(-50%, -50%) scale(2.5);
+    background: rgba(255, 255, 255, 0.04);
     mix-blend-mode: difference;
   }
 
-  .cursor-ring.has-label {
-    width: 80px;
-    height: 80px;
+  .custom-cursor.has-label {
+    transform: translate(-50%, -50%) scale(4);
+    background: rgba(237, 84, 77, 0.12);
     border-color: rgba(237, 84, 77, 0.5);
-    background: rgba(237, 84, 77, 0.08);
     mix-blend-mode: normal;
   }
 
@@ -264,10 +241,10 @@ html {
     left: 50%;
     transform: translate(-50%, -50%);
     font-family: var(--font-body, 'Inter', sans-serif);
-    font-size: 10px;
+    font-size: 3px;
     font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.08em;
     color: var(--color-text-bright);
     white-space: nowrap;
     pointer-events: none;

@@ -11,11 +11,20 @@ const bioCol = ref<HTMLElement | null>(null)
 const toolsCol = ref<HTMLElement | null>(null)
 
 const stats = [
-  { value: '4+', label: 'Exhibitions' },
-  { value: '6', label: 'Creative Roles' },
-  { value: '100+', label: 'Artworks' },
-  { value: '2024', label: 'Since' },
+  { target: 4, suffix: '+', label: 'Exhibitions' },
+  { target: 6, suffix: '', label: 'Creative Roles' },
+  { target: 100, suffix: '+', label: 'Artworks' },
+  { target: 2024, suffix: '', label: 'Since' },
 ]
+
+// Animated counter values — start at 0, GSAP tweens to target
+const counters = reactive(stats.map(() => ({ value: 0 })))
+const displayValues = computed(() =>
+  stats.map((stat, i) => {
+    const v = Math.round(counters[i].value)
+    return `${v}${stat.suffix}`
+  }),
+)
 
 useSectionTransition(sectionEl, { opacityFrom: 0.2 })
 
@@ -45,7 +54,7 @@ onMounted(async () => {
       })
     }
 
-    // Stats counter entrance
+    // Stats counter entrance + animated number count-up
     if (statsEl.value) {
       const statItems = statsEl.value.querySelectorAll('.stat-item')
       gsap.set(statItems, { opacity: 0, y: 30 })
@@ -54,12 +63,22 @@ onMounted(async () => {
         start: 'top 85%',
         once: true,
         onEnter: () => {
+          // Fade-in + slide-up the stat cards
           gsap.to(statItems, {
             opacity: 1,
             y: 0,
             duration: 0.7,
             stagger: 0.1,
             ease: 'power3.out',
+          })
+          // Animated counter count-up for each stat
+          stats.forEach((stat, i) => {
+            gsap.to(counters[i], {
+              value: stat.target,
+              duration: stat.target > 100 ? 2.2 : 1.4,
+              delay: 0.15 + i * 0.1,
+              ease: 'power2.out',
+            })
           })
         },
       })
@@ -140,9 +159,9 @@ const credentials = [
 
     <!-- Stats row -->
     <div ref="statsEl" class="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 mb-20">
-      <div v-for="stat in stats" :key="stat.label" class="stat-item">
-        <span class="font-display text-3xl md:text-4xl font-bold text-lavender-100 block leading-none mb-2">
-          {{ stat.value }}
+      <div v-for="(stat, index) in stats" :key="stat.label" class="stat-item">
+        <span class="font-display text-3xl md:text-4xl font-bold text-lavender-100 block leading-none mb-2 tabular-nums">
+          {{ displayValues[index] }}
         </span>
         <span class="font-body text-xs uppercase tracking-[0.15em] text-lavender-400/60">
           {{ stat.label }}

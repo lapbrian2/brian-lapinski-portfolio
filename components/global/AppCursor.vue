@@ -1,78 +1,50 @@
 <template>
-  <div class="hidden md:block">
-    <!-- Inner dot — follows cursor tightly -->
-    <div
-      ref="dotEl"
-      class="cursor-dot"
-    />
-    <!-- Outer ring — trails behind with spring physics -->
-    <div
-      ref="ringEl"
-      class="cursor-ring"
-    >
-      <span ref="labelEl" class="cursor-label">{{ cursorText }}</span>
-    </div>
+  <div
+    ref="cursorEl"
+    class="custom-cursor hidden md:block"
+  >
+    <span ref="labelEl" class="cursor-label">{{ cursorText }}</span>
   </div>
 </template>
 
 <script setup lang="ts">
 import gsap from 'gsap'
 
-const dotEl = ref<HTMLElement | null>(null)
-const ringEl = ref<HTMLElement | null>(null)
+const cursorEl = ref<HTMLElement | null>(null)
 const labelEl = ref<HTMLElement | null>(null)
 const cursorText = ref('')
-
-// Positions: dot tracks instantly, ring trails with spring
-const dotPos = { x: 0, y: 0 }
-const ringPos = { x: 0, y: 0 }
-const mousePos = { x: 0, y: 0 }
-let isHovering = false
-let hasLabel = false
+const pos = { x: 0, y: 0 }
 let observer: MutationObserver | null = null
 
 function onMouseMove(e: MouseEvent) {
-  mousePos.x = e.clientX
-  mousePos.y = e.clientY
-}
-
-function tick() {
-  // Dot follows mouse tightly
-  dotPos.x += (mousePos.x - dotPos.x) * 0.35
-  dotPos.y += (mousePos.y - dotPos.y) * 0.35
-
-  // Ring trails behind with softer spring
-  ringPos.x += (mousePos.x - ringPos.x) * 0.12
-  ringPos.y += (mousePos.y - ringPos.y) * 0.12
-
-  if (dotEl.value) {
-    dotEl.value.style.transform = `translate(${dotPos.x}px, ${dotPos.y}px) translate(-50%, -50%)`
-  }
-  if (ringEl.value) {
-    ringEl.value.style.transform = `translate(${ringPos.x}px, ${ringPos.y}px) translate(-50%, -50%)${isHovering ? ' scale(2.5)' : ''}${hasLabel ? ' scale(4)' : ''}`
-  }
+  gsap.to(pos, {
+    x: e.clientX,
+    y: e.clientY,
+    duration: 0.3,
+    ease: 'power2.out',
+    onUpdate: () => {
+      if (!cursorEl.value) return
+      cursorEl.value.style.left = `${pos.x}px`
+      cursorEl.value.style.top = `${pos.y}px`
+    },
+  })
 }
 
 function onMouseEnterInteractive(e: Event) {
   const el = e.currentTarget as HTMLElement
-  isHovering = true
-  dotEl.value?.classList.add('hovering')
-  ringEl.value?.classList.add('hovering')
+  cursorEl.value?.classList.add('hovering')
 
+  // Check for contextual cursor text
   const text = el.dataset.cursorText
   if (text && labelEl.value) {
     cursorText.value = text
-    hasLabel = true
-    ringEl.value?.classList.add('has-label')
+    cursorEl.value?.classList.add('has-label')
     gsap.fromTo(labelEl.value, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.25, ease: 'power2.out' })
   }
 }
 
 function onMouseLeaveInteractive() {
-  isHovering = false
-  hasLabel = false
-  dotEl.value?.classList.remove('hovering')
-  ringEl.value?.classList.remove('hovering', 'has-label')
+  cursorEl.value?.classList.remove('hovering', 'has-label')
   if (labelEl.value) {
     gsap.to(labelEl.value, { opacity: 0, scale: 0.8, duration: 0.15, ease: 'power2.in', onComplete: () => { cursorText.value = '' } })
   }
@@ -90,8 +62,8 @@ function bindInteractiveElements(root: Element | Document = document) {
 }
 
 onMounted(() => {
+  cursorEl.value?.classList.add('active')
   window.addEventListener('mousemove', onMouseMove, { passive: true })
-  gsap.ticker.add(tick)
 
   bindInteractiveElements()
 
@@ -110,7 +82,6 @@ onMounted(() => {
 
 onUnmounted(() => {
   window.removeEventListener('mousemove', onMouseMove)
-  gsap.ticker.remove(tick)
   observer?.disconnect()
 
   document.querySelectorAll('[data-cursor-bound]').forEach((el) => {
