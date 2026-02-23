@@ -11,21 +11,30 @@
 
     <!-- Desktop: horizontal scroll with Swiper -->
     <div class="hidden md:block">
-      <Swiper
-        :slides-per-view="'auto'"
-        :space-between="24"
-        :free-mode="true"
-        :grab-cursor="true"
-        class="px-12 !overflow-visible"
-      >
-        <SwiperSlide
-          v-for="step in steps"
-          :key="step.number"
-          class="!w-[380px]"
+      <ClientOnly>
+        <Swiper
+          :slides-per-view="'auto'"
+          :space-between="24"
+          :free-mode="true"
+          :grab-cursor="true"
+          class="px-12 !overflow-visible"
         >
-          <ProcessStep :step="step" />
-        </SwiperSlide>
-      </Swiper>
+          <SwiperSlide
+            v-for="step in steps"
+            :key="step.number"
+            class="!w-[380px]"
+          >
+            <ProcessStep :step="step" />
+          </SwiperSlide>
+        </Swiper>
+        <template #fallback>
+          <div class="flex gap-6 px-12 overflow-x-auto">
+            <div v-for="step in steps" :key="step.number" class="min-w-[380px]">
+              <ProcessStep :step="step" />
+            </div>
+          </div>
+        </template>
+      </ClientOnly>
     </div>
 
     <!-- Mobile: vertical stack -->

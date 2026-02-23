@@ -46,5 +46,12 @@ export default defineNuxtConfig({
     format: ['webp'],
   },
 
+  components: [
+    {
+      path: '~/components',
+      pathPrefix: false,
+    },
+  ],
+
   devtools: { enabled: true },
 })
