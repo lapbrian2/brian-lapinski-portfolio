@@ -18,20 +18,18 @@
         Have a project, collaboration, or just want to talk about AI art?
       </p>
 
-      <!-- Large email CTA — Noomo-style oversized link -->
-      <a
-        ref="emailCtaEl"
-        href="mailto:brian@lapinski.art"
-        class="group relative inline-flex items-center gap-4 md:gap-6 opacity-0 max-w-full"
-        data-cursor-text="Email"
-      >
-        <span class="font-display text-2xl sm:text-section lg:text-hero font-bold text-lavender-200 group-hover:text-accent-red transition-colors duration-500 leading-none break-all sm:break-normal">
+      <!-- Contact Form -->
+      <div ref="formWrapEl" class="opacity-0">
+        <ContactForm />
+      </div>
+
+      <!-- Direct email fallback -->
+      <p class="font-body text-sm text-lavender-400/60 mt-8 opacity-0" ref="emailFallbackEl">
+        Or email directly at
+        <a href="mailto:brian@lapinski.art" class="text-lavender-300 hover:text-accent-red transition-colors duration-200 underline underline-offset-4">
           brian@lapinski.art
-        </span>
-        <span class="flex-shrink-0 text-lavender-400 group-hover:text-accent-red group-hover:translate-x-3 transition-all duration-500 text-2xl md:text-5xl">
-          &rarr;
-        </span>
-      </a>
+        </a>
+      </p>
     </div>
 
     <!-- Social links below -->
@@ -49,7 +47,8 @@ const sectionEl = ref<HTMLElement | null>(null)
 const labelEl = ref<HTMLElement | null>(null)
 const headingEl = ref<HTMLElement | null>(null)
 const subtitleEl = ref<HTMLElement | null>(null)
-const emailCtaEl = ref<HTMLElement | null>(null)
+const formWrapEl = ref<HTMLElement | null>(null)
+const emailFallbackEl = ref<HTMLElement | null>(null)
 
 useSectionTransition(sectionEl, { scaleFrom: 0.95 })
 
@@ -101,14 +100,24 @@ onMounted(async () => {
             ease: 'power2.out',
           })
 
-          // Email CTA slides in
-          if (emailCtaEl.value) {
-            gsap.to(emailCtaEl.value, {
+          // Form slides in
+          if (formWrapEl.value) {
+            gsap.to(formWrapEl.value, {
               opacity: 1,
               y: 0,
               duration: 0.8,
               delay: 0.7,
               ease: 'power3.out',
+            })
+          }
+
+          // Email fallback fades in
+          if (emailFallbackEl.value) {
+            gsap.to(emailFallbackEl.value, {
+              opacity: 1,
+              duration: 0.5,
+              delay: 1,
+              ease: 'power2.out',
             })
           }
         },
