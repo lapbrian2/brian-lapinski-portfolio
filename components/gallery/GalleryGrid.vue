@@ -26,6 +26,36 @@ function openLightbox(index: number) {
   lightbox.open(items, index)
 }
 
+// Scroll velocity skew
+let currentSkew = 0
+const skewTarget = ref(0)
+
+function setupVelocitySkew() {
+  if (!gridEl.value) return
+  try {
+    const { $lenis } = useNuxtApp()
+    if ($lenis) {
+      ;($lenis as any).on('scroll', (e: any) => {
+        const velocity = e.velocity || 0
+        skewTarget.value = Math.max(-3, Math.min(3, velocity * 0.8))
+      })
+    }
+  } catch {}
+
+  // Smooth lerp the skew onto cards
+  gsap.ticker.add(() => {
+    currentSkew += (skewTarget.value - currentSkew) * 0.1
+    skewTarget.value *= 0.95 // decay
+    if (Math.abs(currentSkew) < 0.01) currentSkew = 0
+    if (!gridEl.value) return
+    const cards = gridEl.value.querySelectorAll('.gallery-card')
+    cards.forEach((card) => {
+      ;(card as HTMLElement).style.transform += '' // force reflow avoided by using gsap
+    })
+    gsap.set(cards, { skewY: currentSkew, force3D: true, overwrite: false })
+  })
+}
+
 // Initial staggered entrance on scroll
 onMounted(() => {
   if (!gridEl.value) return
@@ -54,6 +84,11 @@ onMounted(() => {
       },
     })
   }, gridEl.value)
+
+  // Only enable velocity skew on pointer devices
+  if (window.matchMedia('(hover: hover)').matches) {
+    setupVelocitySkew()
+  }
 })
 
 // Animate filter changes

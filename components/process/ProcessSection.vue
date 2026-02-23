@@ -115,30 +115,57 @@ onMounted(() => {
     // Desktop: scroll-pinned horizontal scroll
     if (!desktopEl.value || !stripEl.value) return
 
-    ctx = gsap.context(() => {
-      const stripWidth = stripEl.value!.scrollWidth
-      const viewWidth = window.innerWidth
-
-      ScrollTrigger.create({
-        trigger: desktopEl.value!,
-        start: 'top top',
-        end: `+=${stripWidth}`,
-        pin: true,
-        scrub: 1,
-        onUpdate: (self) => {
-          gsap.set(stripEl.value!, {
-            x: -self.progress * (stripWidth - viewWidth + 48),
-          })
-          if (progressEl.value) {
-            progressEl.value.style.transform = `scaleX(${self.progress})`
-          }
-        },
-      })
-    }, desktopEl.value)
+    setupDesktopScroll()
   })
 })
 
+function setupDesktopScroll() {
+  ctx?.revert()
+
+  if (!desktopEl.value || !stripEl.value) return
+
+  ctx = gsap.context(() => {
+    const stripWidth = stripEl.value!.scrollWidth
+    const viewWidth = window.innerWidth
+
+    ScrollTrigger.create({
+      trigger: desktopEl.value!,
+      start: 'top top',
+      end: `+=${stripWidth}`,
+      pin: true,
+      scrub: 1,
+      invalidateOnRefresh: true,
+      onUpdate: (self) => {
+        const currentStripWidth = stripEl.value!.scrollWidth
+        const currentViewWidth = window.innerWidth
+        gsap.set(stripEl.value!, {
+          x: -self.progress * (currentStripWidth - currentViewWidth + 48),
+        })
+        if (progressEl.value) {
+          progressEl.value.style.transform = `scaleX(${self.progress})`
+        }
+      },
+    })
+  }, desktopEl.value)
+}
+
+let resizeTimer: ReturnType<typeof setTimeout> | null = null
+
+function onResize() {
+  if (isMobile.value) return
+  if (resizeTimer) clearTimeout(resizeTimer)
+  resizeTimer = setTimeout(() => {
+    setupDesktopScroll()
+  }, 200)
+}
+
+onMounted(() => {
+  window.addEventListener('resize', onResize, { passive: true })
+})
+
 onUnmounted(() => {
+  window.removeEventListener('resize', onResize)
+  if (resizeTimer) clearTimeout(resizeTimer)
   ctx?.revert()
 })
 </script>

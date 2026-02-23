@@ -4,7 +4,6 @@ export default defineNuxtConfig({
   modules: [
     '@tresjs/nuxt',
     '@nuxtjs/tailwindcss',
-    'nuxt-swiper',
     '@nuxt/image',
   ],
 
@@ -45,8 +44,6 @@ export default defineNuxtConfig({
       include: ['three', 'gsap'],
     },
   },
-
-  swiper: {},
 
   image: {
     quality: 80,
