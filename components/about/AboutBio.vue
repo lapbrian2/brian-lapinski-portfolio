@@ -1,7 +1,10 @@
 <template>
   <div ref="bioRef">
-    <h2 class="font-display text-section font-bold text-lavender-100 mb-8">
+    <p class="font-body text-xs uppercase tracking-[0.2em] text-lavender-400/60 mb-4">
       About
+    </p>
+    <h2 class="font-display text-section font-bold text-lavender-100 mb-10 leading-none">
+      The Artist
     </h2>
     <div class="space-y-6">
       <p class="font-body text-base leading-relaxed text-lavender-200">
