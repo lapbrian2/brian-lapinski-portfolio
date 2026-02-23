@@ -29,7 +29,7 @@ function openLightbox(index: number) {
 }
 
 // Masonry-style varied column spans for visual rhythm
-// 11-item pattern: large/medium pairs, triple row, asymmetric pair, then featured
+// 15-item pattern: varied pairs, triple rows, and featured items
 const spanPatterns = [
   'col-span-12 md:col-span-7',   // 1: dominant left
   'col-span-12 md:col-span-5',   // 2: medium right
@@ -42,6 +42,10 @@ const spanPatterns = [
   'col-span-12 md:col-span-4',   // 9: aside
   'col-span-12 md:col-span-6',   // 10: balanced pair
   'col-span-12 md:col-span-6',   // 11: balanced pair
+  'col-span-12 md:col-span-4',   // 12: triple row
+  'col-span-12 md:col-span-4',   // 13: triple row
+  'col-span-12 md:col-span-4',   // 14: triple row
+  'col-span-12 md:col-span-12',  // 15: full-width hero
 ]
 
 function getSpanClass(index: number): string {
