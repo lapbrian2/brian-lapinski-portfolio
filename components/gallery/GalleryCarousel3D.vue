@@ -42,7 +42,7 @@ function startAutoRotate() {
   stopAutoRotate()
   autoTween = gsap.to(currentAngle, {
     value: currentAngle.value - 360,
-    duration: 25,
+    duration: 45,
     ease: 'none',
     repeat: -1,
     onUpdate: applyRotation,
