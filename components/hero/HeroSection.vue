@@ -9,13 +9,23 @@ defineProps<{
     <!-- Ambient gradient orbs — subtle, cinematic -->
     <div class="hero-glow absolute inset-0 z-0 pointer-events-none" />
 
+    <!-- Floating artwork mosaic — atmospheric depth layer -->
+    <ClientOnly>
+      <HeroMosaic class="z-[1]" />
+    </ClientOnly>
+
+    <!-- Interactive particle field — cursor-reactive -->
+    <ClientOnly>
+      <HeroParticles class="z-[2]" />
+    </ClientOnly>
+
     <!-- Horizontal rule accent — thin line at ~70% down -->
     <div class="absolute left-0 right-0 z-10 pointer-events-none" style="top: 68%">
       <div class="hero-rule mx-auto h-px max-w-[200px] bg-gradient-to-r from-transparent via-lavender-400/15 to-transparent" />
     </div>
 
     <!-- Text overlay -->
-    <div class="absolute inset-0 z-20 flex items-center justify-center">
+    <div class="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
       <HeroText :ready="ready" />
     </div>
 
