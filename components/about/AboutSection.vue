@@ -99,26 +99,25 @@ const credentials = [
 <template>
   <section id="about" ref="sectionEl" class="section">
     <!-- Pullquote -->
-    <div class="mb-16">
-      <blockquote class="relative pl-6 border-l-[3px] border-accent-red">
+    <div class="mb-20">
+      <blockquote class="relative pl-8 md:pl-12 border-l-2 border-accent-red/60">
         <p
           ref="pullquoteEl"
-          class="font-display text-heading font-semibold text-lavender-100 italic leading-snug"
+          class="font-display text-section font-semibold text-lavender-100 leading-tight"
         >
           I use images as a way to explore what it means to be human.
         </p>
       </blockquote>
     </div>
 
-    <!-- Credentials row -->
-    <div ref="credentialsEl" class="flex flex-wrap items-center gap-x-6 gap-y-2 mb-16">
-      <span
-        v-for="cred in credentials"
-        :key="cred"
-        class="font-body text-sm text-lavender-400 tracking-wide"
-      >
-        {{ cred }}
-      </span>
+    <!-- Credentials row with separator dots -->
+    <div ref="credentialsEl" class="flex flex-wrap items-center gap-y-2 mb-16">
+      <template v-for="(cred, i) in credentials" :key="cred">
+        <span class="font-body text-sm text-lavender-400 tracking-wide">
+          {{ cred }}
+        </span>
+        <span v-if="i < credentials.length - 1" class="w-1 h-1 rounded-full bg-accent-red/40 mx-4 flex-shrink-0" />
+      </template>
     </div>
 
     <!-- Two-column grid -->
