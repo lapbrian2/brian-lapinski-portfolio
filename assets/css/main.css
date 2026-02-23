@@ -203,48 +203,48 @@ html {
   will-change: transform;
 }
 
-/* Custom cursor (desktop only) */
+/* Custom cursor — dot + trailing ring (desktop only) */
 @media (hover: hover) {
-  .custom-cursor {
+  * {
+    cursor: none !important;
+  }
+
+  .cursor-dot {
     position: fixed;
-    width: 20px;
-    height: 20px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
-    border: 1px solid var(--color-text-primary);
+    background: var(--color-accent-red);
     pointer-events: none;
-    z-index: var(--z-cursor);
-    transition: transform 0.15s ease, opacity 0.15s ease;
+    z-index: calc(var(--z-cursor) + 1);
     transform: translate(-50%, -50%);
     opacity: 0;
+    transition: opacity 0.3s ease;
   }
 
-  .custom-cursor.active {
-    opacity: 1;
-  }
-
-  .custom-cursor.hovering {
-    transform: translate(-50%, -50%) scale(2.5);
-    background: rgba(255, 255, 255, 0.04);
-    mix-blend-mode: difference;
-  }
-
-  .custom-cursor.has-label {
-    transform: translate(-50%, -50%) scale(4);
-    background: rgba(237, 84, 77, 0.12);
-    border-color: rgba(237, 84, 77, 0.5);
-    mix-blend-mode: normal;
+  .cursor-ring {
+    position: fixed;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid rgba(201, 210, 231, 0.15);
+    background: transparent;
+    pointer-events: none;
+    z-index: var(--z-cursor);
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .cursor-label {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
     font-family: var(--font-body, 'Inter', sans-serif);
-    font-size: 3px;
+    font-size: 8px;
     font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.1em;
     color: var(--color-text-bright);
     white-space: nowrap;
     pointer-events: none;

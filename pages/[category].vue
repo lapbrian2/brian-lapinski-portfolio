@@ -38,7 +38,7 @@
     <!-- 3D Carousel -->
     <section class="pb-16">
       <ClientOnly>
-        <GalleryCarousel3D :artworks="categoryArtworks" />
+        <GalleryCarousel3D :artworks="categoryArtworks.slice(0, 12)" />
       </ClientOnly>
     </section>
 
@@ -109,6 +109,18 @@
         </div>
       </div>
     </section>
+
+    <!-- Minimal footer -->
+    <footer class="px-6 md:px-12 pb-10 pt-6 border-t border-lavender-400/10">
+      <div class="max-w-6xl mx-auto flex items-center justify-between">
+        <NuxtLink to="/" class="font-display text-sm font-bold text-lavender-400/50 hover:text-lavender-200 transition-colors">
+          BL
+        </NuxtLink>
+        <p class="font-body text-[11px] text-lavender-400/30">
+          &copy; {{ new Date().getFullYear() }} Brian Lapinski
+        </p>
+      </div>
+    </footer>
 
     <GalleryLightbox />
   </div>
