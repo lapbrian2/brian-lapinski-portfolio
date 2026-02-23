@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Artwork } from '~/data/artworks'
+import type { Artwork } from '~/types/artwork'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { artworks } from '~/data/artworks'
 import { useSectionTransition } from '~/composables/useSectionTransition'
 import { useScrollReveal } from '~/composables/useScrollReveal'
 
+const { artworks } = useArtworks()
 const activeCategory = ref('all')
 const sectionEl = ref<HTMLElement | null>(null)
 const headingEl = ref<HTMLElement | null>(null)
@@ -35,10 +35,10 @@ useScrollReveal(headingEl, { y: 30, stagger: 0.1, children: true })
 
     <!-- Filter bar -->
     <div class="mb-10">
-      <GalleryFilter v-model="activeCategory" />
+      <GalleryFilter v-model="activeCategory" :artworks="artworks" />
     </div>
 
     <!-- Grid -->
-    <GalleryGrid :category="activeCategory" />
+    <GalleryGrid :category="activeCategory" :artworks="artworks" />
   </section>
 </template>

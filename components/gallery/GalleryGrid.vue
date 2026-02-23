@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { artworks, type Artwork } from '~/data/artworks'
+import type { Artwork } from '~/types/artwork'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 const props = defineProps<{
   category: string
+  artworks: Artwork[]
 }>()
 
 const lightbox = useLightbox()
@@ -13,8 +14,8 @@ let ctx: gsap.Context | null = null
 let hasRevealed = false
 
 const filteredArtworks = computed<Artwork[]>(() => {
-  if (props.category === 'all') return artworks
-  return artworks.filter((a) => a.category === props.category)
+  if (props.category === 'all') return props.artworks
+  return props.artworks.filter((a) => a.category === props.category)
 })
 
 function openLightbox(index: number) {

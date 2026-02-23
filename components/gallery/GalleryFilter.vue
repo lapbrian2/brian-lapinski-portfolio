@@ -1,14 +1,23 @@
 <script setup lang="ts">
 import gsap from 'gsap'
-import { categories, artworks } from '~/data/artworks'
+import type { Artwork } from '~/types/artwork'
 
-defineProps<{
+const categories = [
+  { id: 'all', label: 'All' },
+  { id: 'portraits', label: 'Portraits' },
+  { id: 'landscapes', label: 'Landscapes' },
+  { id: 'abstract', label: 'Abstract' },
+  { id: 'surreal', label: 'Surreal' },
+]
+
+const props = defineProps<{
   modelValue: string
+  artworks: Artwork[]
 }>()
 
 function getCount(catId: string): number {
-  if (catId === 'all') return artworks.length
-  return artworks.filter((a) => a.category === catId).length
+  if (catId === 'all') return props.artworks.length
+  return props.artworks.filter((a) => a.category === catId).length
 }
 
 const emit = defineEmits<{
