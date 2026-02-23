@@ -46,7 +46,7 @@ const tools = [
   { name: 'Midjourney', role: 'Primary medium', icon: 'M3 3l10 10M13 3L3 13', href: 'https://www.midjourney.com' },
   { name: 'ImagineArt', role: 'Creative Partner', icon: 'M8 2L2 8l6 6 6-6z', href: 'https://www.imagine.art/' },
   { name: 'Caimera', role: 'Creative Partner', icon: 'M2 4h12v8H2zM5 4V2M11 4V2', href: 'https://caimera.ai' },
-  { name: 'Style DNA', role: 'Methodology', icon: 'M4 2c0 6 8 6 8 12M12 2c0 6-8 6-8 12', href: 'https://styledna.ai' },
+  { name: 'Style DNA', role: 'Methodology', icon: 'M4 2c0 6 8 6 8 12M12 2c0 6-8 6-8 12', href: '' },
   { name: 'House of Curiosity', role: 'AI Architect', icon: 'M8 2L2 6v8l6 0 6 0V6z', href: '' },
   { name: 'Creativa Magazine', role: 'Contributor', icon: 'M3 2h10v12H3zM6 2v12M6 5h4M6 8h3', href: 'https://www.creativamagazine.com' },
 ]

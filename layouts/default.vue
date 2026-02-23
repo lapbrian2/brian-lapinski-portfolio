@@ -9,7 +9,6 @@
     </a>
     <ClientOnly>
       <ScrollProgress />
-      <AppCursor />
     </ClientOnly>
     <AppHeader />
     <main id="main-content" role="main">

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import gsap from 'gsap'
 
-defineProps<{
+const props = defineProps<{
   ready?: boolean
 }>()
 
@@ -17,9 +17,11 @@ const activeIndex = ref(0)
 const imgEls = ref<HTMLElement[]>([])
 let cycleTl: gsap.core.Timeline | null = null
 let kenBurnsTween: gsap.core.Tween | null = null
+let cycleStarted = false
 
-onMounted(() => {
-  if (imgEls.value.length < 2) return
+function startCycle() {
+  if (cycleStarted || imgEls.value.length < 2) return
+  cycleStarted = true
 
   // Set initial state: first image visible, rest hidden
   imgEls.value.forEach((el, i) => {
@@ -60,7 +62,12 @@ onMounted(() => {
   }
 
   scheduleNext()
-})
+}
+
+// Wait for loader to complete before starting the image cycle
+watch(() => props.ready, (isReady) => {
+  if (isReady) startCycle()
+}, { immediate: true })
 
 onUnmounted(() => {
   cycleTl?.kill()
@@ -80,7 +87,7 @@ onUnmounted(() => {
         alt=""
         class="absolute inset-0 w-full h-full object-cover will-change-transform"
         style="opacity: 0"
-        loading="eager"
+        :loading="i === 0 ? 'eager' : 'lazy'"
         draggable="false"
       />
     </div>
