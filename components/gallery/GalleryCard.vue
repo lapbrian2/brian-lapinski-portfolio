@@ -3,10 +3,13 @@ import type { Artwork } from '~/data/artworks'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   artwork: Artwork
   index: number
-}>()
+  fullWidth?: boolean
+}>(), {
+  fullWidth: false,
+})
 
 defineEmits<{
   click: []
@@ -105,7 +108,7 @@ onUnmounted(() => {
   <div
     ref="cardEl"
     class="group relative overflow-hidden rounded-lg cursor-pointer"
-    :class="aspectClasses[artwork.aspect]"
+    :class="fullWidth ? 'aspect-[21/9]' : aspectClasses[artwork.aspect]"
     style="perspective: 600px; transform-style: preserve-3d"
     data-cursor-text="View"
     @click="$emit('click')"

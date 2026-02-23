@@ -29,23 +29,23 @@ function openLightbox(index: number) {
 }
 
 // Masonry-style varied column spans for visual rhythm
-// 15-item pattern: varied pairs, triple rows, and featured items
+// 15-item pattern: varied pairs, triple rows, featured items, cinematic finale
 const spanPatterns = [
-  'col-span-12 md:col-span-7',   // 1: dominant left
-  'col-span-12 md:col-span-5',   // 2: medium right
-  'col-span-12 md:col-span-5',   // 3: medium left
-  'col-span-12 md:col-span-7',   // 4: dominant right
-  'col-span-12 md:col-span-4',   // 5: triple row
-  'col-span-12 md:col-span-4',   // 6: triple row
-  'col-span-12 md:col-span-4',   // 7: triple row
-  'col-span-12 md:col-span-8',   // 8: wide featured
-  'col-span-12 md:col-span-4',   // 9: aside
-  'col-span-12 md:col-span-6',   // 10: balanced pair
-  'col-span-12 md:col-span-6',   // 11: balanced pair
-  'col-span-12 md:col-span-4',   // 12: triple row
-  'col-span-12 md:col-span-4',   // 13: triple row
-  'col-span-12 md:col-span-4',   // 14: triple row
-  'col-span-12 md:col-span-12',  // 15: full-width hero
+  'col-span-12 md:col-span-7',   // 1: The Watcher — dominant left
+  'col-span-12 md:col-span-5',   // 2: Bloom of Decay — medium right
+  'col-span-12 md:col-span-5',   // 3: Primal Scream — medium left
+  'col-span-12 md:col-span-7',   // 4: Chromatic Grief — dominant right
+  'col-span-12 md:col-span-4',   // 5: The Gathering — triple row
+  'col-span-12 md:col-span-4',   // 6: Unspoken — triple row
+  'col-span-12 md:col-span-4',   // 7: Peeling Away — triple row
+  'col-span-12 md:col-span-8',   // 8: Metamorphosis — wide featured
+  'col-span-12 md:col-span-4',   // 9: The Crossing — aside
+  'col-span-12 md:col-span-6',   // 10: Red Sun Garden — balanced
+  'col-span-12 md:col-span-6',   // 11: First Encounter — balanced
+  'col-span-12 md:col-span-4',   // 12: Gorgon's Cry — triple row
+  'col-span-12 md:col-span-4',   // 13: The Watchers — triple row
+  'col-span-12 md:col-span-4',   // 14: The Executive — triple row
+  'col-span-12',                  // 15: City Vortex — full-width cinematic
 ]
 
 function getSpanClass(index: number): string {
@@ -188,6 +188,7 @@ onUnmounted(() => {
       :key="artwork.id"
       :artwork="artwork"
       :index="index"
+      :full-width="getSpanClass(index) === 'col-span-12'"
       class="gallery-card"
       :class="getSpanClass(index)"
       @click="openLightbox(index)"
