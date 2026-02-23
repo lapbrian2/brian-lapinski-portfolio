@@ -27,12 +27,12 @@ onMounted(() => {
   })
 
   // Ken Burns on first image
-  kenBurnsTween = gsap.to(imgEls.value[0], { scale: 1.06, duration: 7, ease: 'none' })
+  kenBurnsTween = gsap.to(imgEls.value[0], { scale: 1.06, duration: 4.5, ease: 'none' })
 
   // Start crossfade cycle after initial display
   const scheduleNext = () => {
     cycleTl = gsap.timeline()
-    cycleTl.call(crossfade, [], '+=5.5')
+    cycleTl.call(crossfade, [], '+=3')
   }
 
   const crossfade = () => {
@@ -53,10 +53,10 @@ onMounted(() => {
     })
 
     // Crossfade
-    tl.to(currentEl, { opacity: 0, duration: 1.8, ease: 'power2.inOut' }, 0)
-    tl.to(nextEl, { opacity: 0.4, duration: 1.8, ease: 'power2.inOut' }, 0)
+    tl.to(currentEl, { opacity: 0, duration: 1.2, ease: 'power2.inOut' }, 0)
+    tl.to(nextEl, { opacity: 0.4, duration: 1.2, ease: 'power2.inOut' }, 0)
     // Ken Burns on incoming image
-    tl.to(nextEl, { scale: 1.06, duration: 7, ease: 'none' }, 0)
+    tl.to(nextEl, { scale: 1.06, duration: 4.5, ease: 'none' }, 0)
   }
 
   scheduleNext()

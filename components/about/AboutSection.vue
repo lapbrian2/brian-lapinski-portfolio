@@ -9,6 +9,7 @@ const statsEl = ref<HTMLElement | null>(null)
 const credentialsEl = ref<HTMLElement | null>(null)
 const bioCol = ref<HTMLElement | null>(null)
 const toolsCol = ref<HTMLElement | null>(null)
+const artworkAnchorEl = ref<HTMLElement | null>(null)
 
 const stats = [
   { target: 4, suffix: '+', label: 'Exhibitions' },
@@ -128,6 +129,24 @@ onMounted(async () => {
         },
       })
     }
+
+    // Artwork anchor — subtle parallax + scale on scroll
+    if (artworkAnchorEl.value) {
+      const img = artworkAnchorEl.value.querySelector('img')
+      if (img) {
+        gsap.to(img, {
+          y: -30,
+          scale: 1.04,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: artworkAnchorEl.value,
+            start: 'top bottom',
+            end: 'bottom top',
+            scrub: true,
+          },
+        })
+      }
+    }
   }, sectionEl.value!)
 })
 
@@ -179,13 +198,33 @@ const credentials = [
       </template>
     </div>
 
-    <!-- Two-column grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start">
-      <div ref="bioCol">
+    <!-- Two-column: bio + sticky artwork anchor -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+      <!-- Left: bio + tools stacked -->
+      <div ref="bioCol" class="lg:col-span-7 space-y-16">
         <AboutBio />
-      </div>
-      <div ref="toolsCol">
         <AboutTools />
+      </div>
+
+      <!-- Right: sticky artwork image -->
+      <div ref="toolsCol" class="lg:col-span-5">
+        <div class="lg:sticky lg:top-24">
+          <div ref="artworkAnchorEl" class="relative overflow-hidden rounded-lg">
+            <img
+              src="/images/artworks/peeling-away.webp"
+              alt="Peeling Away — a self-portrait of unmasking"
+              class="w-full h-auto object-cover will-change-transform"
+              loading="lazy"
+              draggable="false"
+            />
+            <!-- Subtle bottom gradient for caption -->
+            <div class="absolute inset-0 bg-gradient-to-t from-dark-900/60 via-transparent to-transparent pointer-events-none" />
+            <div class="absolute bottom-0 left-0 right-0 p-5">
+              <p class="font-display text-sm text-lavender-100/80 leading-tight">Peeling Away</p>
+              <p class="font-body text-[10px] uppercase tracking-[0.15em] text-lavender-400/50 mt-1">Midjourney &middot; 2025</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </section>

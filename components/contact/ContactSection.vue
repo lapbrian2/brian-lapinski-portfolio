@@ -1,6 +1,15 @@
 <template>
-  <section id="contact" ref="sectionEl" class="section">
-    <div class="max-w-5xl mx-auto">
+  <section id="contact" ref="sectionEl" class="section relative overflow-hidden">
+    <!-- Warm radial glow — reveals on scroll -->
+    <div
+      ref="glowEl"
+      class="absolute pointer-events-none"
+      style="top: -10%; left: 50%; transform: translateX(-50%); width: 120%; height: 80%; opacity: 0"
+    >
+      <div class="w-full h-full rounded-full" style="background: radial-gradient(ellipse 50% 60% at 50% 40%, rgba(237, 84, 77, 0.08) 0%, rgba(237, 84, 77, 0.03) 40%, transparent 70%)" />
+    </div>
+
+    <div class="max-w-5xl mx-auto relative z-10">
       <!-- Label -->
       <p ref="labelEl" class="font-body text-xs uppercase tracking-[0.2em] text-lavender-400 mb-8 opacity-0">
         Get in touch
@@ -33,7 +42,7 @@
     </div>
 
     <!-- Social links below -->
-    <div class="mt-20">
+    <div class="mt-20 relative z-10">
       <ContactLinks />
     </div>
   </section>
@@ -49,6 +58,7 @@ const headingEl = ref<HTMLElement | null>(null)
 const subtitleEl = ref<HTMLElement | null>(null)
 const formWrapEl = ref<HTMLElement | null>(null)
 const emailFallbackEl = ref<HTMLElement | null>(null)
+const glowEl = ref<HTMLElement | null>(null)
 
 useSectionTransition(sectionEl, { scaleFrom: 0.95 })
 
@@ -60,6 +70,21 @@ onMounted(async () => {
   const { default: Splitting } = await import('splitting')
 
   ctx = gsap.context(() => {
+    // Warm glow reveal — scrub-driven radial pulse
+    if (glowEl.value) {
+      gsap.to(glowEl.value, {
+        opacity: 1,
+        scale: 1.1,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: sectionEl.value!,
+          start: 'top 80%',
+          end: 'top 20%',
+          scrub: true,
+        },
+      })
+    }
+
     // Character-level split animation from center
     const result = Splitting({ target: headingEl.value!, by: 'chars' })
     const chars = result[0]?.chars || []
