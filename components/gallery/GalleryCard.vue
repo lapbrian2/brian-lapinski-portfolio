@@ -15,6 +15,8 @@ const aspectClasses: Record<Artwork['aspect'], string> = {
   wide: 'aspect-[4/3]',
   square: 'aspect-square',
 }
+
+const imgLoaded = ref(false)
 </script>
 
 <template>
@@ -23,8 +25,20 @@ const aspectClasses: Record<Artwork['aspect'], string> = {
     :class="aspectClasses[artwork.aspect]"
     @click="$emit('click')"
   >
-    <!-- Placeholder image / colored background -->
+    <!-- Real image -->
+    <img
+      v-if="artwork.src"
+      :src="artwork.src"
+      :alt="artwork.title"
+      class="absolute inset-0 w-full h-full object-cover transition-opacity duration-500"
+      :class="imgLoaded ? 'opacity-100' : 'opacity-0'"
+      loading="lazy"
+      @load="imgLoaded = true"
+    >
+
+    <!-- Placeholder (shows while image loads or if no src) -->
     <div
+      v-if="!imgLoaded"
       class="absolute inset-0 w-full h-full bg-dark-700 bg-gradient-to-br from-dark-700 to-dark-800 flex items-center justify-center"
     >
       <span class="font-display text-sm text-lavender-400 text-center px-4 select-none">
@@ -34,7 +48,7 @@ const aspectClasses: Record<Artwork['aspect'], string> = {
 
     <!-- Hover overlay -->
     <div
-      class="absolute inset-0 bg-gradient-to-t from-dark-900/80 to-transparent opacity-0 translate-y-2 transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0 flex items-end"
+      class="absolute inset-0 bg-gradient-to-t from-dark-900/80 via-transparent to-transparent opacity-0 translate-y-2 transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0 flex items-end"
     >
       <div class="p-6">
         <h3 class="font-display text-lg text-lavender-100">

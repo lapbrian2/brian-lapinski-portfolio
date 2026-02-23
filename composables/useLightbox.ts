@@ -10,6 +10,16 @@ const isOpen = ref(false)
 const items = ref<LightboxItem[]>([])
 const currentIndex = ref(0)
 
+function getLenis(): any {
+  if (typeof window === 'undefined') return null
+  try {
+    const nuxtApp = useNuxtApp()
+    return nuxtApp.$lenis || null
+  } catch {
+    return null
+  }
+}
+
 export function useLightbox() {
   const currentItem = computed(() => items.value[currentIndex.value] || null)
   const hasNext = computed(() => currentIndex.value < items.value.length - 1)
@@ -19,12 +29,12 @@ export function useLightbox() {
     items.value = allItems
     currentIndex.value = startIndex
     isOpen.value = true
-    document.body.style.overflow = 'hidden'
+    getLenis()?.stop()
   }
 
   function close() {
     isOpen.value = false
-    document.body.style.overflow = ''
+    getLenis()?.start()
   }
 
   function next() {

@@ -10,6 +10,7 @@ import gsap from 'gsap'
 
 const cursorEl = ref<HTMLElement | null>(null)
 const pos = { x: 0, y: 0 }
+let observer: MutationObserver | null = null
 
 function onMouseMove(e: MouseEvent) {
   gsap.to(pos, {
@@ -33,20 +34,45 @@ function onMouseLeaveInteractive() {
   cursorEl.value?.classList.remove('hovering')
 }
 
+const INTERACTIVE_SELECTOR = 'a, button, [role="button"], .cursor-hover'
+
+function bindInteractiveElements(root: Element | Document = document) {
+  root.querySelectorAll(INTERACTIVE_SELECTOR).forEach((el) => {
+    // Avoid double-binding by checking a data attribute
+    if ((el as HTMLElement).dataset.cursorBound) return
+    ;(el as HTMLElement).dataset.cursorBound = '1'
+    el.addEventListener('mouseenter', onMouseEnterInteractive)
+    el.addEventListener('mouseleave', onMouseLeaveInteractive)
+  })
+}
+
 onMounted(() => {
   cursorEl.value?.classList.add('active')
   window.addEventListener('mousemove', onMouseMove, { passive: true })
 
-  // Track interactive elements
-  document.querySelectorAll('a, button, [role="button"]').forEach((el) => {
-    el.addEventListener('mouseenter', onMouseEnterInteractive)
-    el.addEventListener('mouseleave', onMouseLeaveInteractive)
+  // Bind existing interactive elements
+  bindInteractiveElements()
+
+  // Watch for dynamically added elements (Vue renders, route changes, etc.)
+  observer = new MutationObserver((mutations) => {
+    for (const mutation of mutations) {
+      for (const node of mutation.addedNodes) {
+        if (node instanceof HTMLElement) {
+          // Bind any interactive elements inside the new node
+          bindInteractiveElements(node)
+        }
+      }
+    }
   })
+
+  observer.observe(document.body, { childList: true, subtree: true })
 })
 
 onUnmounted(() => {
   window.removeEventListener('mousemove', onMouseMove)
-  document.querySelectorAll('a, button, [role="button"]').forEach((el) => {
+  observer?.disconnect()
+
+  document.querySelectorAll('[data-cursor-bound]').forEach((el) => {
     el.removeEventListener('mouseenter', onMouseEnterInteractive)
     el.removeEventListener('mouseleave', onMouseLeaveInteractive)
   })

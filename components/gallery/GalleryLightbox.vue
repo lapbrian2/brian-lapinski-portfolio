@@ -55,11 +55,20 @@ onUnmounted(() => {
       <!-- Content area -->
       <div
         v-if="lightbox.currentItem.value"
-        class="flex flex-col items-center px-16"
+        class="flex flex-col items-center px-6 md:px-16 max-w-5xl w-full"
         @click.stop
       >
-        <!-- Image placeholder -->
+        <!-- Image -->
+        <img
+          v-if="lightbox.currentItem.value.src"
+          :src="lightbox.currentItem.value.src"
+          :alt="lightbox.currentItem.value.title"
+          class="max-w-full max-h-[80vh] w-auto h-auto rounded-lg object-contain"
+        >
+
+        <!-- Fallback if no image -->
         <div
+          v-else
           class="max-w-4xl w-full max-h-[80vh] bg-dark-700 bg-gradient-to-br from-dark-700 to-dark-800 rounded-lg flex items-center justify-center aspect-[4/3]"
         >
           <span class="font-display text-lg text-lavender-400 select-none">
