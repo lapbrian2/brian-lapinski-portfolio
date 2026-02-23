@@ -28,6 +28,12 @@ let ctx: gsap.Context | null = null
 
 onMounted(() => {
   if (!cardEl.value) return
+
+  // Safety: force imgLoaded after timeout in case @load doesn't fire (SSR hydration edge case)
+  setTimeout(() => {
+    if (!imgLoaded.value) imgLoaded.value = true
+  }, 3000)
+
   // Only enable magnetic + parallax on pointer devices
   if (!window.matchMedia('(hover: hover)').matches) return
 
@@ -114,7 +120,8 @@ onUnmounted(() => {
       :alt="artwork.title"
       class="card-img absolute inset-0 w-full h-full object-cover transition-opacity duration-500"
       :class="imgLoaded ? 'opacity-100' : 'opacity-0'"
-      loading="lazy"
+      loading="eager"
+      fetchpriority="low"
       @load="imgLoaded = true"
     >
 

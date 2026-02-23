@@ -22,13 +22,13 @@
       <a
         ref="emailCtaEl"
         href="mailto:brian@lapinski.art"
-        class="group relative inline-flex items-center gap-6 opacity-0"
+        class="group relative inline-flex items-center gap-4 md:gap-6 opacity-0 max-w-full"
         data-cursor-text="Email"
       >
-        <span class="font-display text-section md:text-hero font-bold text-lavender-200 group-hover:text-accent-red transition-colors duration-500 leading-none">
+        <span class="font-display text-2xl sm:text-section lg:text-hero font-bold text-lavender-200 group-hover:text-accent-red transition-colors duration-500 leading-none break-all sm:break-normal">
           brian@lapinski.art
         </span>
-        <span class="inline-block text-lavender-400 group-hover:text-accent-red group-hover:translate-x-3 transition-all duration-500 text-3xl md:text-5xl">
+        <span class="flex-shrink-0 text-lavender-400 group-hover:text-accent-red group-hover:translate-x-3 transition-all duration-500 text-2xl md:text-5xl">
           &rarr;
         </span>
       </a>

@@ -90,7 +90,7 @@ onMounted(() => {
 
     ScrollTrigger.create({
       trigger: gridEl.value!,
-      start: 'top 85%',
+      start: 'top 90%',
       once: true,
       onEnter: () => {
         hasRevealed = true
@@ -105,6 +105,23 @@ onMounted(() => {
         })
       },
     })
+
+    // Safety net: if ScrollTrigger hasn't fired after 2.5s, reveal cards anyway
+    // This handles edge cases where the section is already in view on load
+    setTimeout(() => {
+      if (!hasRevealed) {
+        hasRevealed = true
+        gsap.to(cards, {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.8,
+          stagger: { each: 0.08, from: 'start' },
+          ease: 'power3.out',
+          force3D: true,
+        })
+      }
+    }, 2500)
   }, gridEl.value)
 
   // Only enable velocity skew on pointer devices
