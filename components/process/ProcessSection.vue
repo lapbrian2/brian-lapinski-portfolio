@@ -24,10 +24,12 @@
       </div>
 
       <div class="h-screen flex items-center">
-        <div ref="stripEl" class="flex gap-8 pl-12 pr-24">
-          <div v-for="step in steps" :key="step.number" class="w-[420px] flex-shrink-0">
+        <div ref="stripEl" class="flex gap-8 pl-12">
+          <div v-for="step in steps" :key="step.number" class="w-[380px] flex-shrink-0">
             <ProcessStep :step="step" />
           </div>
+          <!-- Spacer so last card can fully enter view -->
+          <div class="w-12 flex-shrink-0" />
         </div>
       </div>
     </div>
@@ -134,19 +136,21 @@ function setupDesktopScroll() {
   ctx = gsap.context(() => {
     const stripWidth = stripEl.value!.scrollWidth
     const viewWidth = window.innerWidth
+    const scrollDistance = stripWidth - viewWidth + 100 // extra breathing room
 
     ScrollTrigger.create({
       trigger: desktopEl.value!,
       start: 'top top',
-      end: `+=${stripWidth}`,
+      end: `+=${Math.max(scrollDistance, stripWidth * 0.6)}`,
       pin: true,
       scrub: 1,
       invalidateOnRefresh: true,
       onUpdate: (self) => {
         const currentStripWidth = stripEl.value!.scrollWidth
         const currentViewWidth = window.innerWidth
+        const maxScroll = currentStripWidth - currentViewWidth + 100
         gsap.set(stripEl.value!, {
-          x: -self.progress * (currentStripWidth - currentViewWidth + 48),
+          x: -self.progress * maxScroll,
         })
         if (progressEl.value) {
           progressEl.value.style.transform = `scaleX(${self.progress})`
