@@ -205,11 +205,11 @@ onUnmounted(() => {
       <!-- Content area — image fills viewport -->
       <div
         v-if="lightbox.currentItem.value"
-        class="relative flex items-center justify-center w-full h-full px-16 md:px-24 py-20"
+        class="relative flex items-center justify-center w-full h-full px-4 md:px-20 py-14"
         @click.stop="toggleCaption"
       >
         <!-- Image -->
-        <div ref="imageEl" class="relative flex items-center justify-center max-w-full max-h-full">
+        <div ref="imageEl" class="relative flex items-center justify-center w-full h-full">
           <!-- Loading spinner -->
           <div
             v-if="!imageLoaded && lightbox.currentItem.value.src"
@@ -223,11 +223,11 @@ onUnmounted(() => {
             :key="lightbox.currentIndex.value"
             :src="lightbox.currentItem.value.src"
             :alt="lightbox.currentItem.value.title"
-            width="1800"
-            height="1400"
+            width="2400"
+            height="1800"
             format="webp"
-            quality="90"
-            class="lightbox-image max-w-full max-h-[88vh] w-auto h-auto rounded-lg object-contain select-none"
+            quality="92"
+            class="lightbox-image max-w-full max-h-full w-auto h-auto object-contain select-none"
             :class="imageLoaded ? 'opacity-100' : 'opacity-0'"
             draggable="false"
             @load="onImageLoad"
@@ -236,7 +236,7 @@ onUnmounted(() => {
           <!-- Fallback if no image -->
           <div
             v-else
-            class="w-full max-h-[88vh] bg-gradient-to-br from-dark-700 to-dark-800 rounded-lg flex items-center justify-center aspect-[4/3]"
+            class="max-w-4xl w-full bg-gradient-to-br from-dark-700 to-dark-800 rounded-lg flex items-center justify-center aspect-[4/3]"
           >
             <span class="font-display text-lg text-lavender-400 select-none">
               {{ lightbox.currentItem.value.title }}
