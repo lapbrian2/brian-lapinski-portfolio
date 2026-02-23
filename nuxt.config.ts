@@ -70,10 +70,22 @@ export default defineNuxtConfig({
     },
   ],
 
+  runtimeConfig: {
+    tursoUrl: process.env.TURSO_DATABASE_URL || '',
+    tursoAuthToken: process.env.TURSO_AUTH_TOKEN || '',
+    resendApiKey: process.env.RESEND_API_KEY || '',
+    resendFromEmail: process.env.RESEND_FROM_EMAIL || 'noreply@lapinski.art',
+    contactNotificationEmail: process.env.CONTACT_NOTIFICATION_EMAIL || 'brian@lapinski.art',
+    adminPassword: process.env.ADMIN_PASSWORD || '',
+    adminSessionSecret: process.env.ADMIN_SESSION_SECRET || '',
+    blobToken: process.env.BLOB_READ_WRITE_TOKEN || '',
+  },
+
   routeRules: {
     '/images/**': {
       headers: { 'Cache-Control': 'public, max-age=31536000, immutable' },
     },
+    '/admin/**': { ssr: false },
   },
 
   devtools: { enabled: true },
