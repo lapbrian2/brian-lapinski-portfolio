@@ -1,12 +1,19 @@
 <template>
   <section id="process" ref="sectionEl" class="overflow-hidden">
     <div class="max-w-[1400px] mx-auto px-6 md:px-12 pt-24 md:pt-32">
-      <h2 ref="headingEl" class="font-display text-section font-bold text-lavender-100 mb-4">
-        Process
-      </h2>
-      <p class="font-body text-lg text-lavender-300 mb-12 max-w-2xl">
-        From concept to final piece &mdash; how AI art comes to life.
-      </p>
+      <div ref="headingEl">
+        <p class="font-body text-xs uppercase tracking-[0.2em] text-lavender-400/60 mb-4">
+          Process
+        </p>
+        <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12">
+          <h2 class="font-display text-section font-bold text-lavender-100 leading-none">
+            From Feeling to Form
+          </h2>
+          <p class="font-body text-base text-lavender-300 max-w-sm md:text-right">
+            How AI art comes to life &mdash; a reproducible creative methodology.
+          </p>
+        </div>
+      </div>
     </div>
 
     <!-- Desktop: scroll-pinned horizontal -->
@@ -17,8 +24,8 @@
       </div>
 
       <div class="h-screen flex items-center">
-        <div ref="stripEl" class="flex gap-6 pl-12 pr-24">
-          <div v-for="step in steps" :key="step.number" class="w-[380px] flex-shrink-0">
+        <div ref="stripEl" class="flex gap-8 pl-12 pr-24">
+          <div v-for="step in steps" :key="step.number" class="w-[420px] flex-shrink-0">
             <ProcessStep :step="step" />
           </div>
         </div>
