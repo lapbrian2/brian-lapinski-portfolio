@@ -14,6 +14,9 @@ const currentAngle = ref(0)
 const isDragging = ref(false)
 const autoRotate = ref(true)
 
+// Track which images have loaded
+const loadedImages = reactive(new Set<string>())
+
 const count = computed(() => props.artworks.length)
 const angleStep = computed(() => count.value > 0 ? 360 / count.value : 360)
 
@@ -24,7 +27,6 @@ const radius = computed(() => {
   if (n <= 6) return 380
   if (n <= 10) return 450
   // For large counts, use circumference math: C = n * cardWidth, r = C / (2*PI)
-  // Card width ~300px with some gap
   return Math.min(700, Math.round((n * 200) / (2 * Math.PI)))
 })
 
@@ -127,6 +129,10 @@ function openArtwork(index: number) {
   lightbox.open(items, index)
 }
 
+function onImageLoad(id: string) {
+  loadedImages.add(id)
+}
+
 onMounted(() => {
   nextTick(() => {
     applyRotation()
@@ -162,6 +168,14 @@ onUnmounted(() => {
           @click.stop="openArtwork(i)"
         >
           <div class="card-inner">
+            <!-- Shimmer placeholder -->
+            <div
+              v-if="!loadedImages.has(artwork.id)"
+              class="absolute inset-0 bg-dark-700 overflow-hidden"
+            >
+              <div class="shimmer absolute inset-0" />
+            </div>
+
             <NuxtImg
               :src="artwork.src"
               :alt="artwork.title"
@@ -169,8 +183,10 @@ onUnmounted(() => {
               height="740"
               format="webp"
               quality="80"
-              class="card-image"
+              class="card-image transition-opacity duration-500"
+              :class="loadedImages.has(artwork.id) ? 'opacity-100' : 'opacity-0'"
               draggable="false"
+              @load="onImageLoad(artwork.id)"
             />
             <div class="card-overlay">
               <h3 class="card-title">{{ artwork.title }}</h3>
@@ -284,6 +300,22 @@ onUnmounted(() => {
   font-family: 'Inter', sans-serif;
   font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.6);
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(42, 34, 64, 0) 0%,
+    rgba(42, 34, 64, 0.4) 50%,
+    rgba(42, 34, 64, 0) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 
 @media (max-width: 768px) {

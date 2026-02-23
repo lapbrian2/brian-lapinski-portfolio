@@ -10,6 +10,7 @@ const credentialsEl = ref<HTMLElement | null>(null)
 const bioCol = ref<HTMLElement | null>(null)
 const toolsCol = ref<HTMLElement | null>(null)
 const artworkAnchorEl = ref<HTMLElement | null>(null)
+const aboutImgLoaded = ref(false)
 
 const stats = [
   { target: 4, suffix: '+', label: 'Exhibitions' },
@@ -210,12 +211,21 @@ const credentials = [
       <div ref="toolsCol" class="lg:col-span-5">
         <div class="lg:sticky lg:top-24">
           <div ref="artworkAnchorEl" class="relative overflow-hidden rounded-lg">
+            <!-- Shimmer placeholder -->
+            <div
+              v-if="!aboutImgLoaded"
+              class="absolute inset-0 bg-dark-700 overflow-hidden z-[1]"
+            >
+              <div class="about-shimmer absolute inset-0" />
+            </div>
             <img
               src="/images/artworks/peeling-away.webp"
               alt="Peeling Away — a self-portrait of unmasking"
-              class="w-full h-auto object-cover will-change-transform"
+              class="w-full h-auto object-cover will-change-transform transition-opacity duration-700"
+              :class="aboutImgLoaded ? 'opacity-100' : 'opacity-0'"
               loading="lazy"
               draggable="false"
+              @load="aboutImgLoaded = true"
             />
             <!-- Subtle bottom gradient for caption -->
             <div class="absolute inset-0 bg-gradient-to-t from-dark-900/60 via-transparent to-transparent pointer-events-none" />
@@ -234,5 +244,21 @@ const credentials = [
 :deep(.word) {
   display: inline-block;
   transition: opacity 0.1s;
+}
+
+.about-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(42, 34, 64, 0) 0%,
+    rgba(42, 34, 64, 0.4) 50%,
+    rgba(42, 34, 64, 0) 100%
+  );
+  background-size: 200% 100%;
+  animation: about-shimmer 1.5s infinite;
+}
+
+@keyframes about-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 </style>

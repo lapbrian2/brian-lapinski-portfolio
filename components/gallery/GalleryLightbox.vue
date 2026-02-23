@@ -210,12 +210,17 @@ onUnmounted(() => {
       >
         <!-- Image -->
         <div ref="imageEl" class="relative flex items-center justify-center w-full h-full">
-          <!-- Loading spinner -->
+          <!-- Loading indicator -->
           <div
             v-if="!imageLoaded && lightbox.currentItem.value.src"
-            class="absolute inset-0 flex items-center justify-center"
+            class="absolute inset-0 flex flex-col items-center justify-center gap-4"
           >
-            <div class="w-10 h-10 border-2 border-lavender-400/20 border-t-lavender-100 rounded-full animate-spin" />
+            <div class="relative w-12 h-12">
+              <div class="absolute inset-0 rounded-full border border-lavender-400/10" />
+              <div class="absolute inset-0 rounded-full border border-transparent border-t-accent-red/60 animate-spin" style="animation-duration: 0.8s" />
+              <div class="absolute inset-1.5 rounded-full border border-transparent border-b-lavender-300/30 animate-spin" style="animation-duration: 1.4s; animation-direction: reverse" />
+            </div>
+            <span class="font-body text-[10px] uppercase tracking-[0.2em] text-lavender-400/40">Loading</span>
           </div>
 
           <NuxtImg

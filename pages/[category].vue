@@ -55,7 +55,14 @@
             class="artwork-card group bg-dark-800/50 border border-lavender-400/10 rounded-2xl overflow-hidden hover:border-accent-red/30 transition-all duration-300 cursor-pointer"
             @click="openLightbox(artwork)"
           >
-            <div class="aspect-[4/3] overflow-hidden">
+            <div class="aspect-[4/3] overflow-hidden relative">
+              <!-- Shimmer placeholder -->
+              <div
+                v-if="!gridLoadedImages.has(artwork.id)"
+                class="absolute inset-0 bg-dark-700 overflow-hidden z-[1]"
+              >
+                <div class="grid-shimmer absolute inset-0" />
+              </div>
               <NuxtImg
                 :src="artwork.src"
                 :alt="artwork.title"
@@ -64,8 +71,10 @@
                 sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 format="webp"
                 quality="80"
-                class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                class="w-full h-full object-cover transition-all duration-500 group-hover:scale-105"
+                :class="gridLoadedImages.has(artwork.id) ? 'opacity-100' : 'opacity-0'"
                 loading="lazy"
+                @load="gridLoadedImages.add(artwork.id)"
               />
             </div>
             <div class="p-5">
@@ -129,6 +138,9 @@ const heroEl = ref<HTMLElement | null>(null)
 const gridHeadingEl = ref<HTMLElement | null>(null)
 const gridEl = ref<HTMLElement | null>(null)
 const navEl = ref<HTMLElement | null>(null)
+
+// Track loaded images for grid shimmer states
+const gridLoadedImages = reactive(new Set<string>())
 
 const categoryArtworks = computed(() =>
   artworks.value.filter((a: Artwork) => a.category === category.value)
@@ -258,3 +270,21 @@ useHead({
   ],
 })
 </script>
+
+<style scoped>
+.grid-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(42, 34, 64, 0) 0%,
+    rgba(42, 34, 64, 0.4) 50%,
+    rgba(42, 34, 64, 0) 100%
+  );
+  background-size: 200% 100%;
+  animation: grid-shimmer 1.5s infinite;
+}
+
+@keyframes grid-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+</style>
