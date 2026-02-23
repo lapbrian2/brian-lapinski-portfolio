@@ -5,7 +5,7 @@
  * with per-particle colors, subtle drift animation, and mouse parallax.
  */
 import * as THREE from 'three'
-import { useRenderLoop } from '@tresjs/core'
+import { useLoop } from '@tresjs/core'
 
 // ---------------------------------------------------------------------------
 // Responsive particle count
@@ -141,12 +141,17 @@ onUnmounted(() => {
 })
 
 // ---------------------------------------------------------------------------
-// Animation loop
+// Animation loop (useLoop replaces deprecated useRenderLoop in TresJS v4+)
 // ---------------------------------------------------------------------------
-const { onLoop } = useRenderLoop()
+const { onBeforeRender } = useLoop()
 
-onLoop(({ elapsed }) => {
+let startTime = 0
+
+onBeforeRender(({ delta }) => {
   if (!points.value) return
+
+  startTime += delta
+  const elapsed = startTime
 
   const posAttr = points.value.geometry.getAttribute('position') as THREE.BufferAttribute
   const positions = posAttr.array as Float32Array
