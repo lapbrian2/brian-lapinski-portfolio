@@ -8,6 +8,7 @@ const props = defineProps<{
 const containerEl = ref<HTMLElement | null>(null)
 const roleEl = ref<HTMLElement | null>(null)
 const nameEl = ref<HTMLElement | null>(null)
+const accentLineEl = ref<HTMLElement | null>(null)
 const taglineEl = ref<HTMLElement | null>(null)
 
 let ctx: gsap.Context | null = null
@@ -56,7 +57,19 @@ async function playEntrance() {
       )
     }
 
-    // Phase 3: Tagline words blur in
+    // Phase 3: Accent line draws in from center
+    if (accentLineEl.value) {
+      const lineL = accentLineEl.value.querySelector('.accent-line-l')
+      const lineR = accentLineEl.value.querySelector('.accent-line-r')
+      const dot = accentLineEl.value.querySelector('.accent-dot')
+
+      tl.to(accentLineEl.value, { opacity: 1, duration: 0.01 }, '-=0.3')
+      if (dot) tl.to(dot, { scale: 1, duration: 0.4, ease: 'back.out(3)' }, '-=0.3')
+      if (lineL) tl.to(lineL, { scaleX: 1, duration: 0.5, ease: 'power2.out' }, '-=0.2')
+      if (lineR) tl.to(lineR, { scaleX: 1, duration: 0.5, ease: 'power2.out' }, '<')
+    }
+
+    // Phase 4: Tagline words blur in
     if (words.length) {
       gsap.set(words, { opacity: 0, y: 20, filter: 'blur(4px)' })
       tl.to(
@@ -69,7 +82,7 @@ async function playEntrance() {
           stagger: { each: 0.06, from: 'start' },
           ease: 'power2.out',
         },
-        '-=0.5',
+        '-=0.3',
       )
     }
 
@@ -128,10 +141,17 @@ onUnmounted(() => {
       Brian Lapinski
     </h1>
 
+    <!-- Animated accent line -->
+    <div ref="accentLineEl" class="mt-6 mb-5 flex items-center gap-3 opacity-0">
+      <div class="h-px w-8 bg-accent-red/60 origin-left scale-x-0 accent-line-l" />
+      <span class="w-1.5 h-1.5 rounded-full bg-accent-red/40 scale-0 accent-dot" />
+      <div class="h-px w-8 bg-accent-red/60 origin-right scale-x-0 accent-line-r" />
+    </div>
+
     <!-- Tagline with word splitting -->
     <p
       ref="taglineEl"
-      class="font-body text-lg md:text-xl text-lavender-300/80 font-light mt-6 tracking-wide max-w-lg"
+      class="font-body text-lg md:text-xl text-lavender-300/80 font-light tracking-wide max-w-lg"
     >
       Exploring what it means to be human through images
     </p>

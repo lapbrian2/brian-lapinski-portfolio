@@ -5,9 +5,17 @@ import { useSectionTransition } from '~/composables/useSectionTransition'
 import { useScrollReveal } from '~/composables/useScrollReveal'
 const sectionEl = ref<HTMLElement | null>(null)
 const pullquoteEl = ref<HTMLElement | null>(null)
+const statsEl = ref<HTMLElement | null>(null)
 const credentialsEl = ref<HTMLElement | null>(null)
 const bioCol = ref<HTMLElement | null>(null)
 const toolsCol = ref<HTMLElement | null>(null)
+
+const stats = [
+  { value: '4+', label: 'Exhibitions' },
+  { value: '6', label: 'Creative Roles' },
+  { value: '100+', label: 'Artworks' },
+  { value: '2024', label: 'Since' },
+]
 
 useSectionTransition(sectionEl, { opacityFrom: 0.2 })
 
@@ -33,6 +41,26 @@ onMounted(async () => {
           start: 'top 80%',
           end: 'bottom 50%',
           scrub: true,
+        },
+      })
+    }
+
+    // Stats counter entrance
+    if (statsEl.value) {
+      const statItems = statsEl.value.querySelectorAll('.stat-item')
+      gsap.set(statItems, { opacity: 0, y: 30 })
+      ScrollTrigger.create({
+        trigger: statsEl.value,
+        start: 'top 85%',
+        once: true,
+        onEnter: () => {
+          gsap.to(statItems, {
+            opacity: 1,
+            y: 0,
+            duration: 0.7,
+            stagger: 0.1,
+            ease: 'power3.out',
+          })
         },
       })
     }
@@ -108,6 +136,18 @@ const credentials = [
           I use images as a way to explore what it means to be human.
         </p>
       </blockquote>
+    </div>
+
+    <!-- Stats row -->
+    <div ref="statsEl" class="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 mb-20">
+      <div v-for="stat in stats" :key="stat.label" class="stat-item">
+        <span class="font-display text-3xl md:text-4xl font-bold text-lavender-100 block leading-none mb-2">
+          {{ stat.value }}
+        </span>
+        <span class="font-body text-xs uppercase tracking-[0.15em] text-lavender-400/60">
+          {{ stat.label }}
+        </span>
+      </div>
     </div>
 
     <!-- Credentials row with separator dots -->

@@ -8,25 +8,29 @@
     </h2>
     <div class="space-y-6">
       <p class="font-body text-base leading-relaxed text-lavender-200">
-        I use images as a way to explore what it means to be human. My work is
-        rooted in personal exploration, emotion, and connection &mdash; not trends or
-        technique for its own sake.
+        I didn't come to AI art through technology &mdash; I came through a need to
+        understand something about myself. Every piece I create starts with a
+        feeling, a question, or a moment of genuine curiosity about the human
+        experience.
       </p>
       <p class="font-body text-base leading-relaxed text-lavender-300">
-        I'm interested in images that speak without words and create a quiet
-        connection between people. Through creating and teaching, I see
-        image-making as a form of self-discovery and shared understanding.
+        I'm drawn to images that speak without words. The ones that stop you for
+        a second and create a quiet connection between strangers. That's what I
+        chase &mdash; not trends, not technique for its own sake, but emotional truth.
       </p>
       <p class="font-body text-base leading-relaxed text-lavender-300">
-        As AI Architect at The House of Curiosity, Creative Partner at ImagineArt
-        and Caimera, and a contributor to Creativa Magazine Volume 7, my practice
-        bridges art and education &mdash; using my Style DNA methodology to treat image
-        generation as a reproducible craft rather than random experimentation.
+        Teaching is central to what I do. As AI Architect at The House of Curiosity,
+        Creative Partner at ImagineArt and Caimera, and a contributor to Creativa
+        Magazine Volume 7, I help others discover their own creative voice through
+        AI. My Style DNA methodology treats prompt engineering as a reproducible
+        craft &mdash; giving artists a framework to translate inner vision into
+        language machines can interpret.
       </p>
       <p class="font-body text-base leading-relaxed text-lavender-300">
-        My work has been exhibited internationally including Dream AI Gallery (NJ),
-        Fundaci&oacute;n Nestl&eacute; Barcelona, FNAC Asturias, and Art Innovation
-        Gallery New York.
+        My work has been exhibited internationally &mdash; Dream AI Gallery in New
+        Jersey, Fundaci&oacute;n Nestl&eacute; Barcelona, FNAC Asturias, and Art
+        Innovation Gallery in New York. Each exhibition is a conversation with a
+        new audience, and that's what keeps this practice alive.
       </p>
     </div>
   </div>

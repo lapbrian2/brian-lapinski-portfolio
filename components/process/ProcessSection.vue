@@ -136,21 +136,24 @@ function setupDesktopScroll() {
   ctx = gsap.context(() => {
     const stripWidth = stripEl.value!.scrollWidth
     const viewWidth = window.innerWidth
-    const scrollDistance = stripWidth - viewWidth + 100 // extra breathing room
+    // How far the strip needs to move so the last card is fully visible
+    const maxTranslate = Math.max(0, stripWidth - viewWidth + 60)
+    // Scroll distance should feel natural — 1:1 ratio with some padding
+    const scrollEnd = Math.max(maxTranslate + 300, viewWidth * 0.8)
 
     ScrollTrigger.create({
       trigger: desktopEl.value!,
       start: 'top top',
-      end: `+=${Math.max(scrollDistance, stripWidth * 0.6)}`,
+      end: `+=${scrollEnd}`,
       pin: true,
       scrub: 1,
       invalidateOnRefresh: true,
       onUpdate: (self) => {
         const currentStripWidth = stripEl.value!.scrollWidth
         const currentViewWidth = window.innerWidth
-        const maxScroll = currentStripWidth - currentViewWidth + 100
+        const currentMaxTranslate = Math.max(0, currentStripWidth - currentViewWidth + 60)
         gsap.set(stripEl.value!, {
-          x: -self.progress * maxScroll,
+          x: -self.progress * currentMaxTranslate,
         })
         if (progressEl.value) {
           progressEl.value.style.transform = `scaleX(${self.progress})`

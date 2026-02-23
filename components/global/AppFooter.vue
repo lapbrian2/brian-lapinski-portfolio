@@ -103,6 +103,7 @@ interface SocialLink {
 const socialLinks: SocialLink[] = [
   { label: 'LinkedIn', href: 'https://www.linkedin.com/in/brian-lapinski-a65238352' },
   { label: 'X / Twitter', href: 'https://x.com/Lapbrian2' },
+  { label: 'Instagram', href: 'https://www.instagram.com/brianlapinski.art' },
 ]
 
 const navLinks = [
