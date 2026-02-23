@@ -54,6 +54,7 @@ function getSpanClass(index: number): string {
 // Scroll velocity skew
 let currentSkew = 0
 const skewTarget = ref(0)
+let skewTickerFn: (() => void) | null = null
 
 function setupVelocitySkew() {
   if (!gridEl.value) return
@@ -68,17 +69,15 @@ function setupVelocitySkew() {
   } catch {}
 
   // Smooth lerp the skew onto cards
-  gsap.ticker.add(() => {
+  skewTickerFn = () => {
     currentSkew += (skewTarget.value - currentSkew) * 0.1
     skewTarget.value *= 0.95 // decay
     if (Math.abs(currentSkew) < 0.01) currentSkew = 0
     if (!gridEl.value) return
     const cards = gridEl.value.querySelectorAll('.gallery-card')
-    cards.forEach((card) => {
-      ;(card as HTMLElement).style.transform += '' // force reflow avoided by using gsap
-    })
     gsap.set(cards, { skewY: currentSkew, force3D: true, overwrite: false })
-  })
+  }
+  gsap.ticker.add(skewTickerFn)
 }
 
 // Initial staggered entrance on scroll
@@ -179,6 +178,7 @@ watch(
 )
 
 onUnmounted(() => {
+  if (skewTickerFn) gsap.ticker.remove(skewTickerFn)
   ctx?.revert()
 })
 </script>

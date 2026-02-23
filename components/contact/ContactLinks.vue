@@ -14,6 +14,7 @@
         target="_blank"
         rel="noopener noreferrer"
         class="link-card group relative overflow-hidden rounded-xl border border-lavender-400/8 bg-dark-800/40 backdrop-blur-sm p-8 flex flex-col items-center text-center transition-colors duration-500 hover:border-lavender-400/20 opacity-0"
+        :data-color="link.color"
         data-cursor-text="Open"
         @mouseenter="onEnter($event.currentTarget as HTMLElement)"
         @mouseleave="onLeave($event.currentTarget as HTMLElement)"
@@ -26,12 +27,8 @@
 
         <!-- Icon -->
         <div
-          class="relative z-10 w-14 h-14 rounded-full flex items-center justify-center mb-6 border transition-all duration-500"
-          :class="[
-            `border-[${link.color}]/15`,
-            `group-hover:border-[${link.color}]/40`,
-          ]"
-          :style="`background: linear-gradient(135deg, ${link.color}08, ${link.color}04); transition: border-color 0.5s, box-shadow 0.5s`"
+          class="icon-ring relative z-10 w-14 h-14 rounded-full flex items-center justify-center mb-6 transition-all duration-500"
+          :style="`border: 1px solid ${link.color}25; background: linear-gradient(135deg, ${link.color}08, ${link.color}04)`"
         >
           <!-- LinkedIn -->
           <svg v-if="link.id === 'linkedin'" width="20" height="20" viewBox="0 0 24 24" fill="none" class="text-lavender-300 transition-colors duration-300 group-hover:text-lavender-100">
@@ -146,17 +143,27 @@ onUnmounted(() => {
 
 function onEnter(el: HTMLElement) {
   const arrow = el.querySelector('.link-arrow')
+  const ring = el.querySelector('.icon-ring')
+  const color = el.dataset.color || '#ed544d'
   gsap.to(el, { y: -4, duration: 0.4, ease: 'power2.out' })
   if (arrow) {
-    gsap.to(arrow, { scale: 1.15, y: -2, rotation: 0, duration: 0.3, ease: 'power2.out' })
+    gsap.to(arrow, { scale: 1.15, y: -2, duration: 0.3, ease: 'power2.out' })
+  }
+  if (ring) {
+    gsap.to(ring, { borderColor: `${color}60`, boxShadow: `0 0 20px ${color}15`, duration: 0.4, ease: 'power2.out' })
   }
 }
 
 function onLeave(el: HTMLElement) {
   const arrow = el.querySelector('.link-arrow')
+  const ring = el.querySelector('.icon-ring')
+  const color = el.dataset.color || '#ed544d'
   gsap.to(el, { y: 0, duration: 0.4, ease: 'power2.out' })
   if (arrow) {
-    gsap.to(arrow, { scale: 1, y: 0, rotation: 0, duration: 0.3, ease: 'power2.out' })
+    gsap.to(arrow, { scale: 1, y: 0, duration: 0.3, ease: 'power2.out' })
+  }
+  if (ring) {
+    gsap.to(ring, { borderColor: `${color}25`, boxShadow: '0 0 0 transparent', duration: 0.4, ease: 'power2.out' })
   }
 }
 </script>

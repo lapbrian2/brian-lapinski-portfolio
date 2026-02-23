@@ -26,13 +26,13 @@ onMounted(() => {
     gsap.set(el, { opacity: i === 0 ? 0.4 : 0, scale: 1 })
   })
 
-  // Ken Burns on first image
-  kenBurnsTween = gsap.to(imgEls.value[0], { scale: 1.06, duration: 4.5, ease: 'none' })
+  // Ken Burns on first image — fast zoom to feel alive
+  kenBurnsTween = gsap.to(imgEls.value[0], { scale: 1.1, duration: 2.5, ease: 'none' })
 
-  // Start crossfade cycle after initial display
+  // Start crossfade cycle — rapid fire, no dead time
   const scheduleNext = () => {
     cycleTl = gsap.timeline()
-    cycleTl.call(crossfade, [], '+=3')
+    cycleTl.call(crossfade, [], '+=0.8')
   }
 
   const crossfade = () => {
@@ -52,11 +52,11 @@ onMounted(() => {
       },
     })
 
-    // Crossfade
-    tl.to(currentEl, { opacity: 0, duration: 1.2, ease: 'power2.inOut' }, 0)
-    tl.to(nextEl, { opacity: 0.4, duration: 1.2, ease: 'power2.inOut' }, 0)
+    // Crossfade — rapid, almost overlapping
+    tl.to(currentEl, { opacity: 0, duration: 0.6, ease: 'power2.inOut' }, 0)
+    tl.to(nextEl, { opacity: 0.45, duration: 0.6, ease: 'power2.inOut' }, 0)
     // Ken Burns on incoming image
-    tl.to(nextEl, { scale: 1.06, duration: 4.5, ease: 'none' }, 0)
+    tl.to(nextEl, { scale: 1.1, duration: 2.5, ease: 'none' }, 0)
   }
 
   scheduleNext()

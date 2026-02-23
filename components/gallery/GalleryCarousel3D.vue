@@ -17,12 +17,15 @@ const autoRotate = ref(true)
 const count = computed(() => props.artworks.length)
 const angleStep = computed(() => count.value > 0 ? 360 / count.value : 360)
 
-// Radius depends on item count — more items = wider circle
+// Radius — sized so cards don't overlap but never balloon past viewport
 const radius = computed(() => {
   const n = count.value
-  if (n <= 3) return 280
-  if (n <= 5) return 380
-  return Math.max(420, n * 60)
+  if (n <= 3) return 300
+  if (n <= 6) return 380
+  if (n <= 10) return 450
+  // For large counts, use circumference math: C = n * cardWidth, r = C / (2*PI)
+  // Card width ~300px with some gap
+  return Math.min(700, Math.round((n * 200) / (2 * Math.PI)))
 })
 
 // Active card index based on current rotation
@@ -42,7 +45,7 @@ function startAutoRotate() {
   stopAutoRotate()
   autoTween = gsap.to(currentAngle, {
     value: currentAngle.value - 360,
-    duration: 60,
+    duration: 80,
     ease: 'none',
     repeat: -1,
     onUpdate: applyRotation,
@@ -199,9 +202,9 @@ onUnmounted(() => {
 
 .carousel-scene {
   width: 100%;
-  height: 440px;
-  perspective: 1200px;
-  overflow: hidden;
+  height: 480px;
+  perspective: 1600px;
+  overflow: visible;
   cursor: grab;
   touch-action: pan-y;
 }
@@ -222,12 +225,11 @@ onUnmounted(() => {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 280px;
-  height: 370px;
-  margin-left: -140px;
-  margin-top: -185px;
+  width: 260px;
+  height: 350px;
+  margin-left: -130px;
+  margin-top: -175px;
   transform-style: preserve-3d;
-  backface-visibility: hidden;
 }
 
 .card-inner {
@@ -286,14 +288,14 @@ onUnmounted(() => {
 
 @media (max-width: 768px) {
   .carousel-scene {
-    height: 350px;
+    height: 380px;
   }
 
   .carousel-card {
-    width: 220px;
-    height: 290px;
-    margin-left: -110px;
-    margin-top: -145px;
+    width: 200px;
+    height: 270px;
+    margin-left: -100px;
+    margin-top: -135px;
   }
 }
 </style>

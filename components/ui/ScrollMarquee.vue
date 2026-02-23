@@ -17,6 +17,7 @@ const stripEl = ref<HTMLElement | null>(null)
 let ctx: gsap.Context | null = null
 let velocityOffset = 0
 let velocityTarget = 0
+let tickerFn: (() => void) | null = null
 
 onMounted(() => {
   if (!containerEl.value || !stripEl.value) return
@@ -50,17 +51,19 @@ onMounted(() => {
   } catch {}
 
   // Smooth lerp the velocity offset and apply via GSAP ticker
-  gsap.ticker.add(() => {
+  tickerFn = () => {
     velocityOffset += (velocityTarget - velocityOffset) * 0.08
     velocityTarget *= 0.92 // decay
     if (Math.abs(velocityOffset) < 0.01) velocityOffset = 0
     if (stripEl.value && Math.abs(velocityOffset) > 0.01) {
       gsap.set(stripEl.value, { x: `+=${velocityOffset * 0.5}`, overwrite: false })
     }
-  })
+  }
+  gsap.ticker.add(tickerFn)
 })
 
 onUnmounted(() => {
+  if (tickerFn) gsap.ticker.remove(tickerFn)
   ctx?.revert()
 })
 
