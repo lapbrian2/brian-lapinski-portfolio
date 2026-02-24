@@ -36,7 +36,7 @@ useScrollReveal(headingEl, { y: 30, stagger: 0.1, children: true })
 </script>
 
 <template>
-  <section id="work" ref="sectionEl" class="section">
+  <section id="work" ref="sectionEl" class="section relative">
     <!-- Heading area -->
     <div ref="headingEl" class="mb-16">
       <div class="flex items-center gap-3 mb-4">

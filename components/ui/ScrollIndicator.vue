@@ -1,9 +1,19 @@
 <script setup lang="ts">
-const visible = ref(true)
+const props = withDefaults(defineProps<{
+  ready?: boolean
+}>(), {
+  ready: false,
+})
+
+const visible = ref(false)
 
 function onScroll() {
-  visible.value = window.scrollY < 100
+  visible.value = props.ready && window.scrollY < 100
 }
+
+watch(() => props.ready, (isReady) => {
+  if (isReady) onScroll()
+})
 
 onMounted(() => {
   window.addEventListener('scroll', onScroll, { passive: true })

@@ -164,7 +164,7 @@ const credentials = [
 </script>
 
 <template>
-  <section id="about" ref="sectionEl" class="section">
+  <section id="about" ref="sectionEl" class="section relative">
     <!-- Pullquote -->
     <div class="mb-20">
       <blockquote class="relative pl-8 md:pl-12 border-l-2 border-accent-red/60">

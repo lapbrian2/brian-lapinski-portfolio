@@ -93,8 +93,8 @@ const repeated = computed(() => {
 <style scoped>
 .marquee-text {
   color: transparent;
-  -webkit-text-stroke: 1px rgba(201, 210, 231, 0.08);
-  text-stroke: 1px rgba(201, 210, 231, 0.08);
-  text-shadow: 0 0 40px rgba(237, 84, 77, 0.02);
+  -webkit-text-stroke: 1px rgba(201, 210, 231, 0.12);
+  text-stroke: 1px rgba(201, 210, 231, 0.12);
+  text-shadow: 0 0 40px rgba(237, 84, 77, 0.04);
 }
 </style>

@@ -22,25 +22,47 @@ useHead({
   })),
 })
 
+const emit = defineEmits<{
+  'first-frame-ready': []
+}>()
+
+const heroTextDone = ref(false)
+
 const activeIndex = ref(0)
 const imgEls = ref<HTMLElement[]>([])
 let cycleTl: gsap.core.Timeline | null = null
 let kenBurnsTween: gsap.core.Tween | null = null
 let cycleStarted = false
+let firstFrameShown = false
 
-function startCycle() {
+// Phase A: Immediately bring the first image to target opacity (no Ken Burns yet).
+// This runs as soon as the loader signals bridge-ready, giving the hero a visible
+// background before the loader's curtain wipe reveals it.
+function showFirstImage(): void {
+  if (firstFrameShown || imgEls.value.length < 2) return
+  firstFrameShown = true
+
+  imgEls.value.forEach((el, i) => {
+    gsap.set(el, { opacity: 0, scale: 1 })
+  })
+
+  gsap.to(imgEls.value[0], {
+    opacity: 0.55,
+    duration: 0.3,
+    ease: 'power2.out',
+    onComplete: () => emit('first-frame-ready'),
+  })
+}
+
+// Phase B: Start the Ken Burns zoom and crossfade cycle.
+// Called shortly after the first frame is visible.
+function startCycle(): void {
   if (cycleStarted || imgEls.value.length < 2) return
   cycleStarted = true
-
-  // Set initial state: first image visible, rest hidden
-  imgEls.value.forEach((el, i) => {
-    gsap.set(el, { opacity: i === 0 ? 0.4 : 0, scale: 1 })
-  })
 
   // Ken Burns on first image — fast zoom to feel alive
   kenBurnsTween = gsap.to(imgEls.value[0], { scale: 1.1, duration: 2.5, ease: 'none', force3D: true })
 
-  // Start crossfade cycle — rapid fire, no dead time
   const scheduleNext = () => {
     cycleTl = gsap.timeline()
     cycleTl.call(crossfade, [], '+=2.0')
@@ -53,7 +75,6 @@ function startCycle() {
     const nextEl = imgEls.value[next]
     if (!currentEl || !nextEl) return
 
-    // Reset next image scale
     gsap.set(nextEl, { scale: 1, opacity: 0 })
 
     const tl = gsap.timeline({
@@ -63,19 +84,20 @@ function startCycle() {
       },
     })
 
-    // Crossfade — rapid, almost overlapping
     tl.to(currentEl, { opacity: 0, duration: 0.6, ease: 'power2.inOut' }, 0)
-    tl.to(nextEl, { opacity: 0.4, duration: 0.6, ease: 'power2.inOut' }, 0)
-    // Ken Burns on incoming image
+    tl.to(nextEl, { opacity: 0.55, duration: 0.6, ease: 'power2.inOut' }, 0)
     tl.to(nextEl, { scale: 1.1, duration: 2.5, ease: 'none', force3D: true }, 0)
   }
 
   scheduleNext()
 }
 
-// Wait for loader to complete before starting the image cycle
+// When ready flips to true, show the first image immediately,
+// then kick off Ken Burns + crossfade cycle after a short beat.
 watch(() => props.ready, (isReady) => {
-  if (isReady) startCycle()
+  if (!isReady) return
+  showFirstImage()
+  setTimeout(startCycle, 400)
 }, { immediate: true })
 
 onUnmounted(() => {
@@ -114,12 +136,12 @@ onUnmounted(() => {
 
     <!-- Text overlay -->
     <div class="absolute inset-0 z-20 flex items-center justify-center">
-      <HeroText :ready="ready" />
+      <HeroText :ready="ready" @entrance-complete="heroTextDone = true" />
     </div>
 
     <!-- Scroll indicator pinned to bottom center -->
     <div class="absolute bottom-10 left-1/2 -translate-x-1/2 z-20">
-      <ScrollIndicator />
+      <ScrollIndicator :ready="heroTextDone" />
     </div>
   </section>
 </template>
@@ -133,9 +155,9 @@ onUnmounted(() => {
   background:
     linear-gradient(to bottom,
       rgba(24, 21, 32, 0.7) 0%,
-      rgba(24, 21, 32, 0.3) 35%,
-      rgba(24, 21, 32, 0.25) 50%,
-      rgba(24, 21, 32, 0.4) 70%,
+      rgba(24, 21, 32, 0.35) 35%,
+      rgba(24, 21, 32, 0.3) 50%,
+      rgba(24, 21, 32, 0.45) 70%,
       rgba(24, 21, 32, 0.85) 100%
     );
 }

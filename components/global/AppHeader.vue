@@ -18,11 +18,22 @@
       </a>
 
       <!-- Desktop Navigation -->
-      <nav class="hidden md:flex items-center gap-8" aria-label="Main navigation">
+      <nav
+        ref="desktopNavEl"
+        class="hidden md:flex items-center gap-8 relative"
+        aria-label="Main navigation"
+      >
+        <div
+          ref="navPillEl"
+          class="absolute bottom-0 h-0.5 bg-accent-red rounded-full transition-opacity duration-300"
+          :class="activeSection ? 'opacity-100' : 'opacity-0'"
+          style="will-change: transform, width"
+        />
         <a
           v-for="link in navLinks"
           :key="link.id"
           :href="`#${link.id}`"
+          :data-nav="link.id"
           :class="[
             'relative font-body text-sm uppercase tracking-wider transition-colors duration-200 hover-reveal',
             activeSection === link.id
@@ -33,13 +44,6 @@
           @click.prevent="scrollToSection(link.id)"
         >
           {{ link.label }}
-          <!-- Active dot indicator -->
-          <span
-            :class="[
-              'absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-accent-red transition-all duration-300',
-              activeSection === link.id ? 'opacity-100 scale-100' : 'opacity-0 scale-0',
-            ]"
-          />
         </a>
       </nav>
 
@@ -120,6 +124,8 @@ const scrolled = ref(false)
 const navHidden = ref(false)
 const mobileOpen = ref(false)
 const activeSection = ref('')
+const desktopNavEl = ref<HTMLElement | null>(null)
+const navPillEl = ref<HTMLElement | null>(null)
 const mobileOverlayEl = ref<HTMLElement | null>(null)
 const mobileNavEl = ref<HTMLElement | null>(null)
 const hamburgerEl = ref<HTMLElement | null>(null)
@@ -297,6 +303,23 @@ function handleScroll(): void {
   lastScrollY = y
 }
 
+function moveNavPill(sectionId: string): void {
+  if (!desktopNavEl.value || !navPillEl.value) return
+  const link = desktopNavEl.value.querySelector(`[data-nav="${sectionId}"]`) as HTMLElement | null
+  if (!link) return
+
+  const navRect = desktopNavEl.value.getBoundingClientRect()
+  const linkRect = link.getBoundingClientRect()
+
+  gsap.to(navPillEl.value, {
+    x: linkRect.left - navRect.left,
+    width: linkRect.width,
+    duration: 0.4,
+    ease: 'power3.out',
+    overwrite: 'auto',
+  })
+}
+
 function setupSectionObserver() {
   observer = new IntersectionObserver(
     (entries) => {
@@ -318,11 +341,20 @@ function setupSectionObserver() {
   })
 }
 
+watch(activeSection, (newSection) => {
+  if (newSection) {
+    moveNavPill(newSection)
+  }
+})
+
 onMounted(() => {
   window.addEventListener('scroll', handleScroll, { passive: true })
   window.addEventListener('keydown', handleKeydown)
   handleScroll()
   nextTick(setupSectionObserver)
+  nextTick(() => {
+    if (activeSection.value) moveNavPill(activeSection.value)
+  })
 })
 
 onUnmounted(() => {

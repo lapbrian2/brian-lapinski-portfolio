@@ -1,6 +1,6 @@
 <template>
   <div>
-    <AppLoader @complete="onLoaderComplete" />
+    <AppLoader @complete="onLoaderComplete" @bridge-ready="onBridgeReady" />
     <HeroSection :ready="heroReady" />
     <ScrollMarquee text="Selected Works" />
     <GallerySection />
@@ -17,8 +17,15 @@
 <script setup lang="ts">
 const heroReady = ref(false)
 
-function onLoaderComplete() {
+function onBridgeReady(): void {
   heroReady.value = true
+}
+
+function onLoaderComplete(): void {
+  // Safety net: ensure hero starts even if bridge-ready was missed
+  if (!heroReady.value) {
+    heroReady.value = true
+  }
 }
 
 useHead({

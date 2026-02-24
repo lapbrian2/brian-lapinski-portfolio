@@ -112,6 +112,7 @@ let exiting = false
 
 const emit = defineEmits<{
   complete: []
+  'bridge-ready': []
 }>()
 
 function exitSequence() {
@@ -187,7 +188,10 @@ function exitSequence() {
     )
   }
 
-  // Curtain wipe — split from center
+  // Signal hero to start showing its first image before the wipe reveals it
+  tl.call(() => emit('bridge-ready'))
+
+  // Curtain wipe — split from center (300ms after bridge-ready)
   tl.to(
     loaderEl.value,
     {
@@ -195,7 +199,7 @@ function exitSequence() {
       duration: 0.6,
       ease: 'power3.inOut',
     },
-    '-=0.3',
+    '+=0.3',
   )
 }
 
@@ -208,11 +212,15 @@ onMounted(() => {
   const hasVisited = sessionStorage.getItem('bl-visited')
   if (hasVisited) {
     hidden.value = true
+    emit('bridge-ready')
     emit('complete')
     return
   }
 
   loaderEl.value?.focus()
+
+  // Prefetch Splitting.js while user watches loader — eliminates delay when hero text needs it
+  import('splitting').catch(() => {})
 
   const entranceTl = gsap.timeline()
 

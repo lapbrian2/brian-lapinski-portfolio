@@ -4,8 +4,13 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useReducedMotion } from '~/composables/useMediaQuery'
 
 const reducedMotion = useReducedMotion()
+
 const props = defineProps<{
   ready?: boolean
+}>()
+
+const emit = defineEmits<{
+  'entrance-complete': []
 }>()
 
 const containerEl = ref<HTMLElement | null>(null)
@@ -49,6 +54,7 @@ async function playEntrance() {
         },
       })
     }, containerEl.value!)
+    emit('entrance-complete')
     return
   }
 
@@ -63,7 +69,7 @@ async function playEntrance() {
     const tagResult = Splitting({ target: taglineEl.value!, by: 'words' })
     const words = tagResult[0]?.words || []
 
-    const tl = gsap.timeline()
+    const tl = gsap.timeline({ onComplete: () => emit('entrance-complete') })
 
     // Phase 1: Role label fades in
     tl.fromTo(
