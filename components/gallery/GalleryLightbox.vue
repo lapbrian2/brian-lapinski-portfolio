@@ -12,6 +12,11 @@ const showArchitect = ref(false)
 // Active transition timeline — kill on rapid navigation
 let activeTl: gsap.core.Timeline | null = null
 
+// Focus management state
+let previouslyFocused: Element | null = null
+
+const FOCUSABLE_SELECTOR = 'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'
+
 // Touch / swipe state
 let touchStartX = 0
 let touchStartY = 0
@@ -144,17 +149,51 @@ function onImageLoad() {
 // Only listen for keyboard events when lightbox is open
 watch(() => lightbox.isOpen.value, (open) => {
   if (open) {
+    previouslyFocused = document.activeElement
     window.addEventListener('keydown', handleKeydown)
+    nextTick(() => {
+      containerEl.value?.focus()
+    })
   } else {
     window.removeEventListener('keydown', handleKeydown)
     showArchitect.value = false
     activeTl?.kill()
     activeTl = null
+    ;(previouslyFocused as HTMLElement | null)?.focus()
+    previouslyFocused = null
   }
 })
 
+function getFocusableElements(): HTMLElement[] {
+  if (!containerEl.value) return []
+  return Array.from(containerEl.value.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR))
+    .filter(el => el.offsetParent !== null)
+}
+
 function handleKeydown(e: KeyboardEvent) {
   if (!lightbox.isOpen.value) return
+
+  // Focus trap — wrap Tab focus within the dialog
+  if (e.key === 'Tab') {
+    const focusable = getFocusableElements()
+    if (focusable.length === 0) {
+      e.preventDefault()
+      return
+    }
+
+    const first = focusable[0]
+    const last = focusable[focusable.length - 1]
+
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault()
+      last.focus()
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault()
+      first.focus()
+    }
+    return
+  }
+
   // Close architect panel on Escape if open, otherwise close lightbox
   if (e.key === 'Escape') {
     if (showArchitect.value) {
@@ -183,6 +222,7 @@ onUnmounted(() => {
     <div
       v-if="lightbox.isOpen.value"
       ref="containerEl"
+      tabindex="-1"
       class="fixed inset-0 z-[60] bg-black/95 backdrop-blur-xl flex items-center justify-center"
       role="dialog"
       aria-modal="true"

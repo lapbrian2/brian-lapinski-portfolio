@@ -39,6 +39,18 @@
     <section class="pb-16">
       <ClientOnly>
         <GalleryCarousel3D :artworks="categoryArtworks.slice(0, 12)" />
+        <template #fallback>
+          <div class="flex items-center justify-center h-[420px] md:h-[520px] rounded-2xl bg-dark-800/30">
+            <div class="flex flex-col items-center gap-4">
+              <div class="relative w-12 h-12">
+                <div class="absolute inset-0 rounded-full border border-lavender-400/10" />
+                <div class="absolute inset-0 rounded-full border border-transparent border-t-accent-red/60 animate-spin" style="animation-duration: 0.8s" />
+                <div class="absolute inset-1.5 rounded-full border border-transparent border-b-lavender-300/30 animate-spin" style="animation-duration: 1.4s; animation-direction: reverse" />
+              </div>
+              <span class="font-body text-[10px] uppercase tracking-[0.2em] text-lavender-400/40">Loading gallery</span>
+            </div>
+          </div>
+        </template>
       </ClientOnly>
     </section>
 

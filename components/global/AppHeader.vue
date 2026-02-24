@@ -219,16 +219,36 @@ function toggleMobile(): void {
 }
 
 let lastScrollY = 0
+let lastDirectionY = 0
+let scrollingDown = false
 
 function handleScroll(): void {
   const y = window.scrollY
   scrolled.value = y > 80
 
-  if (y > 200 && y > lastScrollY && !mobileOpen.value) {
-    navHidden.value = true
-  } else {
-    navHidden.value = false
+  const delta = y - lastScrollY
+  const isDown = delta > 0
+
+  // When direction changes, reset the anchor point
+  if (isDown !== scrollingDown) {
+    lastDirectionY = lastScrollY
+    scrollingDown = isDown
   }
+
+  const distanceInDirection = Math.abs(y - lastDirectionY)
+
+  if (mobileOpen.value) {
+    // Never hide while mobile menu is open
+  } else if (y <= 200) {
+    navHidden.value = false
+  } else if (!isDown && distanceInDirection > 5) {
+    // Show immediately on any upward scroll
+    navHidden.value = false
+  } else if (isDown && distanceInDirection > 60) {
+    // Hide only after sustained downward scroll
+    navHidden.value = true
+  }
+
   lastScrollY = y
 }
 

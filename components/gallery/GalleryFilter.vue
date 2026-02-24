@@ -43,6 +43,7 @@ function movePill(catId: string) {
     width: btnRect.width,
     duration: 0.45,
     ease: 'power3.out',
+    overwrite: 'auto',
   })
 }
 

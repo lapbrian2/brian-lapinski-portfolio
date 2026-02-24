@@ -17,9 +17,18 @@ const currentTransition = computed(() => {
 })
 
 onMounted(() => {
-  // Enable transitions after first paint
   nextTick(() => {
     isFirstLoad.value = false
   })
+})
+
+// Reset Lenis scroll position to top on each page navigation
+const router = useRouter()
+const { $lenis } = useNuxtApp()
+
+router.afterEach((to, from) => {
+  if (to.path !== from.path && $lenis) {
+    ;($lenis as any).scrollTo(0, { immediate: true })
+  }
 })
 </script>

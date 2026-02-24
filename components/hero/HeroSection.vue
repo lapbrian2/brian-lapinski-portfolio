@@ -13,6 +13,15 @@ const heroImages = [
   '/images/artworks/the-crossing.webp',
 ]
 
+// Preload all hero images so crossfades don't pop in on first cycle
+useHead({
+  link: heroImages.map((href) => ({
+    rel: 'preload',
+    as: 'image',
+    href,
+  })),
+})
+
 const activeIndex = ref(0)
 const imgEls = ref<HTMLElement[]>([])
 let cycleTl: gsap.core.Timeline | null = null
@@ -87,7 +96,7 @@ onUnmounted(() => {
         alt=""
         class="absolute inset-0 w-full h-full object-cover hero-img"
         style="opacity: 0"
-        :loading="i === 0 ? 'eager' : 'lazy'"
+        loading="eager"
         draggable="false"
       />
     </div>
