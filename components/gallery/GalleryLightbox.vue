@@ -9,6 +9,9 @@ const imageLoaded = ref(false)
 const showCaption = ref(true)
 const showArchitect = ref(false)
 
+// Active transition timeline — kill on rapid navigation
+let activeTl: gsap.core.Timeline | null = null
+
 // Touch / swipe state
 let touchStartX = 0
 let touchStartY = 0
@@ -46,7 +49,7 @@ function onTouchMove(e: TouchEvent) {
   const deltaY = Math.abs(e.touches[0].clientY - touchStartY)
   // Only track horizontal swipes
   if (Math.abs(touchDeltaX) > deltaY && imageEl.value) {
-    gsap.set(imageEl.value, { x: touchDeltaX * 0.4, rotation: touchDeltaX * 0.02 })
+    gsap.set(imageEl.value, { x: touchDeltaX * 0.4, rotation: touchDeltaX * 0.02, force3D: true })
   }
 }
 
@@ -57,54 +60,56 @@ function onTouchEnd() {
     } else if (touchDeltaX < 0 && lightbox.hasNext.value) {
       lightbox.next()
     } else {
-      // Snap back
-      if (imageEl.value) gsap.to(imageEl.value, { x: 0, rotation: 0, duration: 0.4, ease: 'elastic.out(1, 0.6)' })
+      // Snap back — elastic for edge bounce feel
+      if (imageEl.value) gsap.to(imageEl.value, { x: 0, rotation: 0, duration: 0.5, ease: 'elastic.out(1, 0.5)', force3D: true })
     }
   } else {
-    if (imageEl.value) gsap.to(imageEl.value, { x: 0, rotation: 0, duration: 0.3, ease: 'power2.out' })
+    if (imageEl.value) gsap.to(imageEl.value, { x: 0, rotation: 0, duration: 0.3, ease: 'power2.out', force3D: true })
   }
   touchDeltaX = 0
 }
 
-// Animate image transition on index change
+// Single watcher: handles image transition + closes panel
 watch(() => lightbox.currentIndex.value, (_, oldVal) => {
   if (oldVal === undefined) return
+  showArchitect.value = false
   imageLoaded.value = false
   animateImageTransition()
 })
 
-// Close architect panel when switching artworks
-watch(() => lightbox.currentIndex.value, () => {
-  showArchitect.value = false
-})
-
 function animateImageTransition() {
   if (!imageEl.value) return
-  const dir = lightbox.direction.value === 'next' ? 1 : -1
-  const tl = gsap.timeline()
 
-  tl.fromTo(imageEl.value, {
+  // Kill any in-flight transition to prevent stacking
+  activeTl?.kill()
+
+  const dir = lightbox.direction.value === 'next' ? 1 : -1
+  activeTl = gsap.timeline()
+
+  activeTl.fromTo(imageEl.value, {
     opacity: 0,
     x: 60 * dir,
-    scale: 0.95,
+    scale: 0.96,
   }, {
     opacity: 1,
     x: 0,
     scale: 1,
-    duration: 0.5,
+    duration: 0.45,
     ease: 'power3.out',
+    force3D: true,
+    clearProps: 'scale',
   })
 
   if (captionEl.value) {
-    tl.fromTo(captionEl.value, {
+    activeTl.fromTo(captionEl.value, {
       opacity: 0,
       y: 12,
     }, {
       opacity: 1,
       y: 0,
-      duration: 0.4,
+      duration: 0.35,
       ease: 'power2.out',
-    }, '-=0.3')
+    }, '-=0.25')
   }
 }
 
@@ -114,18 +119,20 @@ function onEnter() {
     if (imageEl.value) {
       gsap.fromTo(imageEl.value, {
         opacity: 0,
-        scale: 0.9,
-        y: 30,
+        scale: 0.92,
+        y: 24,
       }, {
         opacity: 1,
         scale: 1,
         y: 0,
-        duration: 0.6,
+        duration: 0.55,
         ease: 'power3.out',
+        force3D: true,
+        clearProps: 'scale,y',
       })
     }
     if (captionEl.value) {
-      gsap.fromTo(captionEl.value, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4, delay: 0.3, ease: 'power2.out' })
+      gsap.fromTo(captionEl.value, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.4, delay: 0.25, ease: 'power2.out' })
     }
   })
 }
@@ -141,6 +148,8 @@ watch(() => lightbox.isOpen.value, (open) => {
   } else {
     window.removeEventListener('keydown', handleKeydown)
     showArchitect.value = false
+    activeTl?.kill()
+    activeTl = null
   }
 })
 
@@ -165,6 +174,7 @@ function handleKeydown(e: KeyboardEvent) {
 
 onUnmounted(() => {
   window.removeEventListener('keydown', handleKeydown)
+  activeTl?.kill()
 })
 </script>
 
@@ -381,6 +391,7 @@ onUnmounted(() => {
   justify-content: center;
   padding: 56px 64px 0;
   transition: padding-right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: padding;
 }
 
 .lightbox-content.panel-open {
@@ -405,6 +416,7 @@ onUnmounted(() => {
   justify-content: center;
   width: 100%;
   height: 100%;
+  will-change: transform, opacity;
 }
 
 /* Image fills container while maintaining aspect ratio */

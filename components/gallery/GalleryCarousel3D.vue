@@ -48,6 +48,7 @@ const activeIndex = computed(() => {
 let dragStartX = 0
 let dragStartAngle = 0
 let autoTween: gsap.core.Tween | null = null
+let resumeTimer: ReturnType<typeof setTimeout> | null = null
 
 function startAutoRotate() {
   if (!autoRotate.value || !trackEl.value || count.value === 0) return
@@ -62,6 +63,10 @@ function startAutoRotate() {
 }
 
 function stopAutoRotate() {
+  if (resumeTimer) {
+    clearTimeout(resumeTimer)
+    resumeTimer = null
+  }
   if (autoTween) {
     autoTween.kill()
     autoTween = null
@@ -98,6 +103,7 @@ function onPointerUp() {
     value: snapped,
     duration: 0.6,
     ease: 'power3.out',
+    overwrite: true,
     onUpdate: applyRotation,
     onComplete: () => {
       autoRotate.value = true
@@ -114,9 +120,14 @@ function goToCard(index: number) {
     value: target,
     duration: 0.8,
     ease: 'power3.out',
+    overwrite: true,
     onUpdate: applyRotation,
     onComplete: () => {
-      setTimeout(() => {
+      if (resumeTimer) {
+        clearTimeout(resumeTimer)
+      }
+      resumeTimer = setTimeout(() => {
+        resumeTimer = null
         autoRotate.value = true
         startAutoRotate()
       }, 3000)
@@ -247,6 +258,7 @@ onUnmounted(() => {
   position: relative;
   transform-style: preserve-3d;
   transform: rotateY(0deg);
+  will-change: transform;
 }
 
 .carousel-card {
@@ -258,6 +270,7 @@ onUnmounted(() => {
   margin-left: -140px;
   margin-top: -190px;
   transform-style: preserve-3d;
+  will-change: transform;
 }
 
 .card-inner {

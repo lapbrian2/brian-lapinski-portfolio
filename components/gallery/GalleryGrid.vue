@@ -12,6 +12,7 @@ const lightbox = useLightbox()
 const gridEl = ref<HTMLElement | null>(null)
 let ctx: gsap.Context | null = null
 let hasRevealed = false
+let currentFilterTween: gsap.core.Tween | null = null
 
 const filteredArtworks = computed<Artwork[]>(() => {
   if (props.category === 'all') return props.artworks
@@ -83,7 +84,7 @@ function setupVelocitySkew() {
     if (Math.abs(currentSkew) < 0.01) currentSkew = 0
     if (!gridEl.value) return
     const cards = gridEl.value.querySelectorAll('.gallery-card')
-    gsap.set(cards, { skewY: currentSkew, force3D: true, overwrite: false })
+    gsap.set(cards, { skewY: currentSkew, force3D: true })
   }
   gsap.ticker.add(skewTickerFn)
 }
@@ -146,15 +147,28 @@ watch(
   () => props.category,
   async () => {
     if (!gridEl.value || !hasRevealed) return
+
+    // Kill any in-progress filter animation to prevent stacking
+    if (currentFilterTween) {
+      currentFilterTween.kill()
+      currentFilterTween = null
+    }
+
     const cards = gridEl.value.querySelectorAll('.gallery-card')
 
     // Quick exit — curtain closes upward
-    await gsap.to(cards, {
-      clipPath: 'inset(0 0 100% 0)',
-      duration: 0.35,
-      stagger: 0.03,
-      ease: 'power2.in',
+    // gsap.to returns a Tween, not a Promise, so wrap in a real Promise
+    await new Promise<void>((resolve) => {
+      currentFilterTween = gsap.to(cards, {
+        clipPath: 'inset(0 0 100% 0)',
+        duration: 0.35,
+        stagger: 0.03,
+        ease: 'power2.in',
+        onComplete: resolve,
+      })
     })
+
+    currentFilterTween = null
 
     // Wait a frame for Vue to re-render filtered list
     await nextTick()
@@ -165,12 +179,13 @@ watch(
       const newImgs = gridEl.value!.querySelectorAll('.card-img')
       gsap.set(newCards, { clipPath: 'inset(100% 0 0 0)', opacity: 1 })
       gsap.set(newImgs, { y: 30 })
-      gsap.to(newCards, {
+      currentFilterTween = gsap.to(newCards, {
         clipPath: 'inset(0% 0 0 0)',
         duration: 0.7,
         stagger: { each: 0.06, from: 'start' },
         ease: 'power3.inOut',
         force3D: true,
+        overwrite: 'auto',
       })
       gsap.to(newImgs, {
         y: 0,
@@ -178,6 +193,7 @@ watch(
         stagger: { each: 0.06, from: 'start' },
         ease: 'power3.out',
         force3D: true,
+        overwrite: 'auto',
       })
     }
 
@@ -186,6 +202,10 @@ watch(
 )
 
 onUnmounted(() => {
+  if (currentFilterTween) {
+    currentFilterTween.kill()
+    currentFilterTween = null
+  }
   if (skewTickerFn) gsap.ticker.remove(skewTickerFn)
   if (lenisScrollHandler && lenisInstance) {
     lenisInstance.off('scroll', lenisScrollHandler)

@@ -46,6 +46,7 @@ onMounted(() => {
     gsap.to(cardEl.value!, {
       y: direction * 20,
       ease: 'none',
+      force3D: true,
       scrollTrigger: {
         trigger: cardEl.value!,
         start: 'top bottom',
@@ -64,6 +65,7 @@ function onMouseEnter() {
     boxShadow: `0 0 50px ${glowColor}40, 0 0 100px ${glowColor}18`,
     duration: 0.6,
     ease: 'power2.out',
+    force3D: true,
   })
   // Zoom the image itself
   const img = cardEl.value.querySelector('.card-img')
@@ -96,12 +98,13 @@ function onMouseMove(e: MouseEvent) {
     rotateX: -offsetY,
     duration: 0.4,
     ease: 'power2.out',
+    force3D: true,
   })
 }
 
 function onMouseLeaveReset() {
   if (!cardEl.value) return
-  gsap.to(cardEl.value, { rotateY: 0, rotateX: 0, duration: 0.5, ease: 'power3.out' })
+  gsap.to(cardEl.value, { rotateY: 0, rotateX: 0, duration: 0.5, ease: 'power3.out', clearProps: 'boxShadow' })
   onMouseLeave()
 }
 
@@ -113,7 +116,7 @@ onUnmounted(() => {
 <template>
   <div
     ref="cardEl"
-    class="group relative overflow-hidden rounded-lg cursor-pointer focus-visible:ring-2 focus-visible:ring-accent-red/60 focus-visible:ring-offset-2 focus-visible:ring-offset-dark-900 outline-none"
+    class="gallery-card group relative overflow-hidden rounded-lg cursor-pointer focus-visible:ring-2 focus-visible:ring-accent-red/60 focus-visible:ring-offset-2 focus-visible:ring-offset-dark-900 outline-none"
     :class="fullWidth ? 'aspect-[21/9]' : aspectClasses[artwork.aspect]"
     style="perspective: 600px; transform-style: preserve-3d"
     role="button"
@@ -195,6 +198,10 @@ onUnmounted(() => {
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
+}
+
+.gallery-card {
+  will-change: transform;
 }
 
 .card-img {

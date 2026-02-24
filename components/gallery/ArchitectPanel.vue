@@ -16,6 +16,10 @@ const panelEl = ref<HTMLElement | null>(null)
 const contentEl = ref<HTMLElement | null>(null)
 const { fork, quickFork, copied } = usePromptFork()
 
+// GSAP tween trackers — kill before starting new animations to prevent ghost states
+let activeTween: gsap.core.Tween | null = null
+let staggerTween: gsap.core.Tween | null = null
+
 // Technique category color mapping — matches the Ossuary design system
 const categoryColors: Record<TechniqueCategory, { bg: string; text: string; border: string; dot: string }> = {
   lighting: { bg: 'bg-amber-500/10', text: 'text-amber-300', border: 'border-amber-500/20', dot: 'bg-amber-400' },
@@ -54,13 +58,16 @@ const hasOssuaryData = computed(() => {
   return !!(props.item.rawPrompt || props.item.promptNodes?.length)
 })
 
-// GSAP slide-in animation
+// GSAP slide-in/out animation with overwrite protection
 watch(() => props.visible, (open) => {
   if (!panelEl.value) return
 
+  // Kill any in-flight panel tween to prevent ghost states on rapid toggling
+  activeTween?.kill()
+
   if (open) {
     // Slide in from right
-    gsap.fromTo(panelEl.value, {
+    activeTween = gsap.fromTo(panelEl.value, {
       x: '100%',
       opacity: 0,
     }, {
@@ -68,13 +75,14 @@ watch(() => props.visible, (open) => {
       opacity: 1,
       duration: 0.5,
       ease: 'power3.out',
+      force3D: true,
     })
 
     // Stagger content children
     nextTick(() => {
       if (contentEl.value) {
         const children = contentEl.value.querySelectorAll('.animate-in')
-        gsap.fromTo(children, {
+        staggerTween = gsap.fromTo(children, {
           opacity: 0,
           y: 16,
         }, {
@@ -84,18 +92,30 @@ watch(() => props.visible, (open) => {
           stagger: 0.06,
           ease: 'power2.out',
           delay: 0.15,
+          overwrite: 'auto',
         })
       }
     })
   } else {
-    // Slide out
-    gsap.to(panelEl.value, {
+    // Kill stagger animations before sliding out to prevent orphaned child tweens
+    staggerTween?.kill()
+    staggerTween = null
+
+    // Slide out with a smoother ease
+    activeTween = gsap.to(panelEl.value, {
       x: '100%',
       opacity: 0,
       duration: 0.35,
-      ease: 'power2.in',
+      ease: 'power2.inOut',
+      force3D: true,
     })
   }
+})
+
+// Clean up all tweens when the component is destroyed
+onUnmounted(() => {
+  activeTween?.kill()
+  staggerTween?.kill()
 })
 
 async function handleFork() {
@@ -281,6 +301,7 @@ async function handleQuickFork() {
   z-index: 20;
   transform: translateX(100%);
   opacity: 0;
+  will-change: transform, opacity;
 }
 
 @media (max-width: 640px) {

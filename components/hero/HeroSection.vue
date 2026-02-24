@@ -29,12 +29,12 @@ function startCycle() {
   })
 
   // Ken Burns on first image — fast zoom to feel alive
-  kenBurnsTween = gsap.to(imgEls.value[0], { scale: 1.1, duration: 2.5, ease: 'none' })
+  kenBurnsTween = gsap.to(imgEls.value[0], { scale: 1.1, duration: 2.5, ease: 'none', force3D: true })
 
   // Start crossfade cycle — rapid fire, no dead time
   const scheduleNext = () => {
     cycleTl = gsap.timeline()
-    cycleTl.call(crossfade, [], '+=0.8')
+    cycleTl.call(crossfade, [], '+=2.0')
   }
 
   const crossfade = () => {
@@ -56,9 +56,9 @@ function startCycle() {
 
     // Crossfade — rapid, almost overlapping
     tl.to(currentEl, { opacity: 0, duration: 0.6, ease: 'power2.inOut' }, 0)
-    tl.to(nextEl, { opacity: 0.45, duration: 0.6, ease: 'power2.inOut' }, 0)
+    tl.to(nextEl, { opacity: 0.4, duration: 0.6, ease: 'power2.inOut' }, 0)
     // Ken Burns on incoming image
-    tl.to(nextEl, { scale: 1.1, duration: 2.5, ease: 'none' }, 0)
+    tl.to(nextEl, { scale: 1.1, duration: 2.5, ease: 'none', force3D: true }, 0)
   }
 
   scheduleNext()
@@ -85,7 +85,7 @@ onUnmounted(() => {
         :ref="(el) => { if (el) imgEls[i] = el as HTMLElement }"
         :src="src"
         alt=""
-        class="absolute inset-0 w-full h-full object-cover will-change-transform"
+        class="absolute inset-0 w-full h-full object-cover hero-img"
         style="opacity: 0"
         :loading="i === 0 ? 'eager' : 'lazy'"
         draggable="false"
@@ -116,6 +116,10 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
+.hero-img {
+  will-change: transform, opacity;
+}
+
 .hero-overlay {
   background:
     linear-gradient(to bottom,
