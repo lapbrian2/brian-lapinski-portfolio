@@ -13,7 +13,7 @@
         :href="link.href"
         target="_blank"
         rel="noopener noreferrer"
-        class="link-card group relative overflow-hidden rounded-xl border border-lavender-400/8 bg-dark-800/40 backdrop-blur-sm p-8 flex flex-col items-center text-center transition-colors duration-500 hover:border-lavender-400/20 opacity-0"
+        class="btn-press link-card group relative overflow-hidden rounded-xl border border-lavender-400/8 bg-dark-800/40 backdrop-blur-sm p-8 flex flex-col items-center text-center transition-colors duration-500 hover:border-lavender-400/20 opacity-0"
         :data-color="link.color"
         data-cursor-text="Open"
         @mouseenter="onEnter($event.currentTarget as HTMLElement)"

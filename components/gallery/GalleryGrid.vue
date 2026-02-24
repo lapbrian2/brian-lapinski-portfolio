@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Artwork } from '~/types/artwork'
+import type { SourceRect } from '~/composables/useLightbox'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
@@ -19,7 +20,7 @@ const filteredArtworks = computed<Artwork[]>(() => {
   return props.artworks.filter((a) => a.category === props.category)
 })
 
-function openLightbox(index: number) {
+function openLightbox(index: number, rect: SourceRect | null) {
   const items = filteredArtworks.value.map((a) => ({
     id: a.id,
     src: a.src,
@@ -32,7 +33,7 @@ function openLightbox(index: number) {
     refinementNotes: a.refinementNotes,
     promptNodes: a.promptNodes,
   }))
-  lightbox.open(items, index)
+  lightbox.open(items, index, rect)
 }
 
 // Masonry-style varied column spans for visual rhythm
@@ -227,7 +228,7 @@ onUnmounted(() => {
       :full-width="getSpanClass(index) === 'col-span-12'"
       class="gallery-card"
       :class="getSpanClass(index)"
-      @click="openLightbox(index)"
+      @click="openLightbox(index, $event)"
     />
   </div>
 </template>

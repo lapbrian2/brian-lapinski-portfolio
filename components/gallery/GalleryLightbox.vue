@@ -1,13 +1,25 @@
 <script setup lang="ts">
 import gsap from 'gsap'
+import type { SourceRect } from '~/composables/useLightbox'
+import { useReducedMotion } from '~/composables/useMediaQuery'
 
 const lightbox = useLightbox()
+const { copied, copiedType } = usePromptFork()
+const reducedMotion = useReducedMotion()
 const imageEl = ref<HTMLElement | null>(null)
 const captionEl = ref<HTMLElement | null>(null)
 const containerEl = ref<HTMLElement | null>(null)
+const backdropEl = ref<HTMLElement | null>(null)
 const imageLoaded = ref(false)
 const showCaption = ref(true)
 const showArchitect = ref(false)
+const showToast = ref(false)
+let toastTimeoutId: ReturnType<typeof setTimeout> | null = null
+
+// FLIP animation state
+let flipClone: HTMLElement | null = null
+let flipTl: gsap.core.Timeline | null = null
+const isFlipAnimating = ref(false)
 
 // Active transition timeline — kill on rapid navigation
 let activeTl: gsap.core.Timeline | null = null
@@ -34,8 +46,10 @@ const hasOssuaryData = computed(() => {
 })
 
 function onBackdropClick(e: MouseEvent) {
-  if (e.target === e.currentTarget) {
-    lightbox.close()
+  const target = e.target as HTMLElement
+  // Close when clicking the container itself or the backdrop overlay
+  if (target === e.currentTarget || target === backdropEl.value) {
+    animatedClose()
   }
 }
 
@@ -156,28 +170,271 @@ function animateImageTransition() {
   }
 }
 
-// Entrance animation
-function onEnter() {
-  nextTick(() => {
-    if (imageEl.value) {
-      gsap.fromTo(imageEl.value, {
-        opacity: 0,
-        scale: 0.92,
-        y: 24,
-      }, {
-        opacity: 1,
-        scale: 1,
-        y: 0,
-        duration: 0.55,
-        ease: 'power3.out',
-        force3D: true,
-        clearProps: 'scale,y',
-      })
-    }
-    if (captionEl.value) {
-      gsap.fromTo(captionEl.value, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.4, delay: 0.25, ease: 'power2.out' })
-    }
+// ─── FLIP Clone Utilities ───────────────────────────────────────────
+
+function createFlipClone(src: string, rect: SourceRect): HTMLElement {
+  const clone = document.createElement('img')
+  clone.src = src
+  clone.style.cssText = `
+    position: fixed;
+    z-index: 70;
+    top: ${rect.top}px;
+    left: ${rect.left}px;
+    width: ${rect.width}px;
+    height: ${rect.height}px;
+    border-radius: ${rect.borderRadius};
+    object-fit: cover;
+    pointer-events: none;
+    will-change: transform, top, left, width, height, border-radius;
+  `
+  document.body.appendChild(clone)
+  return clone
+}
+
+function removeFlipClone() {
+  if (flipClone) {
+    flipClone.remove()
+    flipClone = null
+  }
+}
+
+function getViewportCenter(): { top: number; left: number; width: number; height: number } {
+  const vw = window.innerWidth
+  const vh = window.innerHeight
+  // Account for lightbox content padding (56px top, 64px sides on desktop, 12px on mobile)
+  const paddingTop = 56
+  const paddingSide = vw <= 768 ? 12 : 64
+  const availW = vw - paddingSide * 2
+  const availH = vh - paddingTop
+  // Max image dimensions: fill 85% of available space
+  const maxW = availW * 0.85
+  const maxH = availH * 0.85
+  // Use the smaller dimension to maintain proportion
+  const size = Math.min(maxW, maxH)
+  return {
+    top: paddingTop + (availH - size) / 2,
+    left: paddingSide + (availW - size) / 2,
+    width: size,
+    height: size,
+  }
+}
+
+// ─── FLIP Enter Animation ───────────────────────────────────────────
+
+function flipEnter(el: Element, done: () => void) {
+  const container = el as HTMLElement
+  const source = lightbox.getSourceRect()
+  const currentSrc = lightbox.currentItem.value?.src
+
+  // Reduced motion: instant show
+  if (reducedMotion.value) {
+    gsap.set(container, { opacity: 1 })
+    done()
+    nextTick(() => containerEl.value?.focus())
+    return
+  }
+
+  // No source rect (e.g., keyboard navigation) — fallback to scale entrance
+  if (!source || !currentSrc) {
+    gsap.set(container, { opacity: 0 })
+    gsap.to(container, {
+      opacity: 1,
+      duration: 0.4,
+      ease: 'power2.out',
+      onComplete: done,
+    })
+    nextTick(() => {
+      if (imageEl.value) {
+        gsap.fromTo(imageEl.value, {
+          opacity: 0,
+          scale: 0.92,
+          y: 24,
+        }, {
+          opacity: 1,
+          scale: 1,
+          y: 0,
+          duration: 0.55,
+          ease: 'power3.out',
+          force3D: true,
+          clearProps: 'scale,y',
+        })
+      }
+      if (captionEl.value) {
+        gsap.fromTo(captionEl.value, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.4, delay: 0.25, ease: 'power2.out' })
+      }
+      containerEl.value?.focus()
+    })
+    return
+  }
+
+  // FLIP: hide real content, create clone, animate
+  isFlipAnimating.value = true
+  gsap.set(container, { opacity: 1 })
+
+  // Hide the real lightbox content during FLIP
+  if (imageEl.value) gsap.set(imageEl.value, { opacity: 0 })
+  if (captionEl.value) gsap.set(captionEl.value, { opacity: 0 })
+
+  // Fade in backdrop separately
+  if (backdropEl.value) {
+    gsap.set(backdropEl.value, { opacity: 0 })
+  }
+
+  // Create the flying clone at the source card position
+  flipClone = createFlipClone(currentSrc, source)
+  const dest = getViewportCenter()
+
+  // Kill any existing FLIP timeline
+  flipTl?.kill()
+  flipTl = gsap.timeline({
+    onComplete() {
+      // FLIP done: reveal real content, remove clone
+      removeFlipClone()
+      isFlipAnimating.value = false
+      if (imageEl.value) {
+        gsap.set(imageEl.value, { opacity: 1, clearProps: 'all' })
+      }
+      if (captionEl.value) {
+        gsap.fromTo(captionEl.value, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.3, ease: 'power2.out' })
+      }
+      lightbox.clearSourceRect()
+      done()
+      nextTick(() => containerEl.value?.focus())
+    },
   })
+
+  // Animate backdrop
+  flipTl.to(backdropEl.value, {
+    opacity: 1,
+    duration: 0.4,
+    ease: 'power2.out',
+  }, 0)
+
+  // Animate clone from source to destination
+  flipTl.to(flipClone, {
+    top: dest.top,
+    left: dest.left,
+    width: dest.width,
+    height: dest.height,
+    borderRadius: '2px',
+    duration: 0.5,
+    ease: 'power3.out',
+    force3D: true,
+  }, 0)
+}
+
+// ─── FLIP Exit Animation ────────────────────────────────────────────
+
+function flipLeave(el: Element, done: () => void) {
+  const container = el as HTMLElement
+
+  // Reduced motion: instant hide
+  if (reducedMotion.value) {
+    done()
+    return
+  }
+
+  // Try to find the current artwork's card for the fly-back animation.
+  // Use the currently displayed item's ID (not the originally opened one),
+  // so the image flies back to the correct card even after next/prev navigation.
+  const artworkId = lightbox.currentItem.value?.id
+  const cardEl = artworkId
+    ? document.querySelector<HTMLElement>(`[data-artwork-id="${artworkId}"]`)
+    : null
+
+  // Get the card's current bounding rect (it may have scrolled)
+  let targetRect: SourceRect | null = null
+  if (cardEl) {
+    const domRect = cardEl.getBoundingClientRect()
+    const isVisible = domRect.top < window.innerHeight && domRect.bottom > 0
+      && domRect.left < window.innerWidth && domRect.right > 0
+    if (isVisible) {
+      const computedStyle = window.getComputedStyle(cardEl)
+      targetRect = {
+        top: domRect.top,
+        left: domRect.left,
+        width: domRect.width,
+        height: domRect.height,
+        borderRadius: computedStyle.borderRadius,
+      }
+    }
+  }
+
+  const currentSrc = lightbox.currentItem.value?.src
+
+  // No target card visible or no image — simple fade out
+  if (!targetRect || !currentSrc) {
+    gsap.to(container, {
+      opacity: 0,
+      duration: 0.3,
+      ease: 'power2.in',
+      onComplete: done,
+    })
+    return
+  }
+
+  // Get the lightbox image's current position for the clone starting point
+  const lightboxImg = container.querySelector<HTMLElement>('.lightbox-image')
+  let cloneStart: SourceRect
+  if (lightboxImg) {
+    const imgRect = lightboxImg.getBoundingClientRect()
+    cloneStart = {
+      top: imgRect.top,
+      left: imgRect.left,
+      width: imgRect.width,
+      height: imgRect.height,
+      borderRadius: '2px',
+    }
+  } else {
+    const dest = getViewportCenter()
+    cloneStart = { ...dest, borderRadius: '2px' }
+  }
+
+  // Hide the real lightbox content, create clone for fly-back
+  if (imageEl.value) gsap.set(imageEl.value, { opacity: 0 })
+  flipClone = createFlipClone(currentSrc, cloneStart)
+
+  flipTl?.kill()
+  flipTl = gsap.timeline({
+    onComplete() {
+      removeFlipClone()
+      done()
+    },
+  })
+
+  // Fade out backdrop
+  flipTl.to(backdropEl.value, {
+    opacity: 0,
+    duration: 0.4,
+    ease: 'power2.in',
+  }, 0)
+
+  // Hide controls immediately
+  const controls = container.querySelectorAll<HTMLElement>('.lightbox-controls, .lightbox-content')
+  flipTl.to(controls, {
+    opacity: 0,
+    duration: 0.15,
+    ease: 'power2.in',
+  }, 0)
+
+  // Animate clone from lightbox position back to card position
+  flipTl.to(flipClone, {
+    top: targetRect.top,
+    left: targetRect.left,
+    width: targetRect.width,
+    height: targetRect.height,
+    borderRadius: targetRect.borderRadius,
+    duration: 0.45,
+    ease: 'power3.inOut',
+    force3D: true,
+  }, 0)
+}
+
+// ─── Animated Close (replaces direct lightbox.close for exit FLIP) ──
+
+function animatedClose() {
+  if (isFlipAnimating.value) return
+  lightbox.close()
 }
 
 function onImageLoad() {
@@ -189,9 +446,6 @@ watch(() => lightbox.isOpen.value, (open) => {
   if (open) {
     previouslyFocused = document.activeElement
     window.addEventListener('keydown', handleKeydown)
-    nextTick(() => {
-      containerEl.value?.focus()
-    })
   } else {
     window.removeEventListener('keydown', handleKeydown)
     showArchitect.value = false
@@ -237,7 +491,7 @@ function handleKeydown(e: KeyboardEvent) {
     if (showArchitect.value) {
       showArchitect.value = false
     } else {
-      lightbox.close()
+      animatedClose()
     }
     return
   }
@@ -249,19 +503,33 @@ function handleKeydown(e: KeyboardEvent) {
   }
 }
 
+// Watch copied state to show toast
+watch(copied, (isCopied) => {
+  if (isCopied) {
+    showToast.value = true
+    if (toastTimeoutId) clearTimeout(toastTimeoutId)
+    toastTimeoutId = setTimeout(() => {
+      showToast.value = false
+    }, 3000)
+  }
+})
+
 onUnmounted(() => {
   window.removeEventListener('keydown', handleKeydown)
   activeTl?.kill()
+  flipTl?.kill()
+  removeFlipClone()
+  if (toastTimeoutId) clearTimeout(toastTimeoutId)
 })
 </script>
 
 <template>
-  <Transition name="lightbox" @after-enter="onEnter">
+  <Transition :css="false" @enter="flipEnter" @leave="flipLeave">
     <div
       v-if="lightbox.isOpen.value"
       ref="containerEl"
       tabindex="-1"
-      class="fixed inset-0 z-[60] bg-black/95 backdrop-blur-xl flex items-center justify-center"
+      class="fixed inset-0 z-[60] flex items-center justify-center"
       role="dialog"
       aria-modal="true"
       aria-label="Artwork lightbox"
@@ -270,8 +538,14 @@ onUnmounted(() => {
       @touchmove.passive="onTouchMove"
       @touchend="onTouchEnd"
     >
+      <!-- Backdrop — separate element so FLIP can control its opacity independently -->
+      <div
+        ref="backdropEl"
+        class="absolute inset-0 bg-black/95 backdrop-blur-xl"
+      />
+
       <!-- Top bar -->
-      <div class="absolute top-0 left-0 right-0 flex items-center justify-between px-5 md:px-8 py-5 z-10">
+      <div class="lightbox-controls absolute top-0 left-0 right-0 flex items-center justify-between px-5 md:px-8 py-5 z-10">
         <!-- Counter -->
         <div class="font-body text-xs text-lavender-400/60 tracking-wider tabular-nums">
           <span class="text-lavender-200">{{ String(lightbox.currentIndex.value + 1).padStart(2, '0') }}</span>
@@ -283,7 +557,7 @@ onUnmounted(() => {
           <!-- Architect Panel toggle -->
           <button
             v-if="hasOssuaryData"
-            class="schema-button group"
+            class="btn-press schema-button group"
             :class="showArchitect ? 'active' : ''"
             aria-label="View prompt architecture"
             @click.stop="toggleArchitect"
@@ -300,7 +574,7 @@ onUnmounted(() => {
 
           <!-- Info toggle -->
           <button
-            class="w-10 h-10 flex items-center justify-center rounded-full text-lavender-400 hover:text-lavender-100 transition-colors duration-200 cursor-hover"
+            class="btn-press w-10 h-10 flex items-center justify-center rounded-full text-lavender-400 hover:text-lavender-100 transition-colors duration-200 cursor-hover"
             :class="showCaption ? 'bg-white/10' : 'bg-white/5'"
             aria-label="Toggle info"
             @click="toggleCaption"
@@ -313,9 +587,9 @@ onUnmounted(() => {
           </button>
           <!-- Close button -->
           <button
-            class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 text-lavender-400 hover:text-lavender-100 hover:bg-white/10 transition-all duration-200 cursor-hover"
+            class="btn-press w-10 h-10 flex items-center justify-center rounded-full bg-white/5 text-lavender-400 hover:text-lavender-100 hover:bg-white/10 transition-all duration-200 cursor-hover"
             aria-label="Close lightbox"
-            @click="lightbox.close()"
+            @click="animatedClose()"
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
               <line x1="2" y1="2" x2="14" y2="14" />
@@ -328,7 +602,7 @@ onUnmounted(() => {
       <!-- Previous arrow -->
       <button
         v-if="lightbox.hasPrev.value"
-        class="absolute left-3 md:left-6 top-1/2 -translate-y-1/2 w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-lavender-300 hover:text-lavender-100 transition-all duration-200 z-10 cursor-hover group"
+        class="btn-press absolute left-3 md:left-6 top-1/2 -translate-y-1/2 w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-lavender-300 hover:text-lavender-100 transition-all duration-200 z-10 cursor-hover group"
         aria-label="Previous artwork"
         @click="lightbox.prev()"
       >
@@ -340,7 +614,7 @@ onUnmounted(() => {
       <!-- Next arrow -->
       <button
         v-if="lightbox.hasNext.value"
-        class="absolute right-3 md:right-6 top-1/2 -translate-y-1/2 w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-lavender-300 hover:text-lavender-100 transition-all duration-200 z-10 cursor-hover group"
+        class="btn-press absolute right-3 md:right-6 top-1/2 -translate-y-1/2 w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-lavender-300 hover:text-lavender-100 transition-all duration-200 z-10 cursor-hover group"
         aria-label="Next artwork"
         @click="lightbox.next()"
       >
@@ -429,22 +703,29 @@ onUnmounted(() => {
         :visible="showArchitect"
         @close="showArchitect = false"
       />
+
+      <!-- Toast notification -->
+      <Transition name="toast-fade">
+        <div
+          v-if="showToast && copiedType"
+          class="fixed bottom-8 left-1/2 -translate-x-1/2 z-30 pointer-events-none"
+        >
+          <div class="toast-pill backdrop-blur-md bg-dark-900/80 border border-dark-700/50 px-4 py-2.5 rounded-full shadow-xl">
+            <span class="text-accent-red font-medium text-sm flex items-center gap-2">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="2 6 5 9 10 3" />
+              </svg>
+              <span v-if="copiedType === 'fork'">Template copied — paste into Midjourney</span>
+              <span v-else>Prompt copied — paste into Midjourney</span>
+            </span>
+          </div>
+        </div>
+      </Transition>
     </div>
   </Transition>
 </template>
 
 <style scoped>
-.lightbox-enter-active {
-  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.lightbox-leave-active {
-  transition: opacity 0.3s cubic-bezier(0.55, 0, 1, 0.45);
-}
-.lightbox-enter-from,
-.lightbox-leave-to {
-  opacity: 0;
-}
-
 .caption-fade-enter-active {
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
@@ -539,5 +820,37 @@ onUnmounted(() => {
   background: rgba(237, 84, 77, 0.12);
   border-color: rgba(237, 84, 77, 0.25);
   color: #ed544d;
+}
+
+/* Toast notification */
+.toast-pill {
+  animation: toast-float 3s ease-in-out infinite;
+}
+
+@keyframes toast-float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+.toast-fade-enter-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.toast-fade-leave-active {
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.toast-fade-enter-from {
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+.toast-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-12px);
 }
 </style>

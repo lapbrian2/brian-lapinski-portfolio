@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Artwork } from '~/types/artwork'
+import type { SourceRect } from '~/composables/useLightbox'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
@@ -11,9 +12,28 @@ const props = withDefaults(defineProps<{
   fullWidth: false,
 })
 
-defineEmits<{
-  click: []
+const emit = defineEmits<{
+  click: [rect: SourceRect | null]
 }>()
+
+function getImageRect(): SourceRect | null {
+  if (!cardEl.value) return null
+  const domRect = cardEl.value.getBoundingClientRect()
+  const computedStyle = window.getComputedStyle(cardEl.value)
+  return {
+    top: domRect.top,
+    left: domRect.left,
+    width: domRect.width,
+    height: domRect.height,
+    borderRadius: computedStyle.borderRadius,
+  }
+}
+
+function handleClick() {
+  emit('click', getImageRect())
+}
+
+defineExpose({ getImageRect })
 
 const aspectClasses: Record<Artwork['aspect'], string> = {
   tall: 'aspect-[3/4]',
@@ -122,10 +142,11 @@ onUnmounted(() => {
     role="button"
     :tabindex="0"
     :aria-label="`View ${artwork.title}`"
+    :data-artwork-id="artwork.id"
     data-cursor-text="View"
-    @click="$emit('click')"
-    @keydown.enter="$emit('click')"
-    @keydown.space.prevent="$emit('click')"
+    @click="handleClick"
+    @keydown.enter="handleClick"
+    @keydown.space.prevent="handleClick"
     @mouseenter="onMouseEnter"
     @mouseleave="onMouseLeaveReset"
     @mousemove="onMouseMove"

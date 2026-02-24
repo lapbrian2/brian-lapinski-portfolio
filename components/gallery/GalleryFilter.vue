@@ -78,7 +78,7 @@ onMounted(() => {
         :aria-selected="modelValue === cat.id"
         aria-label="Filter gallery"
         :class="[
-          'relative z-10 px-5 py-2 rounded-full text-sm font-body uppercase tracking-wider transition-colors duration-300 cursor-hover inline-flex items-center gap-2',
+          'btn-press relative z-10 px-5 py-2 rounded-full text-sm font-body uppercase tracking-wider transition-colors duration-300 cursor-hover inline-flex items-center gap-2',
           modelValue === cat.id
             ? 'text-accent-red font-medium'
             : 'text-lavender-400 hover:text-lavender-200',

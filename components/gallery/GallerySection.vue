@@ -81,7 +81,7 @@ useScrollReveal(headingEl, { y: 30, stagger: 0.1, children: true })
             v-for="cat in ['portraits', 'landscapes', 'abstract', 'surreal']"
             :key="cat"
             :to="`/${cat}`"
-            class="group px-5 py-2.5 rounded-full border border-lavender-400/20 text-lavender-400 hover:border-accent-red/40 hover:text-accent-red hover:bg-accent-red/5 font-body text-sm uppercase tracking-wider transition-all duration-300 inline-flex items-center gap-2"
+            class="btn-press group px-5 py-2.5 rounded-full border border-lavender-400/20 text-lavender-400 hover:border-accent-red/40 hover:text-accent-red hover:bg-accent-red/5 font-body text-sm uppercase tracking-wider transition-all duration-300 inline-flex items-center gap-2"
           >
             {{ cat }}
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" class="opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">

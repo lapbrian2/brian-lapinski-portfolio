@@ -66,14 +66,14 @@ onMounted(() => {
       <!-- Actions -->
       <div class="flex flex-wrap items-center justify-center gap-4 mt-10">
         <button
-          class="px-8 py-3 rounded-full bg-accent-red text-white font-body text-sm uppercase tracking-wider hover:bg-accent-red-hover transition-colors duration-200"
+          class="btn-press px-8 py-3 rounded-full bg-accent-red text-white font-body text-sm uppercase tracking-wider hover:bg-accent-red-hover transition-colors duration-200"
           @click="goHome"
         >
           Back to Home
         </button>
         <button
           v-if="is404"
-          class="px-8 py-3 rounded-full border border-lavender-400/30 text-lavender-300 font-body text-sm uppercase tracking-wider hover:border-lavender-200 hover:text-white transition-all duration-200"
+          class="btn-press px-8 py-3 rounded-full border border-lavender-400/30 text-lavender-300 font-body text-sm uppercase tracking-wider hover:border-lavender-200 hover:text-white transition-all duration-200"
           @click="goGallery"
         >
           View Gallery
@@ -87,7 +87,7 @@ onMounted(() => {
           <button
             v-for="cat in ['portraits', 'landscapes', 'abstract', 'surreal']"
             :key="cat"
-            class="px-4 py-2 rounded-full border border-lavender-400/15 text-lavender-400/60 font-body text-xs uppercase tracking-wider hover:border-accent-red/30 hover:text-lavender-200 transition-all duration-300"
+            class="btn-press px-4 py-2 rounded-full border border-lavender-400/15 text-lavender-400/60 font-body text-xs uppercase tracking-wider hover:border-accent-red/30 hover:text-lavender-200 transition-all duration-300"
             @click="clearError({ redirect: `/${cat}` })"
           >
             {{ cat }}

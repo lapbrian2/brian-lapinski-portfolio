@@ -27,7 +27,9 @@
   --ease-out: cubic-bezier(0, 0.55, 0.45, 1);
   --duration-fast: 0.2s;
   --duration-normal: 0.4s;
+  --duration-moderate: 0.6s;
   --duration-slow: 0.8s;
+  --duration-dramatic: 1.2s;
 
   /* Z-index scale */
   --z-canvas: 0;

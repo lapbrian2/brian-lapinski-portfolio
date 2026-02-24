@@ -65,7 +65,8 @@
             v-for="artwork in categoryArtworks"
             :key="artwork.id"
             class="artwork-card group bg-dark-800/50 border border-lavender-400/10 rounded-2xl overflow-hidden hover:border-accent-red/30 transition-all duration-300 cursor-pointer"
-            @click="openLightbox(artwork)"
+            :data-artwork-id="artwork.id"
+            @click="openLightbox(artwork, $event)"
           >
             <div class="aspect-[4/3] overflow-hidden relative">
               <!-- Shimmer placeholder -->
@@ -109,7 +110,7 @@
             v-for="cat in otherCategories"
             :key="cat.id"
             :to="`/${cat.id}`"
-            class="px-6 py-3 rounded-full border font-body text-sm uppercase tracking-wider transition-all duration-300"
+            class="btn-press px-6 py-3 rounded-full border font-body text-sm uppercase tracking-wider transition-all duration-300"
             :class="cat.id === category
               ? 'bg-accent-red/15 border-accent-red/40 text-accent-red'
               : 'border-lavender-400/20 text-lavender-400 hover:border-lavender-200 hover:text-lavender-200'"
@@ -141,6 +142,7 @@
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import type { Artwork } from '~/types/artwork'
+import type { SourceRect } from '~/composables/useLightbox'
 
 definePageMeta({ layout: false })
 
@@ -190,7 +192,23 @@ const otherCategories = computed(() => {
   }))
 })
 
-function openLightbox(artwork: Artwork) {
+function getCategoryCardRect(e: MouseEvent): SourceRect | null {
+  const card = (e.currentTarget as HTMLElement)
+  if (!card) return null
+  // The image container is the first child div (aspect-[4/3])
+  const imgContainer = card.firstElementChild || card
+  const domRect = imgContainer.getBoundingClientRect()
+  const computedStyle = window.getComputedStyle(card)
+  return {
+    top: domRect.top,
+    left: domRect.left,
+    width: domRect.width,
+    height: domRect.height,
+    borderRadius: computedStyle.borderRadius,
+  }
+}
+
+function openLightbox(artwork: Artwork, e: MouseEvent) {
   const index = categoryArtworks.value.findIndex((a: Artwork) => a.id === artwork.id)
   const items = categoryArtworks.value.map((a: Artwork) => ({
     id: a.id,
@@ -204,7 +222,8 @@ function openLightbox(artwork: Artwork) {
     refinementNotes: a.refinementNotes,
     promptNodes: a.promptNodes,
   }))
-  lightbox.open(items, index >= 0 ? index : 0)
+  const rect = getCategoryCardRect(e)
+  lightbox.open(items, index >= 0 ? index : 0, rect)
 }
 
 // GSAP scroll reveals

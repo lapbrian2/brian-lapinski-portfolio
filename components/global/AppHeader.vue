@@ -50,7 +50,7 @@
       <!-- Mobile Hamburger Button -->
       <button
         ref="hamburgerEl"
-        class="md:hidden relative z-50 w-8 h-6 flex flex-col justify-between"
+        class="btn-press md:hidden relative z-50 w-8 h-6 flex flex-col justify-between"
         aria-label="Toggle navigation menu"
         :aria-expanded="mobileOpen"
         @click="toggleMobile"

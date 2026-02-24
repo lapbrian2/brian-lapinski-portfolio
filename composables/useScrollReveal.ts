@@ -2,6 +2,7 @@ import { onMounted, onUnmounted, type Ref } from 'vue'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useReducedMotion } from './useMediaQuery'
+import { motion } from './useMotion'
 
 interface ScrollRevealOptions {
   y?: number
@@ -24,12 +25,12 @@ export function useScrollReveal(
     y = 40,
     x = 0,
     opacity = 0,
-    duration = 0.8,
+    duration = motion.duration.slow,
     delay = 0,
     stagger = 0,
     start = 'top 85%',
     once = true,
-    ease = 'power2.out',
+    ease = motion.ease.out,
     children = false,
   } = options
 

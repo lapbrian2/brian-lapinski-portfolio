@@ -73,7 +73,7 @@
         <!-- Back to top -->
         <button
           ref="topBtnEl"
-          class="group flex items-center gap-3 text-xs text-lavender-400 hover:text-lavender-100 transition-colors duration-300 uppercase tracking-wider font-body"
+          class="btn-press group flex items-center gap-3 text-xs text-lavender-400 hover:text-lavender-100 transition-colors duration-300 uppercase tracking-wider font-body"
           aria-label="Back to top"
           @click="scrollToTop"
         >

@@ -1,5 +1,6 @@
 import { onMounted, onUnmounted, type Ref } from 'vue'
 import gsap from 'gsap'
+import { motion } from './useMotion'
 
 interface MagneticHoverOptions {
   strength?: number
@@ -11,7 +12,7 @@ export function useMagneticHover(
   element: Ref<HTMLElement | null>,
   options: MagneticHoverOptions = {},
 ) {
-  const { strength = 0.3, scaleTo = 1.04, duration = 0.4 } = options
+  const { strength = 0.3, scaleTo = 1.04, duration = motion.duration.normal } = options
 
   let boundMove: ((e: MouseEvent) => void) | null = null
   let boundLeave: (() => void) | null = null
@@ -36,7 +37,7 @@ export function useMagneticHover(
         y: offsetY,
         scale: scaleTo,
         duration,
-        ease: 'power2.out',
+        ease: motion.ease.out,
         force3D: true,
       })
     }
@@ -46,8 +47,8 @@ export function useMagneticHover(
         x: 0,
         y: 0,
         scale: 1,
-        duration: 0.6,
-        ease: 'elastic.out(1, 0.5)',
+        duration: motion.duration.moderate,
+        ease: motion.ease.elastic,
         force3D: true,
       })
     }

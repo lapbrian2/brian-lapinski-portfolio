@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import gsap from 'gsap'
 import type { Artwork } from '~/types/artwork'
+import type { SourceRect } from '~/composables/useLightbox'
 
 const props = defineProps<{
   artworks: Artwork[]
@@ -168,7 +169,21 @@ function goToCard(index: number) {
   })
 }
 
-function openArtwork(index: number) {
+function getCarouselCardRect(e: MouseEvent): SourceRect | null {
+  const cardInner = (e.currentTarget as HTMLElement)?.querySelector('.card-inner')
+  if (!cardInner) return null
+  const domRect = cardInner.getBoundingClientRect()
+  const computedStyle = window.getComputedStyle(cardInner)
+  return {
+    top: domRect.top,
+    left: domRect.left,
+    width: domRect.width,
+    height: domRect.height,
+    borderRadius: computedStyle.borderRadius,
+  }
+}
+
+function openArtwork(index: number, e: MouseEvent) {
   const items = props.artworks.map((a) => ({
     id: a.id,
     src: a.src,
@@ -181,7 +196,8 @@ function openArtwork(index: number) {
     refinementNotes: a.refinementNotes,
     promptNodes: a.promptNodes,
   }))
-  lightbox.open(items, index)
+  const rect = getCarouselCardRect(e)
+  lightbox.open(items, index, rect)
 }
 
 function onImageLoad(id: string) {
@@ -223,7 +239,8 @@ onUnmounted(() => {
           :style="{
             transform: `rotateY(${i * angleStep}deg) translateZ(${radius}px)`,
           }"
-          @click.stop="openArtwork(i)"
+          :data-artwork-id="artwork.id"
+          @click.stop="openArtwork(i, $event)"
         >
           <div class="card-inner">
             <!-- Shimmer placeholder -->

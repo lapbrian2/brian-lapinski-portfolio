@@ -28,6 +28,7 @@ const categoryMeta: Record<TechniqueCategory, { label: string; icon: string }> =
 
 export function usePromptFork() {
   const copied = ref(false)
+  const copiedType = ref<'fork' | 'quick' | null>(null)
   const copyTimeoutId = ref<ReturnType<typeof setTimeout> | null>(null)
 
   /**
@@ -117,6 +118,7 @@ export function usePromptFork() {
       if (copyTimeoutId.value) clearTimeout(copyTimeoutId.value)
       copyTimeoutId.value = setTimeout(() => {
         copied.value = false
+        copiedType.value = null
       }, 2500)
 
       return true
@@ -136,6 +138,7 @@ export function usePromptFork() {
         if (copyTimeoutId.value) clearTimeout(copyTimeoutId.value)
         copyTimeoutId.value = setTimeout(() => {
           copied.value = false
+          copiedType.value = null
         }, 2500)
 
         return true
@@ -150,7 +153,11 @@ export function usePromptFork() {
    */
   async function fork(options: ForkOptions): Promise<boolean> {
     const template = generateTemplate(options)
-    return copyToClipboard(template)
+    const success = await copyToClipboard(template)
+    if (success) {
+      copiedType.value = 'fork'
+    }
+    return success
   }
 
   /**
@@ -158,11 +165,16 @@ export function usePromptFork() {
    */
   async function quickFork(options: ForkOptions): Promise<boolean> {
     const text = generateQuickFork(options)
-    return copyToClipboard(text)
+    const success = await copyToClipboard(text)
+    if (success) {
+      copiedType.value = 'quick'
+    }
+    return success
   }
 
   return {
     copied,
+    copiedType,
     generateTemplate,
     generateQuickFork,
     copyToClipboard,

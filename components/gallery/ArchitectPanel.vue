@@ -14,7 +14,7 @@ const emit = defineEmits<{
 
 const panelEl = ref<HTMLElement | null>(null)
 const contentEl = ref<HTMLElement | null>(null)
-const { fork, quickFork, copied } = usePromptFork()
+const { fork, quickFork, copied, copiedType } = usePromptFork()
 
 // Scroll fade indicator state
 const scrollTop = ref(0)
@@ -282,10 +282,10 @@ async function handleQuickFork() {
             <!-- Fork Actions -->
             <div class="animate-in pt-2 space-y-2">
               <button
-                class="fork-button group w-full"
+                class="btn-press fork-button group w-full"
                 @click="handleFork"
               >
-                <span class="flex items-center justify-center gap-2">
+                <span v-if="!copied || copiedType !== 'fork'" class="flex items-center justify-center gap-2">
                   <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" class="transition-transform duration-200 group-hover:rotate-12">
                     <path d="M4 2v4a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2V2" />
                     <circle cx="4" cy="2" r="1" />
@@ -293,23 +293,48 @@ async function handleQuickFork() {
                     <line x1="7" y1="8" x2="7" y2="12" />
                     <circle cx="7" cy="12" r="1" />
                   </svg>
-                  <span v-if="!copied">Fork Template</span>
-                  <span v-else class="text-emerald-300">Copied to Clipboard</span>
+                  <span>Fork Template</span>
                 </span>
+                <Transition name="feedback-slide" mode="out-in">
+                  <div v-if="copied && copiedType === 'fork'" class="flex flex-col items-center gap-0.5">
+                    <span class="text-accent-red font-medium flex items-center gap-1.5">
+                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="2 6 5 9 10 3" />
+                      </svg>
+                      Template copied
+                    </span>
+                    <span class="text-dark-400 text-[10px] italic">
+                      Paste into Midjourney and edit the bracketed sections
+                    </span>
+                  </div>
+                </Transition>
               </button>
 
               <button
                 v-if="item.rawPrompt"
-                class="quick-fork-button group w-full"
+                class="btn-press quick-fork-button group w-full"
                 @click="handleQuickFork"
               >
-                <span class="flex items-center justify-center gap-2">
+                <span v-if="!copied || copiedType !== 'quick'" class="flex items-center justify-center gap-2">
                   <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
                     <rect x="2" y="2" width="7" height="9" rx="1" />
                     <path d="M5 2V1a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1h-1" />
                   </svg>
                   <span>Copy Raw Prompt</span>
                 </span>
+                <Transition name="feedback-slide" mode="out-in">
+                  <div v-if="copied && copiedType === 'quick'" class="flex flex-col items-center gap-0.5">
+                    <span class="text-accent-red font-medium flex items-center gap-1.5">
+                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="2 6 5 9 10 3" />
+                      </svg>
+                      Prompt copied
+                    </span>
+                    <span class="text-dark-400 text-[10px] italic">
+                      Paste directly into Midjourney — ready to generate
+                    </span>
+                  </div>
+                </Transition>
               </button>
             </div>
           </template>
@@ -459,5 +484,21 @@ async function handleQuickFork() {
   .scrollbar-thin::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.12);
   }
+}
+
+/* Feedback slide transition */
+.feedback-slide-enter-active,
+.feedback-slide-leave-active {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.feedback-slide-enter-from {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.feedback-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-8px);
 }
 </style>

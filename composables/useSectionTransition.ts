@@ -2,6 +2,7 @@ import { onMounted, onUnmounted, type Ref } from 'vue'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useIsMobile, useReducedMotion } from './useMediaQuery'
+import { motion } from './useMotion'
 
 interface SectionTransitionOptions {
   parallaxIntensity?: number
@@ -49,8 +50,8 @@ export function useSectionTransition(
             gsap.to(element.value!, {
               opacity: 1,
               y: 0,
-              duration: 0.8,
-              ease: 'power2.out',
+              duration: motion.duration.slow,
+              ease: motion.ease.out,
               force3D: true,
             })
           },
