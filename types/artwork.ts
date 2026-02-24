@@ -10,9 +10,23 @@ export interface Artwork {
   dominantColor?: string
   sortOrder?: number
   featured?: boolean | null
+  // Ossuary: prompt architecture
+  rawPrompt?: string | null
+  mjVersion?: string | null
+  refinementNotes?: string | null
+  promptNodes?: PromptNode[]
   createdAt?: string | null
   updatedAt?: string | null
 }
+
+export interface PromptNode {
+  id: string
+  name: string
+  category: TechniqueCategory
+  description?: string | null
+}
+
+export type TechniqueCategory = 'lighting' | 'camera' | 'style' | 'mood' | 'composition' | 'material' | 'color' | 'post'
 
 export type ArtworkCategory = Artwork['category']
 

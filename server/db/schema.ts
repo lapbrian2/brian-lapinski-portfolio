@@ -13,8 +13,29 @@ export const artworks = sqliteTable('artworks', {
   year: integer('year').notNull(),
   sortOrder: integer('sort_order').notNull().default(0),
   featured: integer('featured', { mode: 'boolean' }).default(false),
+  // Ossuary: prompt architecture fields
+  rawPrompt: text('raw_prompt'),
+  mjVersion: text('mj_version'),
+  refinementNotes: text('refinement_notes'),
+  dominantColor: text('dominant_color'),
   createdAt: text('created_at').default(sql`(datetime('now'))`),
   updatedAt: text('updated_at').default(sql`(datetime('now'))`),
+})
+
+// Prompt Techniques — the building blocks of prompt architecture
+export const techniques = sqliteTable('techniques', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull().unique(),
+  category: text('category').notNull(), // 'lighting' | 'camera' | 'style' | 'mood' | 'composition' | 'material' | 'color' | 'post'
+  description: text('description'),
+  createdAt: text('created_at').default(sql`(datetime('now'))`),
+})
+
+// Many-to-many: Artwork <-> Technique
+export const artworkTechniques = sqliteTable('artwork_techniques', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  artworkId: text('artwork_id').notNull().references(() => artworks.id, { onDelete: 'cascade' }),
+  techniqueId: text('technique_id').notNull().references(() => techniques.id, { onDelete: 'cascade' }),
 })
 
 // Key-value content store for editable text blocks

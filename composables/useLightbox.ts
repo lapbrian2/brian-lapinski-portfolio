@@ -1,4 +1,5 @@
 import { ref, computed } from 'vue'
+import type { PromptNode, TechniqueCategory } from '~/types/artwork'
 
 export interface LightboxItem {
   id?: string
@@ -7,6 +8,11 @@ export interface LightboxItem {
   medium?: string
   description?: string
   year?: number
+  // Ossuary: prompt architecture
+  rawPrompt?: string | null
+  mjVersion?: string | null
+  refinementNotes?: string | null
+  promptNodes?: PromptNode[]
 }
 
 // Use useState for SSR-safe shared state (avoids cross-request contamination)

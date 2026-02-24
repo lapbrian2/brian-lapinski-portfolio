@@ -7,12 +7,19 @@ const captionEl = ref<HTMLElement | null>(null)
 const containerEl = ref<HTMLElement | null>(null)
 const imageLoaded = ref(false)
 const showCaption = ref(true)
+const showArchitect = ref(false)
 
 // Touch / swipe state
 let touchStartX = 0
 let touchStartY = 0
 let touchDeltaX = 0
 const SWIPE_THRESHOLD = 50
+
+// Check if current item has Ossuary data
+const hasOssuaryData = computed(() => {
+  const item = lightbox.currentItem.value
+  return !!(item?.rawPrompt || item?.promptNodes?.length)
+})
 
 function onBackdropClick(e: MouseEvent) {
   if (e.target === e.currentTarget) {
@@ -22,6 +29,10 @@ function onBackdropClick(e: MouseEvent) {
 
 function toggleCaption() {
   showCaption.value = !showCaption.value
+}
+
+function toggleArchitect() {
+  showArchitect.value = !showArchitect.value
 }
 
 function onTouchStart(e: TouchEvent) {
@@ -60,6 +71,11 @@ watch(() => lightbox.currentIndex.value, (_, oldVal) => {
   if (oldVal === undefined) return
   imageLoaded.value = false
   animateImageTransition()
+})
+
+// Close architect panel when switching artworks
+watch(() => lightbox.currentIndex.value, () => {
+  showArchitect.value = false
 })
 
 function animateImageTransition() {
@@ -121,14 +137,34 @@ function onImageLoad() {
 // Only listen for keyboard events when lightbox is open
 watch(() => lightbox.isOpen.value, (open) => {
   if (open) {
-    window.addEventListener('keydown', lightbox.handleKeydown)
+    window.addEventListener('keydown', handleKeydown)
   } else {
-    window.removeEventListener('keydown', lightbox.handleKeydown)
+    window.removeEventListener('keydown', handleKeydown)
+    showArchitect.value = false
   }
 })
 
+function handleKeydown(e: KeyboardEvent) {
+  if (!lightbox.isOpen.value) return
+  // Close architect panel on Escape if open, otherwise close lightbox
+  if (e.key === 'Escape') {
+    if (showArchitect.value) {
+      showArchitect.value = false
+    } else {
+      lightbox.close()
+    }
+    return
+  }
+  if (e.key === 'ArrowRight') lightbox.next()
+  if (e.key === 'ArrowLeft') lightbox.prev()
+  // 'a' key toggles architect panel
+  if (e.key === 'a' || e.key === 'A') {
+    if (hasOssuaryData.value) toggleArchitect()
+  }
+}
+
 onUnmounted(() => {
-  window.removeEventListener('keydown', lightbox.handleKeydown)
+  window.removeEventListener('keydown', handleKeydown)
 })
 </script>
 
@@ -155,7 +191,25 @@ onUnmounted(() => {
           <span>{{ String(lightbox.total.value).padStart(2, '0') }}</span>
         </div>
 
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2">
+          <!-- Architect Panel toggle -->
+          <button
+            v-if="hasOssuaryData"
+            class="schema-button group"
+            :class="showArchitect ? 'active' : ''"
+            aria-label="View prompt architecture"
+            @click.stop="toggleArchitect"
+          >
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" class="transition-transform duration-200 group-hover:rotate-12">
+              <path d="M4 2v4a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2V2" />
+              <circle cx="4" cy="2" r="1" />
+              <circle cx="10" cy="2" r="1" />
+              <line x1="7" y1="8" x2="7" y2="12" />
+              <circle cx="7" cy="12" r="1" />
+            </svg>
+            <span class="hidden sm:inline">Schema</span>
+          </button>
+
           <!-- Info toggle -->
           <button
             class="w-10 h-10 flex items-center justify-center rounded-full text-lavender-400 hover:text-lavender-100 transition-colors duration-200 cursor-hover"
@@ -211,6 +265,7 @@ onUnmounted(() => {
       <div
         v-if="lightbox.currentItem.value"
         class="lightbox-content"
+        :class="{ 'panel-open': showArchitect }"
         @click.stop="toggleCaption"
       >
         <!-- Image -->
@@ -253,7 +308,7 @@ onUnmounted(() => {
         <!-- Caption overlay — anchored to bottom of viewport -->
         <Transition name="caption-fade">
           <div
-            v-if="showCaption"
+            v-if="showCaption && !showArchitect"
             ref="captionEl"
             class="absolute bottom-0 left-0 right-0 px-6 md:px-24 pb-6 pt-16 pointer-events-none"
             style="background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 60%, transparent 100%)"
@@ -278,6 +333,14 @@ onUnmounted(() => {
           </div>
         </Transition>
       </div>
+
+      <!-- Architect Panel — slides in from right -->
+      <ArchitectPanel
+        v-if="lightbox.currentItem.value"
+        :item="lightbox.currentItem.value"
+        :visible="showArchitect"
+        @close="showArchitect = false"
+      />
     </div>
   </Transition>
 </template>
@@ -317,11 +380,20 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   padding: 56px 64px 0;
+  transition: padding-right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.lightbox-content.panel-open {
+  padding-right: 360px;
 }
 
 @media (max-width: 768px) {
   .lightbox-content {
     padding: 56px 12px 0;
+  }
+
+  .lightbox-content.panel-open {
+    padding-right: 12px;
   }
 }
 
@@ -346,5 +418,36 @@ onUnmounted(() => {
   box-shadow: 0 0 80px rgba(0, 0, 0, 0.6);
   border-radius: 2px;
   image-rendering: high-quality;
+}
+
+/* Schema button */
+.schema-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 100px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #a5b0c8;
+  font-family: var(--font-body, 'Inter', sans-serif);
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+
+.schema-button:hover {
+  background: rgba(237, 84, 77, 0.08);
+  border-color: rgba(237, 84, 77, 0.2);
+  color: #ed544d;
+}
+
+.schema-button.active {
+  background: rgba(237, 84, 77, 0.12);
+  border-color: rgba(237, 84, 77, 0.25);
+  color: #ed544d;
 }
 </style>

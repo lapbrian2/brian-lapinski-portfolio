@@ -26,6 +26,10 @@ function openLightbox(index: number) {
     medium: a.medium,
     description: a.description,
     year: a.year,
+    rawPrompt: a.rawPrompt,
+    mjVersion: a.mjVersion,
+    refinementNotes: a.refinementNotes,
+    promptNodes: a.promptNodes,
   }))
   lightbox.open(items, index)
 }
