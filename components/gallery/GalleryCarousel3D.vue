@@ -50,6 +50,11 @@ let dragStartAngle = 0
 let autoTween: gsap.core.Tween | null = null
 let resumeTimer: ReturnType<typeof setTimeout> | null = null
 
+// Velocity tracking for momentum flick
+let lastPointerX = 0
+let lastPointerTime = 0
+let velocity = 0
+
 function startAutoRotate() {
   if (!autoRotate.value || !trackEl.value || count.value === 0) return
   stopAutoRotate()
@@ -84,24 +89,52 @@ function onPointerDown(e: PointerEvent) {
   stopAutoRotate()
   dragStartX = e.clientX
   dragStartAngle = currentAngle.value
+  lastPointerX = e.clientX
+  lastPointerTime = performance.now()
+  velocity = 0
   ;(e.target as HTMLElement)?.setPointerCapture?.(e.pointerId)
 }
 
 function onPointerMove(e: PointerEvent) {
   if (!isDragging.value) return
+
+  const now = performance.now()
+  const dt = now - lastPointerTime
+  if (dt > 0) {
+    velocity = (e.clientX - lastPointerX) / dt // px/ms
+  }
+  lastPointerX = e.clientX
+  lastPointerTime = now
+
   const delta = e.clientX - dragStartX
-  currentAngle.value = dragStartAngle + delta * 0.3
+  const sensitivity = e.pointerType === 'touch' ? 0.45 : 0.3
+  currentAngle.value = dragStartAngle + delta * sensitivity
   applyRotation()
 }
 
 function onPointerUp() {
   if (!isDragging.value) return
   isDragging.value = false
-  // Snap to nearest card
-  const snapped = Math.round(currentAngle.value / angleStep.value) * angleStep.value
+
+  const step = angleStep.value
+  const nearestSnap = Math.round(currentAngle.value / step) * step
+
+  // Determine flick offset based on velocity
+  const flickThreshold = 0.3 // px/ms
+  const flickCards = Math.abs(velocity) > flickThreshold
+    ? Math.sign(velocity) * Math.ceil(Math.abs(velocity) / flickThreshold)
+    : 0
+
+  // Clamp flick to a maximum of 3 cards in either direction
+  const maxFlick = 3
+  const clampedFlick = Math.max(-maxFlick, Math.min(maxFlick, flickCards))
+  const targetAngle = nearestSnap + clampedFlick * step
+
+  const isFlick = clampedFlick !== 0
+
   gsap.to(currentAngle, {
-    value: snapped,
-    duration: 0.6,
+    value: targetAngle,
+    duration: isFlick ? 0.8 : 0.6,
     ease: 'power3.out',
     overwrite: true,
     onUpdate: applyRotation,
@@ -172,6 +205,7 @@ onUnmounted(() => {
     <div
       ref="sceneEl"
       class="carousel-scene"
+      data-cursor-drag
       :style="{ perspective: `${perspective}px` }"
       @pointerdown="onPointerDown"
       @pointermove="onPointerMove"
@@ -222,14 +256,18 @@ onUnmounted(() => {
     </div>
 
     <!-- Dot indicators -->
-    <div class="flex justify-center gap-2 mt-8">
+    <div class="flex justify-center gap-1 mt-8">
       <button
         v-for="(_, i) in artworks"
         :key="i"
-        class="h-2 rounded-full transition-all duration-300"
-        :class="activeIndex === i ? 'bg-accent-red w-6' : 'bg-lavender-400/30 hover:bg-lavender-400/50 w-2'"
+        class="relative flex items-center justify-center w-8 h-8 -mx-1 group"
         @click="goToCard(i)"
-      />
+      >
+        <span
+          class="block h-2 rounded-full transition-all duration-300"
+          :class="activeIndex === i ? 'bg-accent-red w-6' : 'bg-lavender-400/30 group-hover:bg-lavender-400/50 w-2'"
+        />
+      </button>
     </div>
   </div>
 </template>

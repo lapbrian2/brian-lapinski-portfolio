@@ -249,6 +249,15 @@ html {
     pointer-events: none;
     opacity: 0;
   }
+
+  .cursor-ring.is-loading {
+    border-style: dashed;
+    animation: cursor-spin 1.2s linear infinite;
+  }
+
+  @keyframes cursor-spin {
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+  }
 }
 
 /* Hover reveal underline — Noomo-style translateX slide */

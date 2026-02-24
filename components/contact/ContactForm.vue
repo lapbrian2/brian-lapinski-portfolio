@@ -2,8 +2,13 @@
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
+const MESSAGE_MAX = 1000
+
 const { form, errors, status, serverError, submit, reset } = useContactForm()
 const formEl = ref<HTMLElement | null>(null)
+
+const messageLength = computed(() => form.message.length)
+const messageLengthPercent = computed(() => Math.min(100, (messageLength.value / MESSAGE_MAX) * 100))
 let ctx: gsap.Context | null = null
 
 onMounted(() => {
@@ -106,11 +111,36 @@ onUnmounted(() => {
           v-model="form.message"
           required
           rows="5"
+          maxlength="1000"
           placeholder="Tell me about your project, collaboration idea, or just say hello..."
           class="w-full bg-dark-800/60 border border-dark-600 rounded-lg px-4 py-3 font-body text-sm text-lavender-100 placeholder-lavender-500/40 focus:outline-none focus:border-accent-red/50 focus:ring-1 focus:ring-accent-red/20 transition-all duration-300 resize-none"
           :class="{ 'border-red-500/50': errors.message }"
         />
-        <p v-if="errors.message" class="font-body text-xs text-red-400 mt-1.5">{{ errors.message }}</p>
+        <div class="h-px mt-0.5 rounded-full overflow-hidden bg-dark-700">
+          <div
+            class="h-full transition-all duration-300 ease-out rounded-full"
+            :class="[
+              messageLength > MESSAGE_MAX ? 'bg-red-400' :
+              messageLength > MESSAGE_MAX * 0.9 ? 'bg-amber-400/60' :
+              'bg-accent-red/30'
+            ]"
+            :style="{ width: `${messageLengthPercent}%` }"
+          />
+        </div>
+        <div class="flex items-center justify-between mt-1.5">
+          <p v-if="errors.message" class="font-body text-xs text-red-400">{{ errors.message }}</p>
+          <span v-else class="flex-1" />
+          <span
+            class="font-body text-[10px] tabular-nums transition-colors duration-300"
+            :class="[
+              messageLength > MESSAGE_MAX ? 'text-red-400' :
+              messageLength > MESSAGE_MAX * 0.9 ? 'text-amber-400/60' :
+              'text-lavender-400/30'
+            ]"
+          >
+            {{ messageLength }} / {{ MESSAGE_MAX }}
+          </span>
+        </div>
       </div>
 
       <!-- Error message -->

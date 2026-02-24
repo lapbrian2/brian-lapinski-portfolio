@@ -16,6 +16,16 @@ const panelEl = ref<HTMLElement | null>(null)
 const contentEl = ref<HTMLElement | null>(null)
 const { fork, quickFork, copied } = usePromptFork()
 
+// Scroll fade indicator state
+const scrollTop = ref(0)
+const canScrollMore = ref(true)
+
+function onContentScroll(e: Event): void {
+  const el = e.target as HTMLElement
+  scrollTop.value = el.scrollTop
+  canScrollMore.value = el.scrollTop + el.clientHeight < el.scrollHeight - 5
+}
+
 // GSAP tween trackers — kill before starting new animations to prevent ghost states
 let activeTween: gsap.core.Tween | null = null
 let staggerTween: gsap.core.Tween | null = null
@@ -78,7 +88,7 @@ watch(() => props.visible, (open) => {
       force3D: true,
     })
 
-    // Stagger content children
+    // Stagger content children and initialize scroll indicators
     nextTick(() => {
       if (contentEl.value) {
         const children = contentEl.value.querySelectorAll('.animate-in')
@@ -94,6 +104,11 @@ watch(() => props.visible, (open) => {
           delay: 0.15,
           overwrite: 'auto',
         })
+
+        // Initialize scroll fade state after content renders
+        const el = contentEl.value
+        scrollTop.value = el.scrollTop
+        canScrollMore.value = el.scrollTop + el.clientHeight < el.scrollHeight - 5
       }
     })
   } else {
@@ -169,122 +184,143 @@ async function handleQuickFork() {
         </button>
       </div>
 
-      <!-- Scrollable body -->
-      <div ref="contentEl" class="flex-1 overflow-y-auto overscroll-contain px-5 py-5 space-y-5 scrollbar-thin">
-        <!-- No data state -->
-        <div v-if="!hasOssuaryData" class="flex flex-col items-center justify-center h-full text-center py-12">
-          <div class="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center mb-3">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" class="text-lavender-400/50">
-              <path d="M8 2v12M2 8h12" stroke-linecap="round" />
-            </svg>
-          </div>
-          <p class="text-xs text-lavender-400/50 font-body">
-            Schema data coming soon
-          </p>
-        </div>
+      <!-- Scrollable body with fade indicators -->
+      <div class="relative flex-1 min-h-0">
+        <!-- Top fade -->
+        <div
+          class="absolute top-0 left-0 right-0 h-8 pointer-events-none z-10 transition-opacity duration-300"
+          :class="scrollTop > 5 ? 'opacity-100' : 'opacity-0'"
+          style="background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent)"
+        />
 
-        <template v-else>
-          <!-- Version badge -->
-          <div v-if="item.mjVersion" class="animate-in">
-            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/[0.08] text-[10px] font-body text-lavender-300/60 uppercase tracking-wider">
-              <span class="w-1 h-1 rounded-full bg-emerald-400" />
-              {{ item.mjVersion }}
-            </span>
-          </div>
-
-          <!-- Technique Tokens -->
-          <div v-if="groupedNodes.size > 0" class="space-y-3.5">
-            <div
-              v-for="[category, nodes] in groupedNodes"
-              :key="category"
-              class="animate-in"
-            >
-              <!-- Category label -->
-              <div class="flex items-center gap-2 mb-2">
-                <span
-                  class="w-1.5 h-1.5 rounded-full"
-                  :class="categoryColors[category]?.dot"
-                />
-                <span class="text-[10px] uppercase tracking-[0.2em] font-body" :class="categoryColors[category]?.text" style="opacity: 0.7">
-                  {{ categoryLabels[category] || category }}
-                </span>
-              </div>
-
-              <!-- Tokens -->
-              <div class="flex flex-wrap gap-1.5">
-                <span
-                  v-for="node in nodes"
-                  :key="node.id"
-                  class="technique-token"
-                  :class="[categoryColors[category]?.bg, categoryColors[category]?.border]"
-                  :title="node.description || undefined"
-                >
-                  <span class="text-[11px] font-body" :class="categoryColors[category]?.text">
-                    {{ node.name }}
-                  </span>
-                </span>
-              </div>
+        <!-- Scrollable content -->
+        <div
+          ref="contentEl"
+          class="h-full overflow-y-auto overscroll-contain px-5 py-5 space-y-5 scrollbar-thin"
+          @scroll="onContentScroll"
+        >
+          <!-- No data state -->
+          <div v-if="!hasOssuaryData" class="flex flex-col items-center justify-center h-full text-center py-12">
+            <div class="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center mb-3">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" class="text-lavender-400/50">
+                <path d="M8 2v12M2 8h12" stroke-linecap="round" />
+              </svg>
             </div>
-          </div>
-
-          <!-- Raw Prompt -->
-          <div v-if="item.rawPrompt" class="animate-in">
-            <div class="flex items-center gap-2 mb-2">
-              <span class="text-[10px] uppercase tracking-[0.2em] font-body text-lavender-400/50">
-                Raw Prompt
-              </span>
-            </div>
-            <div class="prompt-block">
-              <code class="text-[11px] leading-relaxed font-mono text-lavender-200/80 break-words whitespace-pre-wrap">{{ item.rawPrompt }}</code>
-            </div>
-          </div>
-
-          <!-- Refinement Notes -->
-          <div v-if="item.refinementNotes" class="animate-in">
-            <div class="flex items-center gap-2 mb-2">
-              <span class="text-[10px] uppercase tracking-[0.2em] font-body text-lavender-400/50">
-                Artist Notes
-              </span>
-            </div>
-            <p class="text-[12px] leading-relaxed font-body text-lavender-300/60 italic">
-              {{ item.refinementNotes }}
+            <p class="text-xs text-lavender-400/50 font-body">
+              Schema data coming soon
             </p>
           </div>
 
-          <!-- Fork Actions -->
-          <div class="animate-in pt-2 space-y-2">
-            <button
-              class="fork-button group w-full"
-              @click="handleFork"
-            >
-              <span class="flex items-center justify-center gap-2">
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" class="transition-transform duration-200 group-hover:rotate-12">
-                  <path d="M4 2v4a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2V2" />
-                  <circle cx="4" cy="2" r="1" />
-                  <circle cx="10" cy="2" r="1" />
-                  <line x1="7" y1="8" x2="7" y2="12" />
-                  <circle cx="7" cy="12" r="1" />
-                </svg>
-                <span v-if="!copied">Fork Template</span>
-                <span v-else class="text-emerald-300">Copied to Clipboard</span>
+          <template v-else>
+            <!-- Version badge -->
+            <div v-if="item.mjVersion" class="animate-in">
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/[0.08] text-[10px] font-body text-lavender-300/60 uppercase tracking-wider">
+                <span class="w-1 h-1 rounded-full bg-emerald-400" />
+                {{ item.mjVersion }}
               </span>
-            </button>
+            </div>
 
-            <button
-              v-if="item.rawPrompt"
-              class="quick-fork-button group w-full"
-              @click="handleQuickFork"
-            >
-              <span class="flex items-center justify-center gap-2">
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
-                  <rect x="2" y="2" width="7" height="9" rx="1" />
-                  <path d="M5 2V1a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1h-1" />
-                </svg>
-                <span>Copy Raw Prompt</span>
-              </span>
-            </button>
-          </div>
-        </template>
+            <!-- Technique Tokens -->
+            <div v-if="groupedNodes.size > 0" class="space-y-3.5">
+              <div
+                v-for="[category, nodes] in groupedNodes"
+                :key="category"
+                class="animate-in"
+              >
+                <!-- Category label -->
+                <div class="flex items-center gap-2 mb-2">
+                  <span
+                    class="w-1.5 h-1.5 rounded-full"
+                    :class="categoryColors[category]?.dot"
+                  />
+                  <span class="text-[10px] uppercase tracking-[0.2em] font-body" :class="categoryColors[category]?.text" style="opacity: 0.7">
+                    {{ categoryLabels[category] || category }}
+                  </span>
+                </div>
+
+                <!-- Tokens -->
+                <div class="flex flex-wrap gap-1.5">
+                  <span
+                    v-for="node in nodes"
+                    :key="node.id"
+                    class="technique-token"
+                    :class="[categoryColors[category]?.bg, categoryColors[category]?.border]"
+                    :title="node.description || undefined"
+                  >
+                    <span class="text-[11px] font-body" :class="categoryColors[category]?.text">
+                      {{ node.name }}
+                    </span>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Raw Prompt -->
+            <div v-if="item.rawPrompt" class="animate-in">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-[10px] uppercase tracking-[0.2em] font-body text-lavender-400/50">
+                  Raw Prompt
+                </span>
+              </div>
+              <div class="prompt-block">
+                <code class="text-[11px] leading-relaxed font-mono text-lavender-200/80 break-words whitespace-pre-wrap">{{ item.rawPrompt }}</code>
+              </div>
+            </div>
+
+            <!-- Refinement Notes -->
+            <div v-if="item.refinementNotes" class="animate-in">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-[10px] uppercase tracking-[0.2em] font-body text-lavender-400/50">
+                  Artist Notes
+                </span>
+              </div>
+              <p class="text-[12px] leading-relaxed font-body text-lavender-300/60 italic">
+                {{ item.refinementNotes }}
+              </p>
+            </div>
+
+            <!-- Fork Actions -->
+            <div class="animate-in pt-2 space-y-2">
+              <button
+                class="fork-button group w-full"
+                @click="handleFork"
+              >
+                <span class="flex items-center justify-center gap-2">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" class="transition-transform duration-200 group-hover:rotate-12">
+                    <path d="M4 2v4a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2V2" />
+                    <circle cx="4" cy="2" r="1" />
+                    <circle cx="10" cy="2" r="1" />
+                    <line x1="7" y1="8" x2="7" y2="12" />
+                    <circle cx="7" cy="12" r="1" />
+                  </svg>
+                  <span v-if="!copied">Fork Template</span>
+                  <span v-else class="text-emerald-300">Copied to Clipboard</span>
+                </span>
+              </button>
+
+              <button
+                v-if="item.rawPrompt"
+                class="quick-fork-button group w-full"
+                @click="handleQuickFork"
+              >
+                <span class="flex items-center justify-center gap-2">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
+                    <rect x="2" y="2" width="7" height="9" rx="1" />
+                    <path d="M5 2V1a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1h-1" />
+                  </svg>
+                  <span>Copy Raw Prompt</span>
+                </span>
+              </button>
+            </div>
+          </template>
+        </div>
+
+        <!-- Bottom fade -->
+        <div
+          class="absolute bottom-0 left-0 right-0 h-8 pointer-events-none z-10 transition-opacity duration-300"
+          :class="canScrollMore ? 'opacity-100' : 'opacity-0'"
+          style="background: linear-gradient(to top, rgba(0,0,0,0.8), transparent)"
+        />
       </div>
     </div>
   </div>
@@ -407,5 +443,21 @@ async function handleQuickFork() {
 
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.12);
+}
+
+/* iOS smooth scrolling */
+.scrollbar-thin {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Wider scrollbar on mobile for easier touch interaction */
+@media (max-width: 640px) {
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.12);
+  }
 }
 </style>

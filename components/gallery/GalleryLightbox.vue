@@ -21,7 +21,11 @@ const FOCUSABLE_SELECTOR = 'a[href], button:not([disabled]), textarea, input, se
 let touchStartX = 0
 let touchStartY = 0
 let touchDeltaX = 0
-const SWIPE_THRESHOLD = 50
+let touchLastX = 0
+let touchLastTime = 0
+let touchVelocity = 0
+const SWIPE_THRESHOLD = 40
+const VELOCITY_THRESHOLD = 0.3 // px/ms — a quick flick
 
 // Check if current item has Ossuary data
 const hasOssuaryData = computed(() => {
@@ -47,30 +51,64 @@ function onTouchStart(e: TouchEvent) {
   touchStartX = e.touches[0].clientX
   touchStartY = e.touches[0].clientY
   touchDeltaX = 0
+  touchLastX = e.touches[0].clientX
+  touchLastTime = performance.now()
+  touchVelocity = 0
 }
 
 function onTouchMove(e: TouchEvent) {
   touchDeltaX = e.touches[0].clientX - touchStartX
   const deltaY = Math.abs(e.touches[0].clientY - touchStartY)
+
+  // Compute velocity for flick detection
+  const now = performance.now()
+  const dt = now - touchLastTime
+  if (dt > 0) {
+    touchVelocity = (e.touches[0].clientX - touchLastX) / dt
+  }
+  touchLastX = e.touches[0].clientX
+  touchLastTime = now
+
   // Only track horizontal swipes
   if (Math.abs(touchDeltaX) > deltaY && imageEl.value) {
-    gsap.set(imageEl.value, { x: touchDeltaX * 0.4, rotation: touchDeltaX * 0.02, force3D: true })
+    gsap.set(imageEl.value, { x: touchDeltaX * 0.6, rotation: touchDeltaX * 0.015, force3D: true })
   }
 }
 
 function onTouchEnd() {
-  if (Math.abs(touchDeltaX) > SWIPE_THRESHOLD) {
-    if (touchDeltaX > 0 && lightbox.hasPrev.value) {
-      lightbox.prev()
-    } else if (touchDeltaX < 0 && lightbox.hasNext.value) {
-      lightbox.next()
+  const didSwipe = Math.abs(touchDeltaX) > SWIPE_THRESHOLD || Math.abs(touchVelocity) > VELOCITY_THRESHOLD
+  const direction = (touchDeltaX !== 0) ? Math.sign(touchDeltaX) : Math.sign(touchVelocity)
+
+  if (didSwipe && imageEl.value) {
+    if (direction > 0 && lightbox.hasPrev.value) {
+      gsap.to(imageEl.value, {
+        x: 120,
+        opacity: 0.3,
+        duration: 0.2,
+        ease: 'power2.in',
+        force3D: true,
+        overwrite: 'auto',
+        onComplete: () => lightbox.prev(),
+      })
+    } else if (direction < 0 && lightbox.hasNext.value) {
+      gsap.to(imageEl.value, {
+        x: -120,
+        opacity: 0.3,
+        duration: 0.2,
+        ease: 'power2.in',
+        force3D: true,
+        overwrite: 'auto',
+        onComplete: () => lightbox.next(),
+      })
     } else {
-      // Snap back — elastic for edge bounce feel
-      if (imageEl.value) gsap.to(imageEl.value, { x: 0, rotation: 0, duration: 0.5, ease: 'elastic.out(1, 0.5)', force3D: true })
+      // At edge — elastic bounce back
+      gsap.to(imageEl.value, { x: 0, rotation: 0, duration: 0.5, ease: 'elastic.out(1, 0.5)', force3D: true, overwrite: 'auto' })
     }
-  } else {
-    if (imageEl.value) gsap.to(imageEl.value, { x: 0, rotation: 0, duration: 0.3, ease: 'power2.out', force3D: true })
+  } else if (imageEl.value) {
+    // Didn't cross threshold — snap back
+    gsap.to(imageEl.value, { x: 0, rotation: 0, duration: 0.3, ease: 'power2.out', force3D: true, overwrite: 'auto' })
   }
+
   touchDeltaX = 0
 }
 
