@@ -223,14 +223,11 @@ onUnmounted(() => {
             <span class="font-body text-[10px] uppercase tracking-[0.2em] text-lavender-400/40">Loading</span>
           </div>
 
-          <NuxtImg
+          <img
             v-if="lightbox.currentItem.value.src"
             :key="lightbox.currentIndex.value"
             :src="lightbox.currentItem.value.src"
             :alt="lightbox.currentItem.value.title"
-            sizes="100vw"
-            format="webp"
-            quality="92"
             class="lightbox-image select-none"
             :class="imageLoaded ? 'opacity-100' : 'opacity-0'"
             draggable="false"
@@ -343,5 +340,6 @@ onUnmounted(() => {
   transition: opacity 0.3s ease;
   box-shadow: 0 0 80px rgba(0, 0, 0, 0.6);
   border-radius: 2px;
+  image-rendering: high-quality;
 }
 </style>
