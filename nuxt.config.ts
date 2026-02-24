@@ -18,7 +18,8 @@ export default defineNuxtConfig({
         { property: 'og:title', content: 'Brian Lapinski | AI Art Portfolio' },
         { property: 'og:description', content: 'Exploring what it means to be human through images. AI artist, educator, and Creative Partner.' },
         { property: 'og:type', content: 'website' },
-        { property: 'og:image', content: '/images/artworks/the-watcher.webp' },
+        { property: 'og:url', content: 'https://lapinski.art' },
+        { property: 'og:image', content: 'https://lapinski.art/images/artworks/the-watcher.webp' },
         { property: 'og:image:width', content: '1200' },
         { property: 'og:image:height', content: '630' },
         { property: 'og:locale', content: 'en_US' },
@@ -26,7 +27,7 @@ export default defineNuxtConfig({
         { name: 'twitter:card', content: 'summary_large_image' },
         { name: 'twitter:title', content: 'Brian Lapinski | AI Art Portfolio' },
         { name: 'twitter:description', content: 'Exploring what it means to be human through images.' },
-        { name: 'twitter:image', content: '/images/artworks/the-watcher.webp' },
+        { name: 'twitter:image', content: 'https://lapinski.art/images/artworks/the-watcher.webp' },
         { name: 'twitter:creator', content: '@Lapbrian2' },
         // Other
         { name: 'theme-color', content: '#181520' },
@@ -79,6 +80,9 @@ export default defineNuxtConfig({
     adminPassword: process.env.ADMIN_PASSWORD || '',
     adminSessionSecret: process.env.ADMIN_SESSION_SECRET || '',
     blobToken: process.env.BLOB_READ_WRITE_TOKEN || '',
+    public: {
+      siteUrl: process.env.SITE_URL || 'https://lapinski.art',
+    },
   },
 
   routeRules: {
@@ -86,6 +90,15 @@ export default defineNuxtConfig({
       headers: { 'Cache-Control': 'public, max-age=31536000, immutable' },
     },
     '/admin/**': { ssr: false },
+    '/**': {
+      headers: {
+        'X-Content-Type-Options': 'nosniff',
+        'X-Frame-Options': 'DENY',
+        'X-XSS-Protection': '1; mode=block',
+        'Referrer-Policy': 'strict-origin-when-cross-origin',
+        'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+      },
+    },
   },
 
   devtools: { enabled: true },

@@ -1,5 +1,6 @@
-export default defineEventHandler(() => {
-  const baseUrl = 'https://brian-lapinski-portfolio.vercel.app'
+export default defineEventHandler((event) => {
+  const config = useRuntimeConfig(event)
+  const baseUrl = (config.public.siteUrl as string) || 'https://lapinski.art'
   const categories = ['portraits', 'landscapes', 'abstract', 'surreal']
 
   const urls = [

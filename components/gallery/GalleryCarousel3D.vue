@@ -50,7 +50,7 @@ let dragStartAngle = 0
 let autoTween: gsap.core.Tween | null = null
 
 function startAutoRotate() {
-  if (!autoRotate.value || !trackEl.value) return
+  if (!autoRotate.value || !trackEl.value || count.value === 0) return
   stopAutoRotate()
   autoTween = gsap.to(currentAngle, {
     value: currentAngle.value - 360,

@@ -9,10 +9,14 @@ export interface LightboxItem {
   year?: number
 }
 
-const isOpen = ref(false)
-const items = ref<LightboxItem[]>([])
-const currentIndex = ref(0)
-const direction = ref<'next' | 'prev'>('next')
+// Use useState for SSR-safe shared state (avoids cross-request contamination)
+function useLightboxState() {
+  const isOpen = useState<boolean>('lightbox-open', () => false)
+  const items = useState<LightboxItem[]>('lightbox-items', () => [])
+  const currentIndex = useState<number>('lightbox-index', () => 0)
+  const direction = useState<'next' | 'prev'>('lightbox-direction', () => 'next')
+  return { isOpen, items, currentIndex, direction }
+}
 
 function getLenis(): any {
   if (typeof window === 'undefined') return null
@@ -25,6 +29,8 @@ function getLenis(): any {
 }
 
 export function useLightbox() {
+  const { isOpen, items, currentIndex, direction } = useLightboxState()
+
   const currentItem = computed(() => items.value[currentIndex.value] || null)
   const hasNext = computed(() => currentIndex.value < items.value.length - 1)
   const hasPrev = computed(() => currentIndex.value > 0)

@@ -55,16 +55,20 @@ function getSpanClass(index: number): string {
 let currentSkew = 0
 const skewTarget = ref(0)
 let skewTickerFn: (() => void) | null = null
+let lenisScrollHandler: ((e: any) => void) | null = null
+let lenisInstance: any = null
 
 function setupVelocitySkew() {
   if (!gridEl.value) return
   try {
     const { $lenis } = useNuxtApp()
     if ($lenis) {
-      ;($lenis as any).on('scroll', (e: any) => {
+      lenisInstance = $lenis
+      lenisScrollHandler = (e: any) => {
         const velocity = e.velocity || 0
         skewTarget.value = Math.max(-3, Math.min(3, velocity * 0.8))
-      })
+      }
+      ;($lenis as any).on('scroll', lenisScrollHandler)
     }
   } catch {}
 
@@ -179,6 +183,9 @@ watch(
 
 onUnmounted(() => {
   if (skewTickerFn) gsap.ticker.remove(skewTickerFn)
+  if (lenisScrollHandler && lenisInstance) {
+    lenisInstance.off('scroll', lenisScrollHandler)
+  }
   ctx?.revert()
 })
 </script>

@@ -3,4 +3,4 @@ Allow: /
 Disallow: /admin
 Disallow: /api/
 
-Sitemap: https://brian-lapinski-portfolio.vercel.app/sitemap.xml
+Sitemap: https://lapinski.art/sitemap.xml

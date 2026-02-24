@@ -18,6 +18,8 @@ let ctx: gsap.Context | null = null
 let velocityOffset = 0
 let velocityTarget = 0
 let tickerFn: (() => void) | null = null
+let lenisScrollHandler: ((e: any) => void) | null = null
+let lenisInstance: any = null
 
 onMounted(() => {
   if (!containerEl.value || !stripEl.value) return
@@ -41,12 +43,13 @@ onMounted(() => {
   try {
     const { $lenis } = useNuxtApp()
     if ($lenis) {
-      ;($lenis as any).on('scroll', (e: any) => {
+      lenisInstance = $lenis
+      const dir = props.direction === 'left' ? -1 : 1
+      lenisScrollHandler = (e: any) => {
         const velocity = e.velocity || 0
-        // Direction-aware: fast scroll pushes marquee further in its travel direction
-        const dir = props.direction === 'left' ? -1 : 1
         velocityTarget = velocity * dir * 2.5
-      })
+      }
+      ;($lenis as any).on('scroll', lenisScrollHandler)
     }
   } catch {}
 
@@ -64,6 +67,9 @@ onMounted(() => {
 
 onUnmounted(() => {
   if (tickerFn) gsap.ticker.remove(tickerFn)
+  if (lenisScrollHandler && lenisInstance) {
+    lenisInstance.off('scroll', lenisScrollHandler)
+  }
   ctx?.revert()
 })
 

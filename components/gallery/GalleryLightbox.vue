@@ -118,8 +118,13 @@ function onImageLoad() {
   imageLoaded.value = true
 }
 
-onMounted(() => {
-  window.addEventListener('keydown', lightbox.handleKeydown)
+// Only listen for keyboard events when lightbox is open
+watch(() => lightbox.isOpen.value, (open) => {
+  if (open) {
+    window.addEventListener('keydown', lightbox.handleKeydown)
+  } else {
+    window.removeEventListener('keydown', lightbox.handleKeydown)
+  }
 })
 
 onUnmounted(() => {
