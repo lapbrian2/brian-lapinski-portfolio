@@ -1,7 +1,7 @@
 import { onMounted, onUnmounted, type Ref } from 'vue'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { useIsMobile } from './useMediaQuery'
+import { useIsMobile, useReducedMotion } from './useMediaQuery'
 
 interface SectionTransitionOptions {
   parallaxIntensity?: number
@@ -26,10 +26,16 @@ export function useSectionTransition(
   } = options
 
   const isMobile = useIsMobile()
+  const reducedMotion = useReducedMotion()
   let ctx: gsap.Context | null = null
 
   onMounted(() => {
     if (!element.value) return
+
+    if (reducedMotion.value) {
+      gsap.set(element.value!, { opacity: 1, scale: 1, y: 0 })
+      return
+    }
 
     ctx = gsap.context(() => {
       if (isMobile.value) {

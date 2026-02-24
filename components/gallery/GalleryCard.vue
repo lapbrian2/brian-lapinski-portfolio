@@ -156,7 +156,7 @@ onUnmounted(() => {
     <!-- Hover overlay — tinted with artwork's dominant color -->
     <div
       ref="overlayEl"
-      class="absolute inset-0 opacity-0 transition-opacity duration-400 group-hover:opacity-100 flex items-end"
+      class="absolute inset-0 opacity-0 transition-opacity duration-400 group-hover:opacity-100 hidden md:flex items-end"
       :style="{
         background: `linear-gradient(to top, ${artwork.dominantColor || '#181520'}dd 0%, ${artwork.dominantColor || '#181520'}30 40%, transparent 100%)`,
       }"
@@ -178,6 +178,23 @@ onUnmounted(() => {
             </svg>
           </span>
         </div>
+      </div>
+    </div>
+
+    <!-- Mobile-only persistent title strip -->
+    <div
+      class="absolute inset-x-0 bottom-0 pointer-events-none md:hidden"
+      :style="{
+        background: `linear-gradient(to top, ${artwork.dominantColor || '#181520'}cc 0%, transparent 100%)`,
+      }"
+    >
+      <div class="px-3 pt-6 pb-2.5">
+        <h3 class="font-display text-sm text-lavender-100 leading-tight truncate">
+          {{ artwork.title }}
+        </h3>
+        <p class="text-[10px] text-lavender-400 mt-0.5 uppercase tracking-wide truncate">
+          {{ artwork.medium }} &middot; {{ artwork.year }}
+        </p>
       </div>
     </div>
   </div>

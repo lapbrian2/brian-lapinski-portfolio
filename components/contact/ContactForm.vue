@@ -60,7 +60,7 @@ onUnmounted(() => {
     </div>
 
     <!-- Form -->
-    <form v-else class="space-y-5" @submit.prevent="submit">
+    <form v-else class="space-y-5" aria-live="polite" @submit.prevent="submit">
       <!-- Honeypot (hidden from humans) -->
       <div class="absolute opacity-0 h-0 w-0 overflow-hidden" aria-hidden="true" tabindex="-1">
         <label for="website">Website</label>
@@ -78,10 +78,12 @@ onUnmounted(() => {
           type="text"
           required
           placeholder="Your name"
+          :aria-invalid="!!errors.name"
+          :aria-describedby="errors.name ? 'contact-name-error' : undefined"
           class="w-full bg-dark-800/60 border border-dark-600 rounded-lg px-4 py-3 font-body text-sm text-lavender-100 placeholder-lavender-500/40 focus:outline-none focus:border-accent-red/50 focus:ring-1 focus:ring-accent-red/20 transition-all duration-300"
           :class="{ 'border-red-500/50': errors.name }"
         >
-        <p v-if="errors.name" class="font-body text-xs text-red-400 mt-1.5">{{ errors.name }}</p>
+        <p v-if="errors.name" id="contact-name-error" class="font-body text-xs text-red-400 mt-1.5">{{ errors.name }}</p>
       </div>
 
       <!-- Email -->
@@ -95,10 +97,12 @@ onUnmounted(() => {
           type="email"
           required
           placeholder="you@example.com"
+          :aria-invalid="!!errors.email"
+          :aria-describedby="errors.email ? 'contact-email-error' : undefined"
           class="w-full bg-dark-800/60 border border-dark-600 rounded-lg px-4 py-3 font-body text-sm text-lavender-100 placeholder-lavender-500/40 focus:outline-none focus:border-accent-red/50 focus:ring-1 focus:ring-accent-red/20 transition-all duration-300"
           :class="{ 'border-red-500/50': errors.email }"
         >
-        <p v-if="errors.email" class="font-body text-xs text-red-400 mt-1.5">{{ errors.email }}</p>
+        <p v-if="errors.email" id="contact-email-error" class="font-body text-xs text-red-400 mt-1.5">{{ errors.email }}</p>
       </div>
 
       <!-- Message -->
@@ -113,6 +117,8 @@ onUnmounted(() => {
           rows="5"
           maxlength="1000"
           placeholder="Tell me about your project, collaboration idea, or just say hello..."
+          :aria-invalid="!!errors.message"
+          :aria-describedby="errors.message ? 'contact-message-error' : undefined"
           class="w-full bg-dark-800/60 border border-dark-600 rounded-lg px-4 py-3 font-body text-sm text-lavender-100 placeholder-lavender-500/40 focus:outline-none focus:border-accent-red/50 focus:ring-1 focus:ring-accent-red/20 transition-all duration-300 resize-none"
           :class="{ 'border-red-500/50': errors.message }"
         />
@@ -128,7 +134,7 @@ onUnmounted(() => {
           />
         </div>
         <div class="flex items-center justify-between mt-1.5">
-          <p v-if="errors.message" class="font-body text-xs text-red-400">{{ errors.message }}</p>
+          <p v-if="errors.message" id="contact-message-error" class="font-body text-xs text-red-400">{{ errors.message }}</p>
           <span v-else class="flex-1" />
           <span
             class="font-body text-[10px] tabular-nums transition-colors duration-300"
@@ -145,7 +151,7 @@ onUnmounted(() => {
 
       <!-- Error message -->
       <div v-if="status === 'error'" class="form-field">
-        <div class="bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-3">
+        <div role="alert" class="bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-3">
           <p class="font-body text-sm text-red-400">{{ serverError }}</p>
         </div>
       </div>

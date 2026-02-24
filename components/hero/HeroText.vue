@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { useReducedMotion } from '~/composables/useMediaQuery'
+
+const reducedMotion = useReducedMotion()
 const props = defineProps<{
   ready?: boolean
 }>()
@@ -17,6 +20,37 @@ let hasPlayed = false
 async function playEntrance() {
   if (hasPlayed || !nameEl.value || !taglineEl.value || !roleEl.value) return
   hasPlayed = true
+
+  if (reducedMotion.value) {
+    gsap.set(roleEl.value, { opacity: 1, y: 0 })
+    gsap.set(nameEl.value, { visibility: 'visible', opacity: 1 })
+    if (accentLineEl.value) {
+      gsap.set(accentLineEl.value, { opacity: 1 })
+      const lineL = accentLineEl.value.querySelector('.accent-line-l')
+      const lineR = accentLineEl.value.querySelector('.accent-line-r')
+      const dot = accentLineEl.value.querySelector('.accent-dot')
+      if (dot) gsap.set(dot, { scale: 1 })
+      if (lineL) gsap.set(lineL, { scaleX: 1 })
+      if (lineR) gsap.set(lineR, { scaleX: 1 })
+    }
+    gsap.set(taglineEl.value, { visibility: 'visible', opacity: 1 })
+
+    // Still set up scroll parallax so content leaves viewport naturally
+    ctx = gsap.context(() => {
+      gsap.to(containerEl.value, {
+        y: -60,
+        opacity: 0,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: '.hero-section',
+          start: 'top top',
+          end: '40% top',
+          scrub: true,
+        },
+      })
+    }, containerEl.value!)
+    return
+  }
 
   const { default: Splitting } = await import('splitting')
 

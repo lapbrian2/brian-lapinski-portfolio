@@ -45,8 +45,10 @@
 
       <!-- Mobile Hamburger Button -->
       <button
+        ref="hamburgerEl"
         class="md:hidden relative z-50 w-8 h-6 flex flex-col justify-between"
         aria-label="Toggle navigation menu"
+        :aria-expanded="mobileOpen"
         @click="toggleMobile"
       >
         <span
@@ -120,6 +122,7 @@ const mobileOpen = ref(false)
 const activeSection = ref('')
 const mobileOverlayEl = ref<HTMLElement | null>(null)
 const mobileNavEl = ref<HTMLElement | null>(null)
+const hamburgerEl = ref<HTMLElement | null>(null)
 
 let menuTl: gsap.core.Timeline | null = null
 let observer: IntersectionObserver | null = null
@@ -148,6 +151,7 @@ function scrollToSection(sectionId: string): void {
 
 function openMobileMenu() {
   mobileOpen.value = true
+  document.body.style.overflow = 'hidden'
 
   nextTick(() => {
     if (!mobileOverlayEl.value || !mobileNavEl.value) return
@@ -175,12 +179,16 @@ function openMobileMenu() {
       stagger: 0.08,
       ease: 'power3.out',
     }, '-=0.3')
+
+    const firstLink = mobileNavEl.value?.querySelector('a')
+    firstLink?.focus()
   })
 }
 
 function closeMobileMenu() {
   if (!mobileOverlayEl.value || !mobileNavEl.value) {
     mobileOpen.value = false
+    document.body.style.overflow = ''
     return
   }
 
@@ -190,6 +198,8 @@ function closeMobileMenu() {
   menuTl = gsap.timeline({
     onComplete: () => {
       mobileOpen.value = false
+      document.body.style.overflow = ''
+      hamburgerEl.value?.focus()
     },
   })
 
@@ -208,6 +218,41 @@ function closeMobileMenu() {
     duration: 0.5,
     ease: 'power3.inOut',
   }, '-=0.15')
+}
+
+function trapFocus(e: KeyboardEvent): void {
+  if (!mobileOverlayEl.value) return
+
+  const focusableElements = [
+    ...Array.from(mobileOverlayEl.value.querySelectorAll<HTMLElement>('a[href], button')),
+    hamburgerEl.value,
+  ].filter((el): el is HTMLElement => el !== null)
+
+  if (focusableElements.length === 0) return
+
+  const firstEl = focusableElements[0]
+  const lastEl = focusableElements[focusableElements.length - 1]
+
+  if (e.shiftKey && document.activeElement === firstEl) {
+    e.preventDefault()
+    lastEl.focus()
+  } else if (!e.shiftKey && document.activeElement === lastEl) {
+    e.preventDefault()
+    firstEl.focus()
+  }
+}
+
+function handleKeydown(e: KeyboardEvent): void {
+  if (!mobileOpen.value) return
+
+  if (e.key === 'Escape') {
+    closeMobileMenu()
+    return
+  }
+
+  if (e.key === 'Tab') {
+    trapFocus(e)
+  }
 }
 
 function toggleMobile(): void {
@@ -275,12 +320,14 @@ function setupSectionObserver() {
 
 onMounted(() => {
   window.addEventListener('scroll', handleScroll, { passive: true })
+  window.addEventListener('keydown', handleKeydown)
   handleScroll()
   nextTick(setupSectionObserver)
 })
 
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll)
+  window.removeEventListener('keydown', handleKeydown)
   menuTl?.kill()
   observer?.disconnect()
 })

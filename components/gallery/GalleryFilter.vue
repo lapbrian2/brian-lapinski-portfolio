@@ -61,7 +61,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div ref="containerEl" class="relative flex flex-wrap gap-2" role="tablist" aria-label="Gallery category filters">
+  <div ref="containerEl" class="relative flex flex-wrap gap-2" role="group" aria-label="Gallery category filters">
     <!-- Sliding pill indicator -->
     <div
       ref="pillEl"
@@ -74,6 +74,9 @@ onMounted(() => {
       <button
         v-if="!cat.isLink"
         :data-filter="cat.id"
+        role="tab"
+        :aria-selected="modelValue === cat.id"
+        aria-label="Filter gallery"
         :class="[
           'relative z-10 px-5 py-2 rounded-full text-sm font-body uppercase tracking-wider transition-colors duration-300 cursor-hover inline-flex items-center gap-2',
           modelValue === cat.id
@@ -96,6 +99,7 @@ onMounted(() => {
         v-else
         :to="`/${cat.id}`"
         :data-filter="cat.id"
+        :aria-label="`View all ${cat.label} artworks`"
         :class="[
           'relative z-10 px-5 py-2 rounded-full text-sm font-body uppercase tracking-wider transition-colors duration-300 cursor-hover inline-flex items-center gap-2',
           'text-lavender-400 hover:text-lavender-200',

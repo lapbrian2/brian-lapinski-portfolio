@@ -2,8 +2,10 @@
   <div
     v-if="!hidden"
     ref="loaderEl"
+    tabindex="0"
     class="fixed inset-0 z-[100] flex flex-col items-center justify-center cursor-pointer overflow-hidden"
     @click="skip"
+    @keydown="skip"
   >
     <!-- Blurred artwork background that sharpens as loading progresses -->
     <div class="absolute inset-0">
@@ -83,7 +85,7 @@
       ref="skipHintEl"
       class="absolute bottom-8 z-10 font-body text-[10px] text-lavender-400/40 uppercase tracking-[0.3em] opacity-0"
     >
-      Click to skip
+      Press any key to skip
     </span>
   </div>
 </template>
@@ -209,6 +211,8 @@ onMounted(() => {
     emit('complete')
     return
   }
+
+  loaderEl.value?.focus()
 
   const entranceTl = gsap.timeline()
 

@@ -7,6 +7,14 @@ const props = defineProps<{
 }>()
 
 const is404 = computed(() => props.error.statusCode === 404)
+
+useHead({
+  title: computed(() => is404.value ? 'Page Not Found — Brian Lapinski' : 'Error — Brian Lapinski'),
+  meta: [
+    { name: 'robots', content: 'noindex, nofollow' },
+  ],
+})
+
 const containerEl = ref<HTMLElement | null>(null)
 
 function goHome() {
