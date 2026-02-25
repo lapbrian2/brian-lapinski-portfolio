@@ -18,6 +18,9 @@ const showcase = {
 onMounted(() => {
   if (!sectionEl.value || !imageEl.value || !textEl.value) return
 
+  // Respect reduced-motion preference
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
   ctx = gsap.context(() => {
     // Parallax image — drifts slower than scroll for depth
     gsap.fromTo(imageEl.value!, { scale: 1.15, y: '-8%' }, {

@@ -43,7 +43,7 @@ useHead({
         '@context': 'https://schema.org',
         '@type': 'WebSite',
         name: 'Brian Lapinski | AI Art Portfolio',
-        url: 'https://brian-lapinski-portfolio.vercel.app',
+        url: 'https://lapinski.art',
         description: 'Exploring what it means to be human through images. AI artist, educator, and Creative Partner.',
         author: {
           '@type': 'Person',

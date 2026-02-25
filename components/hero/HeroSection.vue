@@ -156,11 +156,11 @@ onUnmounted(() => {
 .hero-overlay {
   background:
     linear-gradient(to bottom,
-      rgba(24, 21, 32, 0.7) 0%,
-      rgba(24, 21, 32, 0.35) 35%,
-      rgba(24, 21, 32, 0.3) 50%,
-      rgba(24, 21, 32, 0.45) 70%,
-      rgba(24, 21, 32, 0.85) 100%
+      rgba(0, 0, 0, 0.7) 0%,
+      rgba(0, 0, 0, 0.35) 35%,
+      rgba(0, 0, 0, 0.3) 50%,
+      rgba(0, 0, 0, 0.45) 70%,
+      rgba(0, 0, 0, 0.85) 100%
     );
 }
 

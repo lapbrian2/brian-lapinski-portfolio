@@ -235,7 +235,7 @@ onMounted(() => {
 
   if (overlayEl.value) {
     entranceTl.to(overlayEl.value, {
-      backgroundColor: 'rgba(24, 21, 32, 0.75)',
+      backgroundColor: 'rgba(0, 0, 0, 0.75)',
       duration: 0.8,
       ease: 'power2.out',
     }, 0)
@@ -345,7 +345,7 @@ onMounted(() => {
       // Overlay lightens subtly
       if (overlayEl.value) {
         const overlayOpacity = 0.75 - (progress * 0.2) // 0.75 -> 0.55
-        overlayEl.value.style.backgroundColor = `rgba(24, 21, 32, ${overlayOpacity})`
+        overlayEl.value.style.backgroundColor = `rgba(0, 0, 0, ${overlayOpacity})`
       }
     },
     onComplete: () => {
