@@ -202,12 +202,10 @@ onUnmounted(() => {
 <style scoped>
 :deep(.char) {
   display: inline-block;
-  will-change: transform, opacity;
 }
 
 :deep(.word) {
   display: inline-block;
-  will-change: transform, opacity, filter;
 }
 
 :deep(.word + .whitespace) {

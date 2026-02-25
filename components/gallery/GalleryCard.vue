@@ -238,11 +238,4 @@ onUnmounted(() => {
   100% { background-position: 200% 0; }
 }
 
-.gallery-card {
-  will-change: transform;
-}
-
-.card-img {
-  will-change: transform;
-}
 </style>

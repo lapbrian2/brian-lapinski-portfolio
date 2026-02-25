@@ -80,17 +80,6 @@ export function useSectionTransition(
         },
       })
 
-      // Exit parallax: content drifts up slightly as scrolled past
-      gsap.to(element.value!, {
-        y: -(parallaxIntensity * 50),
-        ease: 'none',
-        scrollTrigger: {
-          trigger: element.value!,
-          start: 'top top',
-          end: 'bottom top',
-          scrub: true,
-        },
-      })
     }, element.value)
   })
 

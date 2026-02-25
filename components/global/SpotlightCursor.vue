@@ -4,7 +4,7 @@
     class="fixed inset-0 z-[1] pointer-events-none hidden md:block"
     :style="{
       background: 'radial-gradient(circle 600px at var(--spotlight-x) var(--spotlight-y), rgba(255,255,255,0.04), transparent 70%)',
-      mixBlendMode: 'screen',
+      contain: 'strict',
     }"
   />
 </template>
