@@ -35,7 +35,7 @@ export default defineNuxtConfig({
       ],
       link: [
         { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
-        { rel: 'preconnect', href: 'https://fonts.cdnfonts.com' },
+        { rel: 'preconnect', href: 'https://fonts.cdnfonts.com', crossorigin: '' },
         { rel: 'preload', as: 'style', href: 'https://fonts.cdnfonts.com/css/pp-neue-montreal' },
         { rel: 'stylesheet', href: 'https://fonts.cdnfonts.com/css/pp-neue-montreal' },
       ],

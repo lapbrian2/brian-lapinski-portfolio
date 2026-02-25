@@ -332,6 +332,9 @@ function bindAll(root: Element | Document = document): void {
 // ─── Lifecycle ───────────────────────────────────────────────────
 
 onMounted(() => {
+  const hoverQuery = window.matchMedia('(hover: hover)')
+  if (!hoverQuery.matches) return
+
   window.addEventListener('mousemove', onMouseMove, { passive: true })
   window.addEventListener('mousedown', onMouseDown)
   window.addEventListener('mouseup', onMouseUp)

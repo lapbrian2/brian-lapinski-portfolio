@@ -69,7 +69,7 @@ onUnmounted(() => {
 
       <!-- Name -->
       <div class="form-field">
-        <label for="contact-name" class="block font-body text-xs uppercase tracking-[0.15em] text-lavender-400/60 mb-2">
+        <label for="contact-name" class="block font-body text-xs uppercase tracking-[0.15em] text-lavender-300 mb-2">
           Name
         </label>
         <input
@@ -88,7 +88,7 @@ onUnmounted(() => {
 
       <!-- Email -->
       <div class="form-field">
-        <label for="contact-email" class="block font-body text-xs uppercase tracking-[0.15em] text-lavender-400/60 mb-2">
+        <label for="contact-email" class="block font-body text-xs uppercase tracking-[0.15em] text-lavender-300 mb-2">
           Email
         </label>
         <input
@@ -107,7 +107,7 @@ onUnmounted(() => {
 
       <!-- Message -->
       <div class="form-field">
-        <label for="contact-message" class="block font-body text-xs uppercase tracking-[0.15em] text-lavender-400/60 mb-2">
+        <label for="contact-message" class="block font-body text-xs uppercase tracking-[0.15em] text-lavender-300 mb-2">
           Message
         </label>
         <textarea

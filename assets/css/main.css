@@ -198,8 +198,9 @@ html {
   top: 0;
   left: 0;
   width: 100%;
-  height: 2px;
+  height: 3px;
   background: var(--color-accent-red);
+  box-shadow: 0 0 8px rgba(237, 84, 77, 0.4);
   transform-origin: left;
   transform: scaleX(0);
   z-index: calc(var(--z-nav) + 1);
@@ -334,4 +335,20 @@ html {
 .btn-press:active {
   transform: translateY(1px) scale(0.97);
   transition-duration: 0.08s;
+}
+
+/* ─── No-JS / GSAP Failure Safety Net ───────────────────────────── */
+@keyframes gsap-fallback-reveal {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+html:not(.gsap-ready) .opacity-0:not([aria-hidden="true"]):not(.sr-only) {
+  animation: gsap-fallback-reveal 0.5s ease 4s forwards;
+}
+
+html:not(.gsap-ready) [style*="opacity: 0"] {
+  animation: gsap-fallback-reveal 0.5s ease 4s forwards !important;
 }

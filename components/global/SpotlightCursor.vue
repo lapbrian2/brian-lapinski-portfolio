@@ -27,6 +27,9 @@ function onMouseMove(e: MouseEvent): void {
 }
 
 onMounted(() => {
+  const hoverQuery = window.matchMedia('(hover: hover)')
+  if (!hoverQuery.matches) return
+
   if (spotlightEl.value) {
     spotlightEl.value.style.setProperty('--spotlight-x', '50vw')
     spotlightEl.value.style.setProperty('--spotlight-y', '50vh')

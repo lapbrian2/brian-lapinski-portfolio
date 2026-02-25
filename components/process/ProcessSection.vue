@@ -1,8 +1,8 @@
 <template>
-  <section id="process" ref="sectionEl" class="overflow-hidden">
+  <section id="process" ref="sectionEl" class="overflow-hidden md:pb-24">
     <div class="max-w-[1400px] mx-auto px-6 md:px-12 pt-24 md:pt-32">
       <div ref="headingEl">
-        <p class="font-body text-xs uppercase tracking-[0.2em] text-lavender-400/60 mb-4">
+        <p class="font-body text-xs uppercase tracking-[0.2em] text-lavender-300 mb-4">
           Process
         </p>
         <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12">

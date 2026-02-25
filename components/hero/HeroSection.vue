@@ -13,13 +13,15 @@ const heroImages = [
   '/images/artworks/the-crossing.webp',
 ]
 
-// Preload all hero images so crossfades don't pop in on first cycle
+// Preload only the first hero image — subsequent images load lazily as needed
 useHead({
-  link: heroImages.map((href) => ({
-    rel: 'preload',
-    as: 'image',
-    href,
-  })),
+  link: [
+    {
+      rel: 'preload',
+      as: 'image',
+      href: heroImages[0],
+    },
+  ],
 })
 
 const emit = defineEmits<{
@@ -118,7 +120,7 @@ onUnmounted(() => {
         alt=""
         class="absolute inset-0 w-full h-full object-cover hero-img"
         style="opacity: 0"
-        loading="eager"
+        :loading="i === 0 ? 'eager' : 'lazy'"
         draggable="false"
       />
     </div>

@@ -548,7 +548,7 @@ onUnmounted(() => {
       <!-- Top bar -->
       <div class="lightbox-controls absolute top-0 left-0 right-0 flex items-center justify-between px-5 md:px-8 py-5 z-10">
         <!-- Counter -->
-        <div class="font-body text-xs text-lavender-400/60 tracking-wider tabular-nums">
+        <div class="font-body text-xs text-lavender-300 tracking-wider tabular-nums">
           <span class="text-lavender-200">{{ String(lightbox.currentIndex.value + 1).padStart(2, '0') }}</span>
           <span class="mx-1.5">/</span>
           <span>{{ String(lightbox.total.value).padStart(2, '0') }}</span>
@@ -561,6 +561,8 @@ onUnmounted(() => {
             class="btn-press schema-button group"
             :class="showArchitect ? 'active' : ''"
             aria-label="View prompt architecture"
+            title="View prompt architecture"
+            :aria-pressed="showArchitect"
             @click.stop="toggleArchitect"
           >
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" class="transition-transform duration-200 group-hover:rotate-12">
@@ -673,10 +675,10 @@ onUnmounted(() => {
           <div
             v-if="showCaption && !showArchitect"
             ref="captionEl"
-            class="absolute bottom-0 left-0 right-0 px-6 md:px-24 pb-6 pt-16 pointer-events-none"
+            class="absolute bottom-0 left-0 right-0 px-6 md:px-24 pb-8 md:pb-6 pt-16 pointer-events-none"
             style="background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 60%, transparent 100%)"
           >
-            <div class="max-w-2xl mx-auto text-center pointer-events-auto">
+            <div class="max-w-2xl mx-auto text-center pointer-events-auto max-h-[40vh] overflow-y-auto">
               <h3 class="font-display text-xl md:text-2xl lg:text-3xl text-white font-semibold">
                 {{ lightbox.currentItem.value.title }}
               </h3>

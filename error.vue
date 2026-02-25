@@ -87,7 +87,7 @@ onMounted(() => {
           <button
             v-for="cat in ['portraits', 'landscapes', 'abstract', 'surreal']"
             :key="cat"
-            class="btn-press px-4 py-2 rounded-full border border-lavender-400/15 text-lavender-400/60 font-body text-xs uppercase tracking-wider hover:border-accent-red/30 hover:text-lavender-200 transition-all duration-300"
+            class="btn-press px-4 py-2 rounded-full border border-lavender-400/15 text-lavender-300 font-body text-xs uppercase tracking-wider hover:border-accent-red/30 hover:text-lavender-200 transition-all duration-300"
             @click="clearError({ redirect: `/${cat}` })"
           >
             {{ cat }}

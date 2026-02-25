@@ -40,7 +40,7 @@ useScrollReveal(headingEl, { y: 30, stagger: 0.1, children: true })
     <!-- Heading area -->
     <div ref="headingEl" class="mb-16">
       <div class="flex items-center gap-3 mb-4">
-        <p class="font-body text-xs uppercase tracking-[0.2em] text-lavender-400/60">
+        <p class="font-body text-xs uppercase tracking-[0.2em] text-lavender-300">
           Portfolio
         </p>
         <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-accent-red/10 border border-accent-red/20 text-accent-red text-[10px] font-body font-medium tabular-nums">
@@ -69,7 +69,7 @@ useScrollReveal(headingEl, { y: 30, stagger: 0.1, children: true })
     <div class="mt-20 pt-12 border-t border-lavender-400/10">
       <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
         <div>
-          <p class="font-body text-xs uppercase tracking-[0.2em] text-lavender-400/60 mb-2">
+          <p class="font-body text-xs uppercase tracking-[0.2em] text-lavender-300 mb-2">
             Full Collection
           </p>
           <p class="font-display text-xl md:text-2xl font-semibold text-lavender-100">

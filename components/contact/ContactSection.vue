@@ -33,7 +33,7 @@
       </div>
 
       <!-- Direct email fallback -->
-      <p class="font-body text-sm text-lavender-400/60 mt-8 opacity-0" ref="emailFallbackEl">
+      <p class="font-body text-sm text-lavender-300 mt-8 opacity-0" ref="emailFallbackEl">
         Or email directly at
         <a href="mailto:brian@lapinski.art" class="text-lavender-300 hover:text-accent-red transition-colors duration-200 underline underline-offset-4">
           brian@lapinski.art

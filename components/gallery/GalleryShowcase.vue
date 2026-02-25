@@ -64,7 +64,7 @@ onUnmounted(() => {
 
     <!-- Text content — left-aligned, vertically centered -->
     <div ref="textEl" class="absolute inset-0 flex flex-col justify-center px-8 md:px-16 lg:px-24 max-w-3xl">
-      <p class="font-body text-xs uppercase tracking-[0.2em] text-lavender-400/60 mb-4">
+      <p class="font-body text-xs uppercase tracking-[0.2em] text-lavender-300 mb-4">
         Featured Work
       </p>
       <h2 class="font-display text-4xl md:text-6xl lg:text-7xl font-bold text-lavender-100 leading-none mb-6">

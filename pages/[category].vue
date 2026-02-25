@@ -68,7 +68,7 @@
             :data-artwork-id="artwork.id"
             @click="openLightbox(artwork, $event)"
           >
-            <div class="aspect-[4/3] overflow-hidden relative">
+            <div :class="[aspectClasses[artwork.aspect] || 'aspect-[4/3]', 'overflow-hidden relative']">
               <!-- Shimmer placeholder -->
               <div
                 v-if="!gridLoadedImages.has(artwork.id)"
@@ -102,9 +102,9 @@
     <!-- Category Navigation -->
     <section ref="navEl" class="px-6 md:px-12 pb-24">
       <div class="max-w-4xl mx-auto">
-        <h3 class="font-body text-xs uppercase tracking-[0.2em] text-lavender-400/60 text-center mb-6">
+        <p class="font-body text-xs uppercase tracking-[0.2em] text-lavender-300 text-center mb-6">
           Explore More
-        </h3>
+        </p>
         <div class="flex flex-wrap justify-center gap-3">
           <NuxtLink
             v-for="cat in otherCategories"
@@ -122,17 +122,7 @@
       </div>
     </section>
 
-    <!-- Minimal footer -->
-    <footer class="px-6 md:px-12 pb-10 pt-6 border-t border-lavender-400/10">
-      <div class="max-w-6xl mx-auto flex items-center justify-between">
-        <NuxtLink to="/" class="font-display text-sm font-bold text-lavender-400/50 hover:text-lavender-200 transition-colors">
-          BL
-        </NuxtLink>
-        <p class="font-body text-[11px] text-lavender-400/30">
-          &copy; {{ new Date().getFullYear() }} Brian Lapinski
-        </p>
-      </div>
-    </footer>
+    <AppFooter />
 
     <GalleryLightbox />
   </div>
@@ -166,6 +156,12 @@ const navEl = ref<HTMLElement | null>(null)
 
 // Track loaded images for grid shimmer states
 const gridLoadedImages = reactive(new Set<string>())
+
+const aspectClasses: Record<string, string> = {
+  tall: 'aspect-[3/4]',
+  wide: 'aspect-[4/3]',
+  square: 'aspect-square',
+}
 
 const categoryArtworks = computed(() =>
   artworks.value.filter((a: Artwork) => a.category === category.value)

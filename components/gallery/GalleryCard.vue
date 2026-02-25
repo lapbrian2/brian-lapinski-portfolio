@@ -185,7 +185,7 @@ onUnmounted(() => {
       <div class="p-5 md:p-6 w-full">
         <div class="flex items-start justify-between gap-3">
           <div>
-            <h3 ref="titleEl" class="font-display text-base md:text-lg text-lavender-100 leading-tight">
+            <h3 ref="titleEl" aria-hidden="true" class="font-display text-base md:text-lg text-lavender-100 leading-tight">
               {{ artwork.title }}
             </h3>
             <p ref="mediumEl" class="text-xs text-lavender-400 mt-1.5 opacity-0 tracking-wide uppercase">

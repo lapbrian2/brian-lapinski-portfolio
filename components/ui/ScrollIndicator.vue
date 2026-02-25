@@ -30,7 +30,7 @@ onUnmounted(() => {
     class="scroll-indicator flex flex-col items-center gap-3 select-none transition-opacity duration-700"
     :class="visible ? 'opacity-100' : 'opacity-0 pointer-events-none'"
   >
-    <span class="text-[10px] uppercase tracking-[0.3em] text-lavender-400/60 font-body">
+    <span class="text-[10px] uppercase tracking-[0.3em] text-lavender-300 font-body">
       Scroll
     </span>
     <!-- Animated vertical line -->

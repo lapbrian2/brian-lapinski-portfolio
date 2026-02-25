@@ -27,9 +27,9 @@
         <div class="md:col-span-5 flex gap-16">
           <!-- Social -->
           <div>
-            <h4 class="font-body text-xs uppercase tracking-[0.2em] text-lavender-400/60 mb-4">
+            <p class="font-body text-xs uppercase tracking-[0.2em] text-lavender-300 mb-4">
               Social
-            </h4>
+            </p>
             <nav class="flex flex-col gap-3">
               <a
                 v-for="social in socialLinks"
@@ -46,9 +46,9 @@
 
           <!-- Navigation -->
           <div>
-            <h4 class="font-body text-xs uppercase tracking-[0.2em] text-lavender-400/60 mb-4">
+            <p class="font-body text-xs uppercase tracking-[0.2em] text-lavender-300 mb-4">
               Navigate
-            </h4>
+            </p>
             <nav class="flex flex-col gap-3">
               <a
                 v-for="link in navLinks"

@@ -1,6 +1,6 @@
 <template>
   <div ref="toolsRef">
-    <p class="font-body text-xs uppercase tracking-[0.2em] text-lavender-400/60 mb-4">
+    <p class="font-body text-xs uppercase tracking-[0.2em] text-lavender-300 mb-4">
       Tools
     </p>
     <h3 class="font-display text-heading font-semibold text-lavender-100 mb-8 leading-none">
@@ -24,7 +24,7 @@
         </span>
         <div class="flex-1 min-w-0">
           <span class="font-body text-sm text-lavender-200 block leading-tight">{{ tool.name }}</span>
-          <span class="font-body text-xs text-lavender-400/60 leading-tight">{{ tool.role }}</span>
+          <span class="font-body text-xs text-lavender-300 leading-tight">{{ tool.role }}</span>
         </div>
         <!-- External link indicator -->
         <svg v-if="tool.href" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" class="flex-shrink-0 text-lavender-500/40 group-hover:text-accent-red/60 transition-colors duration-300">

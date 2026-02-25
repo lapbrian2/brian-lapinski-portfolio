@@ -80,7 +80,7 @@ const repeated = computed(() => {
 </script>
 
 <template>
-  <div ref="containerEl" class="overflow-hidden py-12 md:py-20">
+  <div ref="containerEl" class="overflow-hidden py-8 md:py-14">
     <div
       ref="stripEl"
       class="marquee-text whitespace-nowrap font-display text-[4rem] md:text-[7rem] lg:text-[9rem] font-bold leading-none select-none uppercase tracking-tight"

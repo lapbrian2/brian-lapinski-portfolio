@@ -1,6 +1,6 @@
 <template>
   <div ref="bioRef">
-    <p class="font-body text-xs uppercase tracking-[0.2em] text-lavender-400/60 mb-4">
+    <p class="font-body text-xs uppercase tracking-[0.2em] text-lavender-300 mb-4">
       About
     </p>
     <h2 class="font-display text-section font-bold text-lavender-100 mb-10 leading-none">

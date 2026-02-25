@@ -187,7 +187,7 @@ const credentials = [
         <span class="font-display text-3xl md:text-4xl font-bold text-lavender-100 block leading-none mb-2 tabular-nums">
           {{ displayValues[index] }}
         </span>
-        <span class="font-body text-xs uppercase tracking-[0.15em] text-lavender-400/60">
+        <span class="font-body text-xs uppercase tracking-[0.15em] text-lavender-300">
           {{ stat.label }}
         </span>
       </div>
