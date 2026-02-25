@@ -16,21 +16,30 @@
         role="button"
         :tabindex="0"
         :aria-label="`View ${artwork.title}`"
+        style="perspective: 600px; transform-style: preserve-3d"
         @click="handleClick"
         @keydown.enter="handleClick"
         @keydown.space.prevent="handleClick"
+        @mouseenter="onImageMouseEnter"
+        @mouseleave="onImageMouseLeave"
+        @mousemove="onImageMouseMove"
       >
         <NuxtImg
           :src="artwork.src"
           :alt="artwork.title"
-          class="w-full h-auto"
+          class="w-full h-auto transition-opacity duration-500"
+          :class="imgLoaded ? 'opacity-100' : 'opacity-0'"
           width="800"
           height="600"
           sizes="(max-width: 768px) 100vw, 50vw"
           quality="100"
           loading="lazy"
           style="object-fit: cover;"
+          @load="imgLoaded = true"
         />
+        <div v-if="!imgLoaded" class="absolute inset-0 bg-dark-700 overflow-hidden">
+          <div class="node-shimmer absolute inset-0" />
+        </div>
       </div>
 
       <!-- Text side -->
@@ -89,7 +98,46 @@ const lightbox = inject<ReturnType<typeof useLightbox>>('threadLightbox')
 const nodeEl = ref<HTMLElement | null>(null)
 const imageWrapEl = ref<HTMLElement | null>(null)
 const textEl = ref<HTMLElement | null>(null)
+const imgLoaded = ref(false)
 let ctx: gsap.Context | null = null
+
+function onImageMouseMove(e: MouseEvent) {
+  if (!imageWrapEl.value) return
+  const rect = imageWrapEl.value.getBoundingClientRect()
+  const centerX = rect.left + rect.width / 2
+  const centerY = rect.top + rect.height / 2
+  const offsetX = (e.clientX - centerX) * 0.012
+  const offsetY = (e.clientY - centerY) * 0.012
+  gsap.to(imageWrapEl.value, {
+    rotateY: offsetX,
+    rotateX: -offsetY,
+    duration: 0.4,
+    ease: 'power2.out',
+    force3D: true,
+  })
+}
+
+function onImageMouseEnter() {
+  if (!imageWrapEl.value) return
+  const glowColor = props.artwork.dominantColor || '#ed544d'
+  gsap.to(imageWrapEl.value, {
+    scale: 1.02,
+    boxShadow: `0 0 50px ${glowColor}40, 0 0 100px ${glowColor}18`,
+    duration: 0.6,
+    ease: 'power2.out',
+  })
+}
+
+function onImageMouseLeave() {
+  if (!imageWrapEl.value) return
+  gsap.to(imageWrapEl.value, {
+    rotateY: 0, rotateX: 0,
+    scale: 1,
+    boxShadow: '0 0 0 transparent',
+    duration: 0.5,
+    ease: 'power3.out',
+  })
+}
 
 onMounted(() => {
   if (!nodeEl.value) return
@@ -117,6 +165,24 @@ onMounted(() => {
           })
         },
       })
+
+      // Continuous scroll parallax on the image itself
+      const img = imageWrapEl.value.querySelector('img')
+      if (img) {
+        gsap.fromTo(img,
+          { y: '-5%' },
+          {
+            y: '5%',
+            ease: 'none',
+            scrollTrigger: {
+              trigger: imageWrapEl.value,
+              start: 'top bottom',
+              end: 'bottom top',
+              scrub: true,
+            },
+          }
+        )
+      }
     }
 
     // Text children stagger from opposite side
@@ -210,6 +276,7 @@ function handleClick() {
 }
 
 .node-image {
+  position: relative;
   width: 100%;
   overflow: hidden;
   cursor: pointer;
@@ -285,5 +352,15 @@ function handleClick() {
   .accent-stripe {
     display: none !important;
   }
+}
+
+.node-shimmer {
+  background: linear-gradient(90deg, rgba(42, 34, 64, 0) 0%, rgba(42, 34, 64, 0.4) 50%, rgba(42, 34, 64, 0) 100%);
+  background-size: 200% 100%;
+  animation: node-shimmer 1.5s infinite;
+}
+@keyframes node-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 </style>
