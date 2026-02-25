@@ -30,7 +30,7 @@ export default defineNuxtConfig({
         { name: 'twitter:image', content: 'https://lapinski.art/images/artworks/the-watcher.webp' },
         { name: 'twitter:creator', content: '@Lapbrian2' },
         // Other
-        { name: 'theme-color', content: '#181520' },
+        { name: 'theme-color', content: '#000000' },
         { name: 'author', content: 'Brian Lapinski' },
       ],
       link: [

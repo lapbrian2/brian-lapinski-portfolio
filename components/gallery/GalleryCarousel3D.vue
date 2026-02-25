@@ -390,9 +390,9 @@ onUnmounted(() => {
 .shimmer {
   background: linear-gradient(
     90deg,
-    rgba(42, 34, 64, 0) 0%,
-    rgba(42, 34, 64, 0.4) 50%,
-    rgba(42, 34, 64, 0) 100%
+    rgba(17, 17, 24, 0) 0%,
+    rgba(17, 17, 24, 0.4) 50%,
+    rgba(17, 17, 24, 0) 100%
   );
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;

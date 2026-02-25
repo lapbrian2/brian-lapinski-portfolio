@@ -183,7 +183,7 @@ const credentials = [
 
     <!-- Stats row -->
     <div ref="statsEl" class="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 mb-20">
-      <div v-for="(stat, index) in stats" :key="stat.label" class="stat-item">
+      <div v-for="(stat, index) in stats" :key="stat.label" class="stat-item glass rounded-xl p-6">
         <span class="font-display text-3xl md:text-4xl font-bold text-lavender-100 block leading-none mb-2 tabular-nums">
           {{ displayValues[index] }}
         </span>
@@ -253,9 +253,9 @@ const credentials = [
 .about-shimmer {
   background: linear-gradient(
     90deg,
-    rgba(42, 34, 64, 0) 0%,
-    rgba(42, 34, 64, 0.4) 50%,
-    rgba(42, 34, 64, 0) 100%
+    rgba(17, 17, 24, 0) 0%,
+    rgba(17, 17, 24, 0.4) 50%,
+    rgba(17, 17, 24, 0) 100%
   );
   background-size: 200% 100%;
   animation: about-shimmer 1.5s infinite;

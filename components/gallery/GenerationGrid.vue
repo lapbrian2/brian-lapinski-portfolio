@@ -34,7 +34,7 @@ const aspectClasses: Record<string, string> = {
 
 // --- Dominant color glow seam overlay (always visible, subtle edge vignette) ---
 function getGlowStyle(artwork: Artwork) {
-  const c = artwork.dominantColor || '#181520'
+  const c = artwork.dominantColor || '#000000'
   return {
     boxShadow: `inset 0 0 40px ${c}55, inset 0 0 80px ${c}25`,
     background: `
@@ -226,14 +226,14 @@ onMounted(() => {
   // If reduced motion, skip all animations — just show everything
   if (prefersReduced) {
     gsap.set(cells, { clipPath: 'inset(0% 0 0 0)', opacity: 1 })
-    gsap.set(imgs, { y: 0 })
+    gsap.set(imgs, { y: 0, filter: 'blur(0px) saturate(1)' })
     hasRevealed = true
     return
   }
 
-  // Initial state: clip-path hides cells from bottom
+  // Initial state: clip-path hides cells from bottom, images blurred + desaturated
   gsap.set(cells, { clipPath: 'inset(100% 0 0 0)', opacity: 1 })
-  gsap.set(imgs, { y: 40 })
+  gsap.set(imgs, { y: 40, filter: 'blur(20px) saturate(0)' })
 
   const reveal = () => {
     if (hasRevealed) return
@@ -248,10 +248,11 @@ onMounted(() => {
       force3D: true,
     })
 
-    // Image slides UP as frame opens (counter-movement = depth)
+    // Image slides UP + blur/desaturate resolves as frame opens
     gsap.to(imgs, {
       y: 0,
-      duration: 1.2,
+      filter: 'blur(0px) saturate(1)',
+      duration: 1.4,
       stagger: { each: 0.12, from: 'start' },
       ease: 'power3.out',
       force3D: true,
@@ -372,7 +373,7 @@ onUnmounted(() => {
         class="absolute inset-0 hidden md:flex flex-col justify-end z-[5] transition-opacity duration-300"
         :class="hoveredIndex === index ? 'opacity-100' : 'opacity-0 pointer-events-none'"
         :style="{
-          background: `linear-gradient(to top, ${artwork.dominantColor || '#181520'}dd 0%, ${artwork.dominantColor || '#181520'}30 40%, transparent 100%)`,
+          background: `linear-gradient(to top, ${artwork.dominantColor || '#000000'}dd 0%, ${artwork.dominantColor || '#000000'}30 40%, transparent 100%)`,
         }"
       >
         <div class="p-5">
@@ -397,7 +398,7 @@ onUnmounted(() => {
       <div
         class="absolute inset-x-0 bottom-0 pointer-events-none md:hidden z-[3]"
         :style="{
-          background: `linear-gradient(to top, ${artwork.dominantColor || '#181520'}cc 0%, transparent 100%)`,
+          background: `linear-gradient(to top, ${artwork.dominantColor || '#000000'}cc 0%, transparent 100%)`,
         }"
       >
         <div class="px-3 pt-6 pb-2.5">
@@ -455,9 +456,9 @@ onUnmounted(() => {
 .shimmer {
   background: linear-gradient(
     90deg,
-    rgba(42, 34, 64, 0) 0%,
-    rgba(42, 34, 64, 0.4) 50%,
-    rgba(42, 34, 64, 0) 100%
+    rgba(17, 17, 24, 0) 0%,
+    rgba(17, 17, 24, 0.4) 50%,
+    rgba(17, 17, 24, 0) 100%
   );
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;

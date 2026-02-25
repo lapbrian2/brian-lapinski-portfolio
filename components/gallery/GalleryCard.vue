@@ -179,7 +179,7 @@ onUnmounted(() => {
       ref="overlayEl"
       class="absolute inset-0 opacity-0 transition-opacity duration-400 group-hover:opacity-100 hidden md:flex items-end"
       :style="{
-        background: `linear-gradient(to top, ${artwork.dominantColor || '#181520'}dd 0%, ${artwork.dominantColor || '#181520'}30 40%, transparent 100%)`,
+        background: `linear-gradient(to top, ${artwork.dominantColor || '#000000'}dd 0%, ${artwork.dominantColor || '#000000'}30 40%, transparent 100%)`,
       }"
     >
       <div class="p-5 md:p-6 w-full">
@@ -206,7 +206,7 @@ onUnmounted(() => {
     <div
       class="absolute inset-x-0 bottom-0 pointer-events-none md:hidden"
       :style="{
-        background: `linear-gradient(to top, ${artwork.dominantColor || '#181520'}cc 0%, transparent 100%)`,
+        background: `linear-gradient(to top, ${artwork.dominantColor || '#000000'}cc 0%, transparent 100%)`,
       }"
     >
       <div class="px-3 pt-6 pb-2.5">
@@ -225,9 +225,9 @@ onUnmounted(() => {
 .shimmer {
   background: linear-gradient(
     90deg,
-    rgba(42, 34, 64, 0) 0%,
-    rgba(42, 34, 64, 0.4) 50%,
-    rgba(42, 34, 64, 0) 100%
+    rgba(17, 17, 24, 0) 0%,
+    rgba(17, 17, 24, 0.4) 50%,
+    rgba(17, 17, 24, 0) 100%
   );
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;

@@ -60,7 +60,7 @@ onUnmounted(() => {
     </div>
 
     <!-- Form -->
-    <form v-else class="space-y-5" aria-live="polite" @submit.prevent="submit">
+    <form v-else class="glass rounded-xl p-8 md:p-10 space-y-5" aria-live="polite" @submit.prevent="submit">
       <!-- Honeypot (hidden from humans) -->
       <div class="absolute opacity-0 h-0 w-0 overflow-hidden" aria-hidden="true" tabindex="-1">
         <label for="website">Website</label>

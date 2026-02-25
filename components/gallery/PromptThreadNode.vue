@@ -334,7 +334,7 @@ function handleClick() {
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: #181520;
+  background: #000000;
   border: 2px solid;
   transform: translateX(-50%);
   z-index: 2;
@@ -355,7 +355,7 @@ function handleClick() {
 }
 
 .node-shimmer {
-  background: linear-gradient(90deg, rgba(42, 34, 64, 0) 0%, rgba(42, 34, 64, 0.4) 50%, rgba(42, 34, 64, 0) 100%);
+  background: linear-gradient(90deg, rgba(17, 17, 24, 0) 0%, rgba(17, 17, 24, 0.4) 50%, rgba(17, 17, 24, 0) 100%);
   background-size: 200% 100%;
   animation: node-shimmer 1.5s infinite;
 }
