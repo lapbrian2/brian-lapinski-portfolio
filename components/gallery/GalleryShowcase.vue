@@ -19,23 +19,33 @@ onMounted(() => {
   if (!sectionEl.value || !imageEl.value || !textEl.value) return
 
   ctx = gsap.context(() => {
-    // Pin the section and drive animations via scroll
-    const tl = gsap.timeline({
+    // Parallax image — drifts slower than scroll for depth
+    gsap.fromTo(imageEl.value!, { scale: 1.15, y: '-8%' }, {
+      scale: 1,
+      y: '8%',
+      ease: 'none',
       scrollTrigger: {
         trigger: sectionEl.value!,
-        start: 'top top',
-        end: '+=80%',
-        pin: true,
-        scrub: 1,
+        start: 'top bottom',
+        end: 'bottom top',
+        scrub: true,
       },
     })
 
-    // Image settles from slight zoom to resting scale
-    tl.fromTo(imageEl.value!, { scale: 1.12 }, { scale: 1, ease: 'none' }, 0)
-
-    // Text elements scrub in from left
+    // Text elements reveal as section enters viewport
     const textChildren = textEl.value!.children
-    tl.fromTo(textChildren, { x: -50, opacity: 0 }, { x: 0, opacity: 1, stagger: 0.15, ease: 'power2.out' }, 0.2)
+    gsap.fromTo(textChildren, { x: -40, opacity: 0 }, {
+      x: 0,
+      opacity: 1,
+      stagger: 0.08,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: sectionEl.value!,
+        start: 'top 70%',
+        end: 'top 20%',
+        scrub: 1,
+      },
+    })
   }, sectionEl.value)
 })
 
