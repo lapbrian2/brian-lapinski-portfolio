@@ -374,7 +374,7 @@ onUnmounted(() => {
 }
 
 .card-title {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'PP Neue Montreal', sans-serif;
   font-weight: 700;
   font-size: 1.125rem;
   color: white;
@@ -382,7 +382,7 @@ onUnmounted(() => {
 }
 
 .card-medium {
-  font-family: 'Inter', sans-serif;
+  font-family: 'PP Neue Montreal', sans-serif;
   font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.6);
 }

@@ -33,7 +33,7 @@ A dark, Caravaggio-inspired portfolio showcasing AI-generated artwork with an in
 | Email | Resend |
 | Image Storage | Vercel Blob |
 | Hosting | Vercel (SSR) |
-| Fonts | Space Grotesk + Inter |
+| Fonts | PP Neue Montreal |
 
 ---
 

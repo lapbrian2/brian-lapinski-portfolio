@@ -136,7 +136,7 @@ onUnmounted(() => {
 
     <!-- Text overlay -->
     <div class="absolute inset-0 z-20 flex items-center justify-center">
-      <HeroText :ready="ready" @entrance-complete="heroTextDone = true" />
+      <HeroText :ready="ready" style="text-shadow: 0 2px 20px rgba(0,0,0,0.5)" @entrance-complete="heroTextDone = true" />
     </div>
 
     <!-- Scroll indicator pinned to bottom center -->

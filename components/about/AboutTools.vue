@@ -19,10 +19,8 @@
         @mouseenter="onCardEnter($event.currentTarget as HTMLElement)"
         @mouseleave="onCardLeave($event.currentTarget as HTMLElement)"
       >
-        <span class="tool-icon flex-shrink-0 w-9 h-9 rounded-full bg-dark-700 border border-dark-600 flex items-center justify-center text-lavender-300 group-hover:border-accent-red/30 group-hover:text-accent-red transition-all duration-300">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
-            <path :d="tool.icon" />
-          </svg>
+        <span class="tool-icon flex-shrink-0 w-9 h-9 rounded-full bg-dark-700 border border-dark-600 flex items-center justify-center text-xs font-semibold text-lavender-300 group-hover:border-accent-red/30 group-hover:text-accent-red transition-all duration-300">
+          {{ tool.abbr }}
         </span>
         <div class="flex-1 min-w-0">
           <span class="font-body text-sm text-lavender-200 block leading-tight">{{ tool.name }}</span>
@@ -43,12 +41,12 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 const tools = [
-  { name: 'Midjourney', role: 'Primary medium', icon: 'M3 3l10 10M13 3L3 13', href: 'https://www.midjourney.com' },
-  { name: 'ImagineArt', role: 'Creative Partner', icon: 'M8 2L2 8l6 6 6-6z', href: 'https://www.imagine.art/' },
-  { name: 'Caimera', role: 'Creative Partner', icon: 'M2 4h12v8H2zM5 4V2M11 4V2', href: 'https://caimera.ai' },
-  { name: 'Style DNA', role: 'Methodology', icon: 'M4 2c0 6 8 6 8 12M12 2c0 6-8 6-8 12', href: '' },
-  { name: 'House of Curiosity', role: 'AI Architect', icon: 'M8 2L2 6v8l6 0 6 0V6z', href: '' },
-  { name: 'Creativa Magazine', role: 'Contributor', icon: 'M3 2h10v12H3zM6 2v12M6 5h4M6 8h3', href: 'https://www.creativamagazine.com' },
+  { name: 'Midjourney', role: 'Primary medium', abbr: 'Mj', icon: 'M3 3l10 10M13 3L3 13', href: 'https://www.midjourney.com' },
+  { name: 'ImagineArt', role: 'Creative Partner', abbr: 'Ia', icon: 'M8 2L2 8l6 6 6-6z', href: 'https://www.imagine.art/' },
+  { name: 'Caimera', role: 'Creative Partner', abbr: 'Ca', icon: 'M2 4h12v8H2zM5 4V2M11 4V2', href: 'https://caimera.ai' },
+  { name: 'Style DNA', role: 'Methodology', abbr: 'SD', icon: 'M4 2c0 6 8 6 8 12M12 2c0 6-8 6-8 12', href: '' },
+  { name: 'House of Curiosity', role: 'AI Architect', abbr: 'HC', icon: 'M8 2L2 6v8l6 0 6 0V6z', href: '' },
+  { name: 'Creativa Magazine', role: 'Contributor', abbr: 'Cm', icon: 'M3 2h10v12H3zM6 2v12M6 5h4M6 8h3', href: 'https://www.creativamagazine.com' },
 ]
 
 const toolsRef = ref<HTMLElement | null>(null)

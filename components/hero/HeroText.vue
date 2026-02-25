@@ -166,7 +166,7 @@ onUnmounted(() => {
     <!-- Role label with accent dot -->
     <p
       ref="roleEl"
-      class="flex items-center gap-2 font-body text-xs uppercase tracking-[0.25em] text-lavender-400 mb-6 opacity-0"
+      class="flex items-center gap-2 font-body text-xs uppercase tracking-[0.25em] text-lavender-300 mb-6 opacity-0"
     >
       <span class="w-1.5 h-1.5 rounded-full bg-accent-red inline-block" />
       AI Artist & Educator
@@ -191,7 +191,8 @@ onUnmounted(() => {
     <!-- Tagline with word splitting -->
     <p
       ref="taglineEl"
-      class="font-body text-lg md:text-xl text-lavender-300/80 font-light tracking-wide max-w-lg"
+      class="font-body text-lg md:text-xl text-lavender-200 font-normal tracking-wide max-w-lg"
+      style="text-shadow: 0 1px 8px rgba(0,0,0,0.3)"
     >
       Exploring what it means to be human through images
     </p>

@@ -35,10 +35,9 @@ export default defineNuxtConfig({
       ],
       link: [
         { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
-        { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
-        { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
-        { rel: 'preload', as: 'style', href: 'https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap' },
-        { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap' },
+        { rel: 'preconnect', href: 'https://fonts.cdnfonts.com' },
+        { rel: 'preload', as: 'style', href: 'https://fonts.cdnfonts.com/css/pp-neue-montreal' },
+        { rel: 'stylesheet', href: 'https://fonts.cdnfonts.com/css/pp-neue-montreal' },
       ],
     },
   },

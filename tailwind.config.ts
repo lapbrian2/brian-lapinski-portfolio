@@ -33,8 +33,8 @@ export default {
         },
       },
       fontFamily: {
-        display: ['"Space Grotesk"', 'sans-serif'],
-        body: ['"Inter"', 'sans-serif'],
+        display: ['"PP Neue Montreal"', 'sans-serif'],
+        body: ['"PP Neue Montreal"', 'sans-serif'],
       },
       fontSize: {
         'hero': 'clamp(3rem, 8vw, 8rem)',

@@ -14,13 +14,14 @@ const aboutImgLoaded = ref(false)
 
 const stats = [
   { target: 4, suffix: '+', label: 'Exhibitions' },
-  { target: 6, suffix: '', label: 'Creative Roles' },
-  { target: 100, suffix: '+', label: 'Artworks' },
+  { target: 5, suffix: '', label: 'Creative Roles' },
+  { target: 42, suffix: '+', label: 'Artworks' },
   { target: 2024, suffix: '', label: 'Since' },
 ]
 
-// Animated counter values — start at 0, GSAP tweens to target
-const counters = reactive(stats.map(() => ({ value: 0 })))
+// Animated counter values — initialise to targets so values are never 0.
+// GSAP resets them to 0 and tweens back up when the ScrollTrigger fires.
+const counters = reactive(stats.map((s) => ({ value: s.target })))
 const displayValues = computed(() =>
   stats.map((stat, i) => {
     const v = Math.round(counters[i].value)
@@ -65,6 +66,9 @@ onMounted(async () => {
         start: 'top 85%',
         once: true,
         onEnter: () => {
+          // Reset counters to 0 so the count-up animation is visible
+          stats.forEach((_, i) => { counters[i].value = 0 })
+
           // Fade-in + slide-up the stat cards
           gsap.to(statItems, {
             opacity: 1,

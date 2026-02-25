@@ -161,7 +161,7 @@ onUnmounted(() => {
         <button
           type="submit"
           :disabled="status === 'submitting'"
-          class="btn-press group relative inline-flex items-center gap-3 px-8 py-3.5 bg-accent-red/10 border border-accent-red/40 rounded-full font-body text-sm uppercase tracking-wider text-accent-red hover:bg-accent-red hover:text-dark-900 transition-all duration-400 disabled:opacity-50 disabled:cursor-not-allowed"
+          class="btn-press group relative inline-flex items-center gap-3 px-8 py-3.5 bg-accent-red/15 border border-accent-red/50 rounded-full font-body text-sm font-medium uppercase tracking-wider text-accent-red hover:bg-accent-red hover:text-dark-900 transition-all duration-400 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <span v-if="status === 'submitting'">Sending...</span>
           <span v-else>Send Message</span>

@@ -1,7 +1,7 @@
 /* Typography Scale - Fluid with clamp() */
 :root {
-  --font-display: 'Space Grotesk', sans-serif;
-  --font-body: 'Inter', sans-serif;
+  --font-display: 'PP Neue Montreal', sans-serif;
+  --font-body: 'PP Neue Montreal', sans-serif;
 
   /* Fluid type scale */
   --text-hero: clamp(3rem, 8vw, 8rem);
@@ -19,7 +19,7 @@
   --leading-relaxed: 1.75;
 
   /* Letter spacing */
-  --tracking-tight: -0.02em;
+  --tracking-tight: -0.03em;
   --tracking-normal: 0;
   --tracking-wide: 0.05em;
   --tracking-wider: 0.1em;

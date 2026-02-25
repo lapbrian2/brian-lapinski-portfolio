@@ -811,7 +811,7 @@ onUnmounted(() => {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
   color: #a5b0c8;
-  font-family: var(--font-body, 'Inter', sans-serif);
+  font-family: var(--font-body, 'PP Neue Montreal', sans-serif);
   font-size: 10px;
   font-weight: 500;
   text-transform: uppercase;
