@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import gsap from 'gsap'
 import type { SourceRect } from '~/composables/useLightbox'
-import { useReducedMotion } from '~/composables/useMediaQuery'
+import { useIsMobile, useReducedMotion } from '~/composables/useMediaQuery'
 
 const lightbox = useLightbox()
 const { copied, copiedType } = usePromptFork()
 const reducedMotion = useReducedMotion()
+const isMobile = useIsMobile()
 const imageEl = ref<HTMLElement | null>(null)
 const captionEl = ref<HTMLElement | null>(null)
 const containerEl = ref<HTMLElement | null>(null)
@@ -696,7 +697,16 @@ onUnmounted(() => {
         </Transition>
       </div>
 
-      <!-- Architect Panel — slides in from right -->
+      <!-- Mobile scrim behind bottom sheet -->
+      <Transition name="scrim-fade">
+        <div
+          v-if="showArchitect && isMobile"
+          class="absolute inset-0 bg-black/50 z-[15]"
+          @click="showArchitect = false"
+        />
+      </Transition>
+
+      <!-- Architect Panel — slides in from right on desktop, up from bottom on mobile -->
       <ArchitectPanel
         v-if="lightbox.currentItem.value"
         :item="lightbox.currentItem.value"
@@ -852,5 +862,16 @@ onUnmounted(() => {
 .toast-fade-leave-to {
   opacity: 0;
   transform: translateY(-12px);
+}
+
+/* Mobile scrim fade transition */
+.scrim-fade-enter-active,
+.scrim-fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.scrim-fade-enter-from,
+.scrim-fade-leave-to {
+  opacity: 0;
 }
 </style>

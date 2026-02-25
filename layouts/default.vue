@@ -8,7 +8,9 @@
       Skip to content
     </a>
     <ClientOnly>
+      <SpotlightCursor />
       <ScrollProgress />
+      <SectionProgressDots />
     </ClientOnly>
     <AppHeader />
     <main id="main-content" role="main">

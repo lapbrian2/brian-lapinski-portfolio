@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import gsap from 'gsap'
 import type { LightboxItem } from '~/composables/useLightbox'
+import { useIsMobile } from '~/composables/useMediaQuery'
 import type { PromptNode, TechniqueCategory } from '~/types/artwork'
+
+const isMobile = useIsMobile()
 
 const props = defineProps<{
   item: LightboxItem
@@ -75,13 +78,15 @@ watch(() => props.visible, (open) => {
   // Kill any in-flight panel tween to prevent ghost states on rapid toggling
   activeTween?.kill()
 
+  // Mobile: slide up from bottom; Desktop: slide in from right
+  const axis = isMobile.value ? 'y' : 'x'
+
   if (open) {
-    // Slide in from right
     activeTween = gsap.fromTo(panelEl.value, {
-      x: '100%',
+      [axis]: '100%',
       opacity: 0,
     }, {
-      x: '0%',
+      [axis]: '0%',
       opacity: 1,
       duration: 0.5,
       ease: 'power3.out',
@@ -116,14 +121,21 @@ watch(() => props.visible, (open) => {
     staggerTween?.kill()
     staggerTween = null
 
-    // Slide out with a smoother ease
     activeTween = gsap.to(panelEl.value, {
-      x: '100%',
+      [axis]: '100%',
       opacity: 0,
       duration: 0.35,
       ease: 'power2.inOut',
       force3D: true,
     })
+  }
+})
+
+// Reset panel position on orientation change to prevent stale transforms
+watch(isMobile, () => {
+  if (props.visible && panelEl.value) {
+    activeTween?.kill()
+    gsap.set(panelEl.value, { x: '0%', y: '0%', opacity: 1 })
   }
 })
 
@@ -164,6 +176,11 @@ async function handleQuickFork() {
 
     <!-- Content -->
     <div class="relative z-10 h-full flex flex-col">
+      <!-- Mobile bottom sheet drag handle -->
+      <div v-if="isMobile" class="flex justify-center py-3 shrink-0">
+        <div class="w-10 h-1 rounded-full bg-white/20" />
+      </div>
+
       <!-- Header -->
       <div class="flex items-center justify-between px-5 py-4 border-b border-white/[0.06]">
         <div class="flex items-center gap-2.5">
@@ -365,10 +382,18 @@ async function handleQuickFork() {
   will-change: transform, opacity;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 767px) {
   .architect-panel {
+    top: auto;
+    right: 0;
+    bottom: 0;
+    left: 0;
     width: 100%;
     max-width: 100vw;
+    height: 65vh;
+    border-radius: 16px 16px 0 0;
+    overflow: hidden;
+    transform: translateY(100%);
   }
 }
 
@@ -476,7 +501,7 @@ async function handleQuickFork() {
 }
 
 /* Wider scrollbar on mobile for easier touch interaction */
-@media (max-width: 640px) {
+@media (max-width: 767px) {
   .scrollbar-thin::-webkit-scrollbar {
     width: 6px;
   }

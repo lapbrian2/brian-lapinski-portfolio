@@ -30,7 +30,7 @@
           style="will-change: transform, width"
         />
         <a
-          v-for="link in navLinks"
+          v-for="link in sections"
           :key="link.id"
           :href="`#${link.id}`"
           :data-nav="link.id"
@@ -87,7 +87,7 @@
     >
       <nav ref="mobileNavEl" class="flex flex-col items-center gap-10" aria-label="Mobile navigation">
         <a
-          v-for="(link, i) in navLinks"
+          v-for="link in sections"
           :key="link.id"
           :href="`#${link.id}`"
           :class="[
@@ -107,23 +107,13 @@
 
 <script setup lang="ts">
 import gsap from 'gsap'
+import { useActiveSection } from '~/composables/useActiveSection'
 
-interface NavLink {
-  id: string
-  label: string
-}
-
-const navLinks: NavLink[] = [
-  { id: 'work', label: 'Work' },
-  { id: 'about', label: 'About' },
-  { id: 'process', label: 'Process' },
-  { id: 'contact', label: 'Contact' },
-]
+const { activeSection, sections } = useActiveSection()
 
 const scrolled = ref(false)
 const navHidden = ref(false)
 const mobileOpen = ref(false)
-const activeSection = ref('')
 const desktopNavEl = ref<HTMLElement | null>(null)
 const navPillEl = ref<HTMLElement | null>(null)
 const mobileOverlayEl = ref<HTMLElement | null>(null)
@@ -131,7 +121,6 @@ const mobileNavEl = ref<HTMLElement | null>(null)
 const hamburgerEl = ref<HTMLElement | null>(null)
 
 let menuTl: gsap.core.Timeline | null = null
-let observer: IntersectionObserver | null = null
 
 function scrollToTop(): void {
   const { $lenis } = useNuxtApp()
@@ -320,27 +309,6 @@ function moveNavPill(sectionId: string): void {
   })
 }
 
-function setupSectionObserver() {
-  observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          activeSection.value = entry.target.id
-        }
-      })
-    },
-    {
-      rootMargin: '-20% 0px -60% 0px',
-      threshold: 0,
-    },
-  )
-
-  navLinks.forEach((link) => {
-    const section = document.querySelector(`#${link.id}`)
-    if (section) observer!.observe(section)
-  })
-}
-
 watch(activeSection, (newSection) => {
   if (newSection) {
     moveNavPill(newSection)
@@ -351,7 +319,6 @@ onMounted(() => {
   window.addEventListener('scroll', handleScroll, { passive: true })
   window.addEventListener('keydown', handleKeydown)
   handleScroll()
-  nextTick(setupSectionObserver)
   nextTick(() => {
     if (activeSection.value) moveNavPill(activeSection.value)
   })
@@ -361,6 +328,5 @@ onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll)
   window.removeEventListener('keydown', handleKeydown)
   menuTl?.kill()
-  observer?.disconnect()
 })
 </script>
