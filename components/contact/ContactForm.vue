@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { useReducedMotion } from '~/composables/useMediaQuery'
 
 const MESSAGE_MAX = 1000
 
 const { form, errors, status, serverError, submit, reset } = useContactForm()
 const formEl = ref<HTMLElement | null>(null)
+const reducedMotion = useReducedMotion()
 
 const messageLength = computed(() => form.message.length)
 const messageLengthPercent = computed(() => Math.min(100, (messageLength.value / MESSAGE_MAX) * 100))
@@ -13,6 +15,9 @@ let ctx: gsap.Context | null = null
 
 onMounted(() => {
   if (!formEl.value) return
+
+  // Respect reduced-motion preference
+  if (reducedMotion.value) return
 
   ctx = gsap.context(() => {
     const fields = formEl.value!.querySelectorAll('.form-field')

@@ -2,6 +2,7 @@ export default defineEventHandler((event) => {
   const config = useRuntimeConfig(event)
   const baseUrl = (config.public.siteUrl as string) || 'https://lapinski.art'
   const categories = ['portraits', 'landscapes', 'abstract', 'surreal']
+  const today = new Date().toISOString().split('T')[0]
 
   const urls = [
     { loc: '/', priority: '1.0', changefreq: 'weekly' },
@@ -18,6 +19,7 @@ ${urls
   .map(
     (u) => `  <url>
     <loc>${baseUrl}${u.loc}</loc>
+    <lastmod>${today}</lastmod>
     <changefreq>${u.changefreq}</changefreq>
     <priority>${u.priority}</priority>
   </url>`

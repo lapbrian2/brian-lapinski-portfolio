@@ -39,12 +39,17 @@
 <script setup lang="ts">
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { useReducedMotion } from '~/composables/useMediaQuery'
 
 const bioRef = ref<HTMLElement | null>(null)
+const reducedMotion = useReducedMotion()
 let ctx: gsap.Context | null = null
 
 onMounted(() => {
   if (!bioRef.value) return
+
+  // Respect reduced-motion preference
+  if (reducedMotion.value) return
 
   ctx = gsap.context(() => {
     const paragraphs = bioRef.value!.querySelectorAll('p')

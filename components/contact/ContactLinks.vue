@@ -73,6 +73,7 @@
 <script setup lang="ts">
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { useReducedMotion } from '~/composables/useMediaQuery'
 
 interface ContactLink {
   id: string
@@ -90,11 +91,20 @@ const links: ContactLink[] = [
 
 const linksRef = ref<HTMLElement | null>(null)
 const labelEl = ref<HTMLElement | null>(null)
+const reducedMotion = useReducedMotion()
 
 let ctx: gsap.Context | null = null
 
 onMounted(() => {
   if (!linksRef.value) return
+
+  // Respect reduced-motion preference — show all content immediately
+  if (reducedMotion.value) {
+    if (labelEl.value) gsap.set(labelEl.value, { opacity: 1 })
+    const cards = linksRef.value.querySelectorAll('.link-card')
+    gsap.set(cards, { opacity: 1 })
+    return
+  }
 
   ctx = gsap.context(() => {
     const cards = linksRef.value!.querySelectorAll('.link-card')

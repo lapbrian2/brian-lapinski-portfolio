@@ -3,6 +3,7 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useSectionTransition } from '~/composables/useSectionTransition'
 import { useScrollReveal } from '~/composables/useScrollReveal'
+import { useReducedMotion } from '~/composables/useMediaQuery'
 const sectionEl = ref<HTMLElement | null>(null)
 const pullquoteEl = ref<HTMLElement | null>(null)
 const statsEl = ref<HTMLElement | null>(null)
@@ -31,10 +32,14 @@ const displayValues = computed(() =>
 
 useSectionTransition(sectionEl, { opacityFrom: 0.2 })
 
+const reducedMotion = useReducedMotion()
 let ctx: gsap.Context | null = null
 
 onMounted(async () => {
   if (!pullquoteEl.value) return
+
+  // Respect reduced-motion preference — show all content without animation
+  if (reducedMotion.value) return
 
   const { default: Splitting } = await import('splitting')
 

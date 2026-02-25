@@ -52,6 +52,7 @@
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useSectionTransition } from '~/composables/useSectionTransition'
+import { useReducedMotion } from '~/composables/useMediaQuery'
 const sectionEl = ref<HTMLElement | null>(null)
 const labelEl = ref<HTMLElement | null>(null)
 const headingEl = ref<HTMLElement | null>(null)
@@ -62,10 +63,19 @@ const glowEl = ref<HTMLElement | null>(null)
 
 useSectionTransition(sectionEl, { scaleFrom: 0.95 })
 
+const reducedMotion = useReducedMotion()
 let ctx: gsap.Context | null = null
 
 onMounted(async () => {
   if (!headingEl.value) return
+
+  // Respect reduced-motion preference — show all content immediately
+  if (reducedMotion.value) {
+    const targets = [labelEl.value, subtitleEl.value, formWrapEl.value, emailFallbackEl.value].filter(Boolean) as HTMLElement[]
+    targets.forEach(el => gsap.set(el, { opacity: 1, y: 0 }))
+    if (glowEl.value) gsap.set(glowEl.value, { opacity: 1 })
+    return
+  }
 
   const { default: Splitting } = await import('splitting')
 

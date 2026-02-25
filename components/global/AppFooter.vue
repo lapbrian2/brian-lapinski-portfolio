@@ -94,6 +94,7 @@
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useMagneticHover } from '~/composables/useMagneticHover'
+import { useReducedMotion } from '~/composables/useMediaQuery'
 
 interface SocialLink {
   label: string
@@ -120,6 +121,7 @@ const topBtnEl = ref<HTMLElement | null>(null)
 
 useMagneticHover(topBtnEl, { strength: 0.4, scaleTo: 1.05 })
 
+const reducedMotion = useReducedMotion()
 let ctx: gsap.Context | null = null
 
 function scrollToTop() {
@@ -144,6 +146,9 @@ function scrollToSection(sectionId: string) {
 
 onMounted(() => {
   if (!footerEl.value) return
+
+  // Respect reduced-motion preference
+  if (reducedMotion.value) return
 
   ctx = gsap.context(() => {
     // Border animates width from center

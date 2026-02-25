@@ -30,6 +30,7 @@ const emit = defineEmits<{
 
 const heroTextDone = ref(false)
 
+const prefersReducedMotion = ref(false)
 const activeIndex = ref(0)
 const imgEls = ref<HTMLElement[]>([])
 let cycleTl: gsap.core.Timeline | null = null
@@ -94,12 +95,19 @@ function startCycle(): void {
   scheduleNext()
 }
 
+onMounted(() => {
+  prefersReducedMotion.value = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+})
+
 // When ready flips to true, show the first image immediately,
-// then kick off Ken Burns + crossfade cycle after a short beat.
+// then kick off Ken Burns + crossfade cycle after a short beat
+// (skip cycle entirely for reduced-motion users — just show static image).
 watch(() => props.ready, (isReady) => {
   if (!isReady) return
   showFirstImage()
-  setTimeout(startCycle, 400)
+  if (!prefersReducedMotion.value) {
+    setTimeout(startCycle, 400)
+  }
 }, { immediate: true })
 
 onUnmounted(() => {

@@ -42,7 +42,7 @@
 <script setup lang="ts">
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { useIsMobile } from '~/composables/useMediaQuery'
+import { useIsMobile, useReducedMotion } from '~/composables/useMediaQuery'
 import { useSectionTransition } from '~/composables/useSectionTransition'
 import { useScrollReveal } from '~/composables/useScrollReveal'
 
@@ -80,6 +80,7 @@ const steps: ProcessStepData[] = [
 ]
 
 const isMobile = useIsMobile()
+const reducedMotion = useReducedMotion()
 const sectionEl = ref<HTMLElement | null>(null)
 const headingEl = ref<HTMLElement | null>(null)
 const desktopEl = ref<HTMLElement | null>(null)
@@ -94,6 +95,9 @@ let ctx: gsap.Context | null = null
 
 onMounted(() => {
   nextTick(() => {
+    // Respect reduced-motion preference — skip scroll-driven animations
+    if (reducedMotion.value) return
+
     if (isMobile.value) {
       // Mobile: stagger step cards
       if (mobileEl.value) {

@@ -3,6 +3,7 @@ import type { Artwork } from '~/types/artwork'
 import type { SourceRect } from '~/composables/useLightbox'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { useReducedMotion } from '~/composables/useMediaQuery'
 
 const props = defineProps<{
   category: string
@@ -10,6 +11,7 @@ const props = defineProps<{
 }>()
 
 const lightbox = useLightbox()
+const reducedMotion = useReducedMotion()
 const gridEl = ref<HTMLElement | null>(null)
 let ctx: gsap.Context | null = null
 let hasRevealed = false
@@ -93,6 +95,12 @@ function setupVelocitySkew() {
 // Initial staggered entrance on scroll
 onMounted(() => {
   if (!gridEl.value) return
+
+  // Respect reduced-motion preference — show all content immediately
+  if (reducedMotion.value) {
+    hasRevealed = true
+    return
+  }
 
   ctx = gsap.context(() => {
     const cards = gridEl.value!.querySelectorAll('.gallery-card')

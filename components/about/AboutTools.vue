@@ -39,6 +39,7 @@
 <script setup lang="ts">
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { useReducedMotion } from '~/composables/useMediaQuery'
 
 const tools = [
   { name: 'Midjourney', role: 'Primary medium', abbr: 'Mj', icon: 'M3 3l10 10M13 3L3 13', href: 'https://www.midjourney.com' },
@@ -51,6 +52,7 @@ const tools = [
 
 const toolsRef = ref<HTMLElement | null>(null)
 const gridRef = ref<HTMLElement | null>(null)
+const reducedMotion = useReducedMotion()
 let ctx: gsap.Context | null = null
 
 function onCardEnter(el: HTMLElement) {
@@ -63,6 +65,9 @@ function onCardLeave(el: HTMLElement) {
 
 onMounted(() => {
   if (!gridRef.value) return
+
+  // Respect reduced-motion preference
+  if (reducedMotion.value) return
 
   ctx = gsap.context(() => {
     const cards = gridRef.value!.querySelectorAll('.tool-card')

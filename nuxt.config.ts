@@ -60,7 +60,7 @@ export default defineNuxtConfig({
   },
 
   image: {
-    quality: 100,
+    quality: 85,
   },
 
   components: [
