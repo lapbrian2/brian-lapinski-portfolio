@@ -209,57 +209,62 @@ function setupVelocitySkew() {
 }
 
 // --- Mount: clip-path reveal, image counter-movement, per-cell parallax, velocity skew ---
+let hasRevealed = false
+
 onMounted(() => {
   canHover.value = window.matchMedia('(hover: hover)').matches
   if (!gridEl.value) return
 
+  // Check reduced motion preference
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+  const cells = gridEl.value.querySelectorAll<HTMLElement>('.grid-cell')
+  const imgs = gridEl.value.querySelectorAll<HTMLElement>('.cell-img')
+
+  if (!cells.length) return
+
+  // If reduced motion, skip all animations — just show everything
+  if (prefersReduced) {
+    gsap.set(cells, { clipPath: 'inset(0% 0 0 0)', opacity: 1 })
+    gsap.set(imgs, { y: 0 })
+    hasRevealed = true
+    return
+  }
+
+  // Initial state: clip-path hides cells from bottom
+  gsap.set(cells, { clipPath: 'inset(100% 0 0 0)', opacity: 1 })
+  gsap.set(imgs, { y: 40 })
+
+  const reveal = () => {
+    if (hasRevealed) return
+    hasRevealed = true
+
+    // Clip-path curtain reveal
+    gsap.to(cells, {
+      clipPath: 'inset(0% 0 0 0)',
+      duration: 1,
+      stagger: { each: 0.12, from: 'start' },
+      ease: 'power3.inOut',
+      force3D: true,
+    })
+
+    // Image slides UP as frame opens (counter-movement = depth)
+    gsap.to(imgs, {
+      y: 0,
+      duration: 1.2,
+      stagger: { each: 0.12, from: 'start' },
+      ease: 'power3.out',
+      force3D: true,
+    })
+  }
+
   ctx = gsap.context(() => {
-    const cells = gridEl.value!.querySelectorAll('.grid-cell')
-    if (!cells.length) return
-
-    // Initial state: clip-path hides cells from bottom
-    gsap.set(cells, { clipPath: 'inset(100% 0 0 0)', opacity: 1 })
-
-    // Inner images start offset for counter-movement parallax
-    const imgs = gridEl.value!.querySelectorAll('.cell-img')
-    gsap.set(imgs, { y: 40 })
-
-    let hasRevealed = false
-
-    const reveal = () => {
-      if (hasRevealed) return
-      hasRevealed = true
-
-      // Clip-path curtain reveal
-      gsap.to(cells, {
-        clipPath: 'inset(0% 0 0 0)',
-        duration: 1,
-        stagger: { each: 0.12, from: 'start' },
-        ease: 'power3.inOut',
-        force3D: true,
-      })
-
-      // Image slides UP as frame opens (counter-movement = depth)
-      gsap.to(imgs, {
-        y: 0,
-        duration: 1.2,
-        stagger: { each: 0.12, from: 'start' },
-        ease: 'power3.out',
-        force3D: true,
-      })
-    }
-
     ScrollTrigger.create({
       trigger: gridEl.value!,
-      start: 'top 85%',
+      start: 'top 90%',
       once: true,
       onEnter: reveal,
     })
-
-    // Safety net: reveal after 2.5s if ScrollTrigger hasn't fired
-    setTimeout(() => {
-      if (!hasRevealed) reveal()
-    }, 2500)
 
     // Per-cell scroll parallax (alternating direction like old GalleryCard)
     if (canHover.value) {
@@ -279,6 +284,21 @@ onMounted(() => {
       })
     }
   }, gridEl.value)
+
+  // Safety net: if already scrolled past trigger (e.g. hash navigation), reveal immediately
+  nextTick(() => {
+    if (!hasRevealed && gridEl.value) {
+      const rect = gridEl.value.getBoundingClientRect()
+      if (rect.top < window.innerHeight) {
+        reveal()
+      }
+    }
+  })
+
+  // Absolute fallback: reveal after 2s no matter what
+  setTimeout(() => {
+    if (!hasRevealed) reveal()
+  }, 2000)
 
   // Velocity skew on pointer devices only
   if (canHover.value) {
