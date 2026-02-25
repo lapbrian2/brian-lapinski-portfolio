@@ -35,6 +35,7 @@ export default {
       fontFamily: {
         display: ['"PP Neue Montreal"', 'sans-serif'],
         body: ['"PP Neue Montreal"', 'sans-serif'],
+        mono: ['"Courier New"', 'Courier', 'monospace'],
       },
       fontSize: {
         'hero': 'clamp(3rem, 8vw, 8rem)',

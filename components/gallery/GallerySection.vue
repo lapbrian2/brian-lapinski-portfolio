@@ -4,11 +4,10 @@ import { useSectionTransition } from '~/composables/useSectionTransition'
 import { useScrollReveal } from '~/composables/useScrollReveal'
 
 const { artworks } = useArtworks()
-const activeCategory = ref('all')
 const sectionEl = ref<HTMLElement | null>(null)
 const headingEl = ref<HTMLElement | null>(null)
 
-// Curated selection for homepage — the best 12 across all categories
+// Curated selection for homepage — the best 6 across all categories
 const featuredIds = [
   'the-watcher',
   'bloom-of-decay',
@@ -16,12 +15,6 @@ const featuredIds = [
   'primal-scream',
   'the-gathering',
   'metamorphosis',
-  'the-crossing',
-  'gorgons-cry',
-  'first-encounter',
-  'the-offering',
-  'the-deep-one',
-  'the-procession',
 ]
 
 const selectedWorks = computed<Artwork[]>(() => {
@@ -57,13 +50,8 @@ useScrollReveal(headingEl, { y: 30, stagger: 0.1, children: true })
       </div>
     </div>
 
-    <!-- Filter bar -->
-    <div class="mb-10">
-      <GalleryFilter v-model="activeCategory" :artworks="selectedWorks" :all-artworks="artworks" />
-    </div>
-
     <!-- Grid -->
-    <GalleryGrid :category="activeCategory" :artworks="selectedWorks" />
+    <GenerationGrid :artworks="selectedWorks" />
 
     <!-- Explore full collection -->
     <div class="mt-20 pt-12 border-t border-lavender-400/10">

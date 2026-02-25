@@ -35,69 +35,8 @@
       </div>
     </section>
 
-    <!-- 3D Carousel -->
-    <section class="pb-16">
-      <ClientOnly>
-        <GalleryCarousel3D :artworks="categoryArtworks.slice(0, 12)" />
-        <template #fallback>
-          <div class="flex items-center justify-center h-[420px] md:h-[520px] rounded-2xl bg-dark-800/30">
-            <div class="flex flex-col items-center gap-4">
-              <div class="relative w-12 h-12">
-                <div class="absolute inset-0 rounded-full border border-lavender-400/10" />
-                <div class="absolute inset-0 rounded-full border border-transparent border-t-accent-red/60 animate-spin" style="animation-duration: 0.8s" />
-                <div class="absolute inset-1.5 rounded-full border border-transparent border-b-lavender-300/30 animate-spin" style="animation-duration: 1.4s; animation-direction: reverse" />
-              </div>
-              <span class="font-body text-[10px] uppercase tracking-[0.2em] text-lavender-400/40">Loading gallery</span>
-            </div>
-          </div>
-        </template>
-      </ClientOnly>
-    </section>
-
-    <!-- Artwork Details Grid -->
-    <section class="px-6 md:px-12 pb-24">
-      <div class="max-w-6xl mx-auto">
-        <h2 ref="gridHeadingEl" class="font-display text-heading font-bold text-lavender-100 mb-10 text-center">
-          All {{ categoryLabel }}
-        </h2>
-        <div ref="gridEl" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div
-            v-for="artwork in categoryArtworks"
-            :key="artwork.id"
-            class="artwork-card group bg-dark-800/50 border border-lavender-400/10 rounded-2xl overflow-hidden hover:border-accent-red/30 transition-all duration-300 cursor-pointer"
-            :data-artwork-id="artwork.id"
-            @click="openLightbox(artwork, $event)"
-          >
-            <div :class="[aspectClasses[artwork.aspect] || 'aspect-[4/3]', 'overflow-hidden relative']">
-              <!-- Shimmer placeholder -->
-              <div
-                v-if="!gridLoadedImages.has(artwork.id)"
-                class="absolute inset-0 bg-dark-700 overflow-hidden z-[1]"
-              >
-                <div class="grid-shimmer absolute inset-0" />
-              </div>
-              <NuxtImg
-                :src="artwork.src"
-                :alt="artwork.title"
-                width="800"
-                height="600"
-                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                quality="100"
-                class="w-full h-full object-cover transition-all duration-500 group-hover:scale-105"
-                :class="gridLoadedImages.has(artwork.id) ? 'opacity-100' : 'opacity-0'"
-                loading="lazy"
-                @load="gridLoadedImages.add(artwork.id)"
-              />
-            </div>
-            <div class="p-5">
-              <h3 class="font-display text-lg font-semibold text-lavender-100 mb-1">{{ artwork.title }}</h3>
-              <p class="font-body text-sm text-lavender-400 mb-3">{{ artwork.medium }} &middot; {{ artwork.year }}</p>
-              <p class="font-body text-sm text-lavender-300/70 line-clamp-2">{{ artwork.description }}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+    <!-- Prompt Thread -->
+    <PromptThread :artworks="categoryArtworks" />
 
     <!-- Category Navigation -->
     <section ref="navEl" class="px-6 md:px-12 pb-24">
@@ -132,7 +71,6 @@
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import type { Artwork } from '~/types/artwork'
-import type { SourceRect } from '~/composables/useLightbox'
 
 definePageMeta({ layout: false })
 
@@ -147,21 +85,9 @@ if (!validCategories.includes(category.value)) {
 }
 
 const { artworks } = useArtworks()
-const lightbox = useLightbox()
 
 const heroEl = ref<HTMLElement | null>(null)
-const gridHeadingEl = ref<HTMLElement | null>(null)
-const gridEl = ref<HTMLElement | null>(null)
 const navEl = ref<HTMLElement | null>(null)
-
-// Track loaded images for grid shimmer states
-const gridLoadedImages = reactive(new Set<string>())
-
-const aspectClasses: Record<string, string> = {
-  tall: 'aspect-[3/4]',
-  wide: 'aspect-[4/3]',
-  square: 'aspect-square',
-}
 
 const categoryArtworks = computed(() =>
   artworks.value.filter((a: Artwork) => a.category === category.value)
@@ -188,40 +114,6 @@ const otherCategories = computed(() => {
   }))
 })
 
-function getCategoryCardRect(e: MouseEvent): SourceRect | null {
-  const card = (e.currentTarget as HTMLElement)
-  if (!card) return null
-  // The image container is the first child div (aspect-[4/3])
-  const imgContainer = card.firstElementChild || card
-  const domRect = imgContainer.getBoundingClientRect()
-  const computedStyle = window.getComputedStyle(card)
-  return {
-    top: domRect.top,
-    left: domRect.left,
-    width: domRect.width,
-    height: domRect.height,
-    borderRadius: computedStyle.borderRadius,
-  }
-}
-
-function openLightbox(artwork: Artwork, e: MouseEvent) {
-  const index = categoryArtworks.value.findIndex((a: Artwork) => a.id === artwork.id)
-  const items = categoryArtworks.value.map((a: Artwork) => ({
-    id: a.id,
-    src: a.src,
-    title: a.title,
-    medium: a.medium,
-    description: a.description,
-    year: a.year,
-    rawPrompt: a.rawPrompt,
-    mjVersion: a.mjVersion,
-    refinementNotes: a.refinementNotes,
-    promptNodes: a.promptNodes,
-  }))
-  const rect = getCategoryCardRect(e)
-  lightbox.open(items, index >= 0 ? index : 0, rect)
-}
-
 // GSAP scroll reveals
 let ctx: gsap.Context | null = null
 
@@ -239,36 +131,6 @@ onMounted(() => {
         stagger: 0.15,
         ease: 'power3.out',
         delay: 0.2,
-      })
-    }
-
-    // Grid heading
-    if (gridHeadingEl.value) {
-      gsap.from(gridHeadingEl.value, {
-        y: 30,
-        opacity: 0,
-        duration: 0.7,
-        ease: 'power3.out',
-        scrollTrigger: {
-          trigger: gridHeadingEl.value,
-          start: 'top 85%',
-        },
-      })
-    }
-
-    // Grid cards stagger
-    if (gridEl.value) {
-      const cards = gridEl.value.querySelectorAll('.artwork-card')
-      gsap.from(cards, {
-        y: 50,
-        opacity: 0,
-        duration: 0.7,
-        stagger: 0.1,
-        ease: 'power3.out',
-        scrollTrigger: {
-          trigger: gridEl.value,
-          start: 'top 80%',
-        },
       })
     }
 
@@ -313,20 +175,3 @@ useHead({
 })
 </script>
 
-<style scoped>
-.grid-shimmer {
-  background: linear-gradient(
-    90deg,
-    rgba(42, 34, 64, 0) 0%,
-    rgba(42, 34, 64, 0.4) 50%,
-    rgba(42, 34, 64, 0) 100%
-  );
-  background-size: 200% 100%;
-  animation: grid-shimmer 1.5s infinite;
-}
-
-@keyframes grid-shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-</style>

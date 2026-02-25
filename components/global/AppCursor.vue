@@ -136,6 +136,11 @@ function onMouseUp(): void {
 function onMouseEnterInteractive(e: Event): void {
   const el = e.currentTarget as HTMLElement
 
+  // Check for artwork dominant color on element or ancestor
+  const dominantColor = el.dataset.dominantColor
+    || el.closest('[data-dominant-color]')?.getAttribute('data-dominant-color')
+    || '#ed544d' // fallback to accent-red
+
   // Dot shrinks, ring expands with accent glow
   if (dotEl.value) {
     gsap.to(dotEl.value, {
@@ -150,8 +155,8 @@ function onMouseEnterInteractive(e: Event): void {
     gsap.to(ringEl.value, {
       width: 48,
       height: 48,
-      borderColor: 'rgba(237, 84, 77, 0.4)',
-      backgroundColor: 'rgba(237, 84, 77, 0.06)',
+      borderColor: `${dominantColor}66`,
+      backgroundColor: `${dominantColor}0F`,
       duration: 0.35,
       ease: 'power3.out',
       overwrite: 'auto',
@@ -166,8 +171,8 @@ function onMouseEnterInteractive(e: Event): void {
     gsap.to(ringEl.value, {
       width: 80,
       height: 80,
-      borderColor: 'rgba(237, 84, 77, 0.5)',
-      backgroundColor: 'rgba(237, 84, 77, 0.08)',
+      borderColor: `${dominantColor}80`,
+      backgroundColor: `${dominantColor}14`,
       duration: 0.35,
       ease: 'power3.out',
       overwrite: 'auto',
