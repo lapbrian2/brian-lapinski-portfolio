@@ -16,8 +16,8 @@ const textEls = ref<HTMLElement[]>([])
 
 let ctx: gsap.Context | null = null
 
-// Pick 3 showcase-worthy artworks, fall back to first 3
-const showcaseIds = ['the-threshold', 'leviathan', 'the-colonnade']
+// Pick 3 showcase-worthy artworks — different categories, no hero duplicates
+const showcaseIds = ['veiled-gaze', 'blue-architecture', 'city-of-lights']
 const revealArtworks = computed(() => {
   const found = showcaseIds
     .map(id => artworks.value.find(a => a.id === id))

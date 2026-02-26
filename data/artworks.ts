@@ -101,6 +101,7 @@ export const artworks: Artwork[] = [
     aspect: 'square',
     year: 2025,
     dominantColor: '#c4a060',
+    featured: true,
   },
   // --- Portraits: character studies ---
   {
@@ -158,6 +159,7 @@ export const artworks: Artwork[] = [
     aspect: 'square',
     year: 2025,
     dominantColor: '#6a7a8a',
+    featured: true,
   },
   // --- Portraits: botanical + impasto ---
   {
@@ -170,6 +172,7 @@ export const artworks: Artwork[] = [
     aspect: 'square',
     year: 2025,
     dominantColor: '#8a9aaa',
+    featured: true,
   },
   {
     id: 'impasto-man',
@@ -181,6 +184,7 @@ export const artworks: Artwork[] = [
     aspect: 'square',
     year: 2025,
     dominantColor: '#7a8a9a',
+    featured: true,
   },
   // --- Dreamscape landscapes ---
   {
@@ -215,6 +219,7 @@ export const artworks: Artwork[] = [
     aspect: 'wide',
     year: 2025,
     dominantColor: '#7a8a9a',
+    featured: true,
   },
   {
     id: 'wind-song',
@@ -261,6 +266,7 @@ export const artworks: Artwork[] = [
     aspect: 'wide',
     year: 2025,
     dominantColor: '#8a7a4a',
+    featured: true,
   },
   {
     id: 'twisted-sentinels',
@@ -307,6 +313,7 @@ export const artworks: Artwork[] = [
     aspect: 'square',
     year: 2025,
     dominantColor: '#2a3a6a',
+    featured: true,
   },
   {
     id: 'the-infiltrator',
@@ -329,6 +336,7 @@ export const artworks: Artwork[] = [
     aspect: 'square',
     year: 2025,
     dominantColor: '#2a3a5a',
+    featured: true,
   },
   // --- Surreal: whimsical machines ---
   {
@@ -341,6 +349,7 @@ export const artworks: Artwork[] = [
     aspect: 'square',
     year: 2025,
     dominantColor: '#d4a040',
+    featured: true,
   },
   {
     id: 'the-scouts',
@@ -352,6 +361,7 @@ export const artworks: Artwork[] = [
     aspect: 'wide',
     year: 2025,
     dominantColor: '#c4a040',
+    featured: true,
   },
   {
     id: 'city-of-lights',
@@ -397,6 +407,7 @@ export const artworks: Artwork[] = [
     aspect: 'wide',
     year: 2025,
     dominantColor: '#c48a40',
+    featured: true,
   },
   {
     id: 'the-departure',
@@ -431,6 +442,7 @@ export const artworks: Artwork[] = [
     aspect: 'wide',
     year: 2025,
     dominantColor: '#2a5a5a',
+    featured: true,
   },
   {
     id: 'leviathan',

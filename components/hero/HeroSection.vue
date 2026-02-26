@@ -6,12 +6,12 @@ const props = defineProps<{
   ready?: boolean
 }>()
 
-// Hero artwork cycle — 4 signature pieces as immersive background
+// Hero artwork cycle — 4 diverse pieces spanning every style
 const heroImages = [
-  '/images/artworks/the-threshold.webp',
-  '/images/artworks/leviathan.webp',
+  '/images/artworks/red-shift.webp',
   '/images/artworks/silk-valley.webp',
-  '/images/artworks/the-colonnade.webp',
+  '/images/artworks/the-deep.webp',
+  '/images/artworks/the-threshold.webp',
 ]
 
 // Preload only the first hero image — subsequent images load lazily as needed

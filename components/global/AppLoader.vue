@@ -11,7 +11,7 @@
     <div class="absolute inset-0">
       <img
         ref="bgImgEl"
-        src="/images/artworks/the-threshold.webp"
+        src="/images/artworks/red-shift.webp"
         alt=""
         class="absolute inset-0 w-full h-full object-cover will-change-transform"
         style="filter: blur(40px) saturate(0.4); transform: scale(1.2); opacity: 0"

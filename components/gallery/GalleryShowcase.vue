@@ -10,16 +10,16 @@ const textEl = ref<HTMLElement | null>(null)
 const reducedMotion = useReducedMotion()
 let ctx: gsap.Context | null = null
 
-// Data-driven showcase: find "the-threshold" or first featured artwork, fall back to static
+// Data-driven showcase: feature leviathan (unique to this section), fall back to static
 const { artworks } = useArtworks()
 const staticFallback = {
-  title: 'The Threshold',
+  title: 'Leviathan',
   medium: 'Midjourney · 2025',
-  description: 'A solitary figure stands between massive stone monoliths at sunset — the doorway between worlds measured in human scale.',
-  src: '/images/artworks/the-threshold.webp',
+  description: 'A diver with a single light encounters the mouth of something vast and dark — the sublime terror of being small in an enormous world.',
+  src: '/images/artworks/leviathan.webp',
 }
 const showcase = computed(() => {
-  const found = artworks.value.find(a => a.id === 'the-threshold')
+  const found = artworks.value.find(a => a.id === 'leviathan')
     || artworks.value.find(a => a.featured)
   if (found) {
     return {
