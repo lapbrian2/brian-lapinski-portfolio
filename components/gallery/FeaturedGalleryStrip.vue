@@ -176,9 +176,10 @@ onUnmounted(() => {
             <NuxtImg
               :src="artwork.src"
               :alt="artwork.title"
-              width="800"
-              height="1000"
+              width="640"
+              height="640"
               sizes="(max-width: 768px) 80vw, 30vw"
+              format="webp"
               class="strip-img absolute inset-[-8%] w-[116%] h-[116%] object-cover transition-transform duration-700 group-hover:scale-105"
               loading="lazy"
             />
@@ -239,8 +240,9 @@ onUnmounted(() => {
             :src="artwork.src"
             :alt="artwork.title"
             width="640"
-            height="840"
+            height="640"
             sizes="75vw"
+            format="webp"
             class="absolute inset-0 w-full h-full object-cover"
             loading="lazy"
           />
