@@ -8,7 +8,7 @@
       Skip to content
     </a>
     <ClientOnly>
-      <SpotlightCursor />
+      <ParticleCanvas />
       <ScrollProgress />
       <SectionProgressDots />
     </ClientOnly>

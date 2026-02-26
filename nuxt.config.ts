@@ -50,12 +50,12 @@ export default defineNuxtConfig({
   ],
 
   build: {
-    transpile: ['gsap'],
+    transpile: ['gsap', 'three'],
   },
 
   vite: {
     optimizeDeps: {
-      include: ['gsap'],
+      include: ['gsap', 'three'],
     },
   },
 
