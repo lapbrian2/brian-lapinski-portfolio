@@ -390,21 +390,7 @@ onUnmounted(() => {
   color: rgba(255, 255, 255, 0.6);
 }
 
-.shimmer {
-  background: linear-gradient(
-    90deg,
-    rgba(17, 17, 24, 0) 0%,
-    rgba(17, 17, 24, 0.4) 50%,
-    rgba(17, 17, 24, 0) 100%
-  );
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
-}
-
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
+/* shimmer class is defined globally in assets/css/main.css */
 
 @media (max-width: 768px) {
   .carousel-scene {

@@ -29,13 +29,16 @@ export function useActiveSection() {
     nextTick(() => {
       observer = new IntersectionObserver(
         (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              activeSection.value = entry.target.id
-            }
-          })
+          // Pick the most-visible intersecting section to avoid flicker at boundaries
+          const intersecting = entries.filter(e => e.isIntersecting)
+          if (intersecting.length) {
+            const mostVisible = intersecting.reduce((a, b) =>
+              a.intersectionRatio > b.intersectionRatio ? a : b,
+            )
+            activeSection.value = mostVisible.target.id
+          }
         },
-        { rootMargin: '-20% 0px -60% 0px', threshold: 0 },
+        { rootMargin: '-20% 0px -60% 0px', threshold: [0, 0.25, 0.5] },
       )
 
       SECTIONS.forEach((s) => {

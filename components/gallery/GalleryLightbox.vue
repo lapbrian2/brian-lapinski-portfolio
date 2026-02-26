@@ -411,10 +411,15 @@ function flipLeave(el: Element, done: () => void) {
   if (imageEl.value) gsap.set(imageEl.value, { opacity: 0 })
   flipClone = createFlipClone(currentSrc, cloneStart)
 
+  // Capture local reference so onComplete removes the correct clone
+  // even if flipClone is reassigned by a rapid reopen
+  const localClone = flipClone
+
   flipTl?.kill()
   flipTl = gsap.timeline({
     onComplete() {
-      removeFlipClone()
+      localClone?.remove()
+      if (flipClone === localClone) flipClone = null
       done()
     },
   })

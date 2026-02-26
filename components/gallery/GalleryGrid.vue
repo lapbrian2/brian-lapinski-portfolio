@@ -111,6 +111,7 @@ onMounted(() => {
         stagger: { each: 0.1, from: 'start' },
         ease: 'power3.out',
         force3D: true,
+        onComplete: setupParallax, // start parallax after entrance finishes
       })
     }
 
@@ -127,10 +128,16 @@ onMounted(() => {
     }, 2500)
 
     // Depth-based parallax layers (desktop only)
-    // Each card scrolls at a different speed based on its column span —
-    // creating a sense of traveling through layered depth
-    if (canHover) {
-      cards.forEach((card, i) => {
+    // Deferred via setupParallax() — only starts after the entrance reveal
+    // completes, preventing the scrubbed y tween from competing with the
+    // entrance y:40 → y:0 animation on inner images.
+    let parallaxSetup = false
+    const setupParallax = () => {
+      if (parallaxSetup || !canHover || !gridEl.value) return
+      parallaxSetup = true
+
+      const freshCards = gridEl.value.querySelectorAll<HTMLElement>('.gallery-card')
+      freshCards.forEach((card, i) => {
         const depth = getParallaxDepth(i)
         const direction = i % 2 === 0 ? 1 : -1
 
