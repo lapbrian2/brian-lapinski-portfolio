@@ -19,7 +19,7 @@ export default defineNuxtConfig({
         { property: 'og:description', content: 'Exploring what it means to be human through images. AI artist, educator, and Creative Partner.' },
         { property: 'og:type', content: 'website' },
         { property: 'og:url', content: 'https://lapinski.art' },
-        { property: 'og:image', content: 'https://lapinski.art/images/artworks/the-watcher.webp' },
+        { property: 'og:image', content: 'https://lapinski.art/images/artworks/the-threshold.webp' },
         { property: 'og:image:width', content: '1200' },
         { property: 'og:image:height', content: '630' },
         { property: 'og:locale', content: 'en_US' },
@@ -27,7 +27,7 @@ export default defineNuxtConfig({
         { name: 'twitter:card', content: 'summary_large_image' },
         { name: 'twitter:title', content: 'Brian Lapinski | AI Art Portfolio' },
         { name: 'twitter:description', content: 'Exploring what it means to be human through images.' },
-        { name: 'twitter:image', content: 'https://lapinski.art/images/artworks/the-watcher.webp' },
+        { name: 'twitter:image', content: 'https://lapinski.art/images/artworks/the-threshold.webp' },
         { name: 'twitter:creator', content: '@Lapbrian2' },
         // Other
         { name: 'theme-color', content: '#000000' },

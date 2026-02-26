@@ -10,16 +10,16 @@ const textEl = ref<HTMLElement | null>(null)
 const reducedMotion = useReducedMotion()
 let ctx: gsap.Context | null = null
 
-// Data-driven showcase: find "the-watcher" or first featured artwork, fall back to static
+// Data-driven showcase: find "the-threshold" or first featured artwork, fall back to static
 const { artworks } = useArtworks()
 const staticFallback = {
-  title: 'The Watcher',
+  title: 'The Threshold',
   medium: 'Midjourney · 2025',
-  description: 'A sentient eye erupts from organic matter, crowned with lightning — the boundary between seeing and being seen dissolves.',
-  src: '/images/artworks/the-watcher.webp',
+  description: 'A solitary figure stands between massive stone monoliths at sunset — the doorway between worlds measured in human scale.',
+  src: '/images/artworks/the-threshold.webp',
 }
 const showcase = computed(() => {
-  const found = artworks.value.find(a => a.id === 'the-watcher')
+  const found = artworks.value.find(a => a.id === 'the-threshold')
     || artworks.value.find(a => a.featured)
   if (found) {
     return {

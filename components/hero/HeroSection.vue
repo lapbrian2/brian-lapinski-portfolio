@@ -8,10 +8,10 @@ const props = defineProps<{
 
 // Hero artwork cycle — 4 signature pieces as immersive background
 const heroImages = [
-  '/images/artworks/the-watcher.webp',
-  '/images/artworks/bloom-of-decay.webp',
-  '/images/artworks/metamorphosis.webp',
-  '/images/artworks/the-crossing.webp',
+  '/images/artworks/the-threshold.webp',
+  '/images/artworks/leviathan.webp',
+  '/images/artworks/silk-valley.webp',
+  '/images/artworks/the-colonnade.webp',
 ]
 
 // Preload only the first hero image — subsequent images load lazily as needed

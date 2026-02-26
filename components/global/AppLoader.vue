@@ -11,7 +11,7 @@
     <div class="absolute inset-0">
       <NuxtImg
         ref="bgImgEl"
-        src="/images/artworks/the-watcher.webp"
+        src="/images/artworks/the-threshold.webp"
         alt=""
         width="1920"
         height="1080"

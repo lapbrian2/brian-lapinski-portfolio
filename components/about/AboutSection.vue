@@ -228,8 +228,8 @@ const credentials = [
               <div class="about-shimmer absolute inset-0" />
             </div>
             <NuxtImg
-              src="/images/artworks/peeling-away.webp"
-              alt="Peeling Away — a self-portrait of unmasking"
+              src="/images/artworks/the-elder.webp"
+              alt="The Elder — wisdom emerging from golden fog"
               width="800"
               height="1000"
               sizes="(max-width: 768px) 100vw, 40vw"

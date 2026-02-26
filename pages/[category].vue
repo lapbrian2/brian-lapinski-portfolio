@@ -164,7 +164,7 @@ onUnmounted(() => {
 
 const ogImage = computed(() => {
   const first = categoryArtworks.value[0]
-  return first?.src || '/images/artworks/the-watcher.webp'
+  return first?.src || '/images/artworks/the-threshold.webp'
 })
 
 useHead({

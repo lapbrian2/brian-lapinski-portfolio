@@ -62,7 +62,7 @@
           type="text"
           required
           :disabled="isEditing"
-          placeholder="e.g. the-watcher"
+          placeholder="e.g. veiled-gaze"
           class="admin-input disabled:opacity-50"
         />
       </div>
