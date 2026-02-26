@@ -39,6 +39,7 @@ let kenBurnsTween: gsap.core.Tween | null = null
 let cycleStarted = false
 let firstFrameShown = false
 let cycleTimeout: ReturnType<typeof setTimeout> | null = null
+let crossfadeTl: gsap.core.Timeline | null = null
 
 // Phase A: Immediately bring the first image to target opacity (no Ken Burns yet).
 // This runs as soon as the loader signals bridge-ready, giving the hero a visible
@@ -80,18 +81,19 @@ function startCycle(): void {
     const nextEl = imgEls.value[next]
     if (!currentEl || !nextEl) return
 
+    crossfadeTl?.kill()
     gsap.set(nextEl, { scale: 1, opacity: 0 })
 
-    const tl = gsap.timeline({
+    crossfadeTl = gsap.timeline({
       onComplete: () => {
         activeIndex.value = next
         scheduleNext()
       },
     })
 
-    tl.to(currentEl, { opacity: 0, duration: 0.6, ease: 'power2.inOut' }, 0)
-    tl.to(nextEl, { opacity: 0.55, duration: 0.6, ease: 'power2.inOut' }, 0)
-    tl.to(nextEl, { scale: 1.1, duration: 2.5, ease: 'none', force3D: true }, 0)
+    crossfadeTl.to(currentEl, { opacity: 0, duration: 0.6, ease: 'power2.inOut' }, 0)
+    crossfadeTl.to(nextEl, { opacity: 0.55, duration: 0.6, ease: 'power2.inOut' }, 0)
+    crossfadeTl.to(nextEl, { scale: 1.1, duration: 2.5, ease: 'none', force3D: true }, 0)
   }
 
   scheduleNext()
@@ -110,6 +112,7 @@ watch(() => props.ready, (isReady) => {
 
 onUnmounted(() => {
   if (cycleTimeout) clearTimeout(cycleTimeout)
+  crossfadeTl?.kill()
   cycleTl?.kill()
   kenBurnsTween?.kill()
 })

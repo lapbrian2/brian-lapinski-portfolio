@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core'
+import { sqliteTable, text, integer, index } from 'drizzle-orm/sqlite-core'
 import { sql } from 'drizzle-orm'
 
 // Artworks
@@ -68,7 +68,10 @@ export const artworkLikes = sqliteTable('artwork_likes', {
   artworkId: text('artwork_id').notNull().references(() => artworks.id, { onDelete: 'cascade' }),
   ip: text('ip').notNull(),
   createdAt: text('created_at').default(sql`(datetime('now'))`),
-})
+}, (table) => ({
+  artworkIdx: index('artwork_likes_artwork_idx').on(table.artworkId),
+  ipIdx: index('artwork_likes_ip_idx').on(table.ip),
+}))
 
 // Analytics: Page Views
 export const pageViews = sqliteTable('page_views', {
@@ -80,7 +83,11 @@ export const pageViews = sqliteTable('page_views', {
   ip: text('ip'),
   country: text('country'),
   createdAt: text('created_at').default(sql`(datetime('now'))`),
-})
+}, (table) => ({
+  artworkIdx: index('page_views_artwork_idx').on(table.artworkId),
+  createdAtIdx: index('page_views_created_at_idx').on(table.createdAt),
+  pathIdx: index('page_views_path_idx').on(table.path),
+}))
 
 // Admin Sessions
 export const sessions = sqliteTable('sessions', {

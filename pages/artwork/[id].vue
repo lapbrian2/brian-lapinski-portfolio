@@ -290,10 +290,8 @@ useHead({
   }),
 })
 
-// JSON-LD structured data
-watchEffect(() => {
-  if (artwork.value) {
-    useArtworkSchema(artwork.value)
-  }
-})
+// JSON-LD structured data — watch artwork ref to update on navigation
+watch(artwork, (a) => {
+  if (a) useArtworkSchema(a)
+}, { immediate: true })
 </script>

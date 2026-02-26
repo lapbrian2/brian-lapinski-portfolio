@@ -45,7 +45,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // Rate limiting
-  const ip = getHeader(event, 'x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
+  const ip = getRequestIP(event, { xForwardedFor: true }) || 'unknown'
   if (!checkRateLimit(ip)) {
     throw createError({ statusCode: 429, statusMessage: 'Too many messages. Please try again later.' })
   }

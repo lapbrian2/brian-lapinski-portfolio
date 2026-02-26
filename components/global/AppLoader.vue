@@ -111,6 +111,7 @@ const lineBottomEl = ref<HTMLElement | null>(null)
 
 const hidden = ref(false)
 let loadTween: gsap.core.Tween | null = null
+let entranceTl: gsap.core.Timeline | null = null
 let exiting = false
 
 const emit = defineEmits<{
@@ -225,7 +226,7 @@ onMounted(() => {
   // Prefetch Splitting.js while user watches loader — eliminates delay when hero text needs it
   import('splitting').catch(() => {})
 
-  const entranceTl = gsap.timeline()
+  entranceTl = gsap.timeline()
 
   // Phase 1: Dark scene — overlay fades down, bg image fades in blurred
   if (bgImgEl.value) {
@@ -356,5 +357,10 @@ onMounted(() => {
       exitSequence()
     },
   })
+})
+
+onUnmounted(() => {
+  entranceTl?.kill()
+  loadTween?.kill()
 })
 </script>

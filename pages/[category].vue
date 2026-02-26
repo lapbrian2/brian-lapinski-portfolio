@@ -161,8 +161,8 @@ const ogImage = computed(() => {
 })
 
 useHead({
-  title: `${categoryLabel.value} | Brian Lapinski`,
-  meta: [
+  title: computed(() => `${categoryLabel.value} | Brian Lapinski`),
+  meta: computed(() => [
     { name: 'description', content: categoryDescription.value },
     { property: 'og:title', content: `${categoryLabel.value} — AI Art by Brian Lapinski` },
     { property: 'og:description', content: categoryDescription.value },
@@ -172,10 +172,14 @@ useHead({
     { name: 'twitter:title', content: `${categoryLabel.value} | Brian Lapinski` },
     { name: 'twitter:description', content: categoryDescription.value },
     { name: 'twitter:image', content: ogImage.value },
-  ],
+  ]),
 })
 
-// JSON-LD structured data for category page
-useCategorySchema(categoryLabel.value, categoryDescription.value, categoryArtworks.value)
+// JSON-LD structured data for category page — reactive via watchEffect
+watchEffect(() => {
+  if (categoryLabel.value && categoryArtworks.value.length) {
+    useCategorySchema(categoryLabel.value, categoryDescription.value, categoryArtworks.value)
+  }
+})
 </script>
 

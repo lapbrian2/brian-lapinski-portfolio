@@ -197,6 +197,7 @@ watch(
         stagger: 0.03,
         ease: 'power2.in',
         onComplete: resolve,
+        onInterrupt: resolve,
       })
     })
 

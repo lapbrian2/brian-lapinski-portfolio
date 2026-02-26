@@ -2,6 +2,10 @@ import { asc } from 'drizzle-orm'
 import { artworks, collections } from '~/server/db/schema'
 import { useDb } from '~/server/db'
 
+function escapeXml(str: string): string {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+}
+
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig(event)
   const baseUrl = (config.public.siteUrl as string) || 'https://lapinski.art'
@@ -55,7 +59,7 @@ export default defineEventHandler(async (event) => {
 ${urls
   .map(
     (u) => `  <url>
-    <loc>${baseUrl}${u.loc}</loc>
+    <loc>${escapeXml(baseUrl + u.loc)}</loc>
     <lastmod>${(u as any).lastmod || today}</lastmod>
     <changefreq>${u.changefreq}</changefreq>
     <priority>${u.priority}</priority>

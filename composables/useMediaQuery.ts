@@ -1,4 +1,4 @@
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onUnmounted } from 'vue'
 
 export function useMediaQuery(query: string) {
   const matches = ref(false)
@@ -8,11 +8,12 @@ export function useMediaQuery(query: string) {
     matches.value = e.matches
   }
 
-  onMounted(() => {
+  // Read correct value synchronously on the client before first render
+  if (import.meta.client) {
     mediaQuery = window.matchMedia(query)
     matches.value = mediaQuery.matches
     mediaQuery.addEventListener('change', update)
-  })
+  }
 
   onUnmounted(() => {
     mediaQuery?.removeEventListener('change', update)

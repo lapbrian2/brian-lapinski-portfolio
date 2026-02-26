@@ -14,7 +14,7 @@ export function useVelocitySkew(
   selector: string,
 ) {
   let currentSkew = 0
-  const skewTarget = ref(0)
+  let skewTarget = 0
   let skewTickerFn: (() => void) | null = null
   let lenisScrollHandler: ((e: any) => void) | null = null
   let lenisInstance: any = null
@@ -29,7 +29,7 @@ export function useVelocitySkew(
         lenisInstance = $lenis
         lenisScrollHandler = (e: any) => {
           const velocity = e.velocity || 0
-          skewTarget.value = Math.max(-3, Math.min(3, velocity * 0.8))
+          skewTarget = Math.max(-3, Math.min(3, velocity * 0.8))
         }
         ;($lenis as any).on('scroll', lenisScrollHandler)
       }
@@ -39,8 +39,8 @@ export function useVelocitySkew(
 
     // Smooth lerp the skew onto cells via GSAP ticker
     skewTickerFn = () => {
-      currentSkew += (skewTarget.value - currentSkew) * 0.1
-      skewTarget.value *= 0.95
+      currentSkew += (skewTarget - currentSkew) * 0.1
+      skewTarget *= 0.95
       if (Math.abs(currentSkew) < 0.01) currentSkew = 0
       if (!gridEl.value) return
       const cells = gridEl.value.querySelectorAll(selector)

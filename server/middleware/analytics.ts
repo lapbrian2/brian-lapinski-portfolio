@@ -1,5 +1,6 @@
 import { pageViews } from '~/server/db/schema'
 import { useDb } from '~/server/db'
+import { hashIp } from '~/server/utils/hash-ip'
 
 const BOT_PATTERNS = /bot|crawl|spider|slurp|lighthouse|pagespeed|gtmetrix|pingdom/i
 
@@ -55,12 +56,4 @@ async function trackPageView(event: any, path: string, userAgent: string) {
   } catch {
     // Never let analytics crash the app
   }
-}
-
-async function hashIp(ip: string): Promise<string> {
-  const encoder = new TextEncoder()
-  const data = encoder.encode(ip + '_salt_lapinski_art')
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data)
-  const hashArray = Array.from(new Uint8Array(hashBuffer))
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('').substring(0, 16)
 }

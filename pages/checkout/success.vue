@@ -80,7 +80,10 @@ const cart = useCart()
 const contentEl = ref<HTMLElement | null>(null)
 
 onMounted(() => {
-  cart.clearCart()
+  // Only clear cart if we arrived via Stripe redirect (has session_id)
+  if (sessionId.value) {
+    cart.clearCart()
+  }
 
   // Entrance animation
   if (contentEl.value) {

@@ -31,6 +31,9 @@ const likes = ref(0)
 const displayViews = ref(0)
 const displayLikes = ref(0)
 
+let viewsTween: gsap.core.Tween | null = null
+let likesTween: gsap.core.Tween | null = null
+
 watch(
   () => props.artworkId,
   async (id) => {
@@ -42,8 +45,10 @@ watch(
 
       // Animate number tween with GSAP
       if (import.meta.client) {
-        gsap.to(displayViews, { value: views.value, duration: 0.8, ease: 'power2.out', roundProps: 'value' })
-        gsap.to(displayLikes, { value: likes.value, duration: 0.8, ease: 'power2.out', roundProps: 'value' })
+        viewsTween?.kill()
+        likesTween?.kill()
+        viewsTween = gsap.to(displayViews, { value: views.value, duration: 0.8, ease: 'power2.out', roundProps: 'value' })
+        likesTween = gsap.to(displayLikes, { value: likes.value, duration: 0.8, ease: 'power2.out', roundProps: 'value' })
       } else {
         displayViews.value = views.value
         displayLikes.value = likes.value
@@ -54,4 +59,9 @@ watch(
   },
   { immediate: true },
 )
+
+onUnmounted(() => {
+  viewsTween?.kill()
+  likesTween?.kill()
+})
 </script>

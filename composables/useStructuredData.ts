@@ -94,6 +94,7 @@ export function useWebsiteSchema() {
   useHead({
     script: [
       {
+        key: 'ld-website',
         type: 'application/ld+json',
         innerHTML: JSON.stringify(schema),
       },
@@ -123,6 +124,7 @@ export function useArtworkSchema(artwork: Artwork) {
   useHead({
     script: [
       {
+        key: 'ld-artwork',
         type: 'application/ld+json',
         innerHTML: JSON.stringify(schema),
       },
@@ -160,6 +162,7 @@ export function useCategorySchema(
   useHead({
     script: [
       {
+        key: 'ld-category',
         type: 'application/ld+json',
         innerHTML: JSON.stringify(schema),
       },

@@ -1,4 +1,4 @@
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 import type { PromptNode, TechniqueCategory } from '~/types/artwork'
 
 export interface LightboxItem {
@@ -30,13 +30,10 @@ function useLightboxState() {
   const items = useState<LightboxItem[]>('lightbox-items', () => [])
   const currentIndex = useState<number>('lightbox-index', () => 0)
   const direction = useState<'next' | 'prev'>('lightbox-direction', () => 'next')
-  return { isOpen, items, currentIndex, direction }
+  const sourceRect = useState<SourceRect | null>('lightbox-source-rect', () => null)
+  const sourceArtworkId = useState<string | null>('lightbox-source-id', () => null)
+  return { isOpen, items, currentIndex, direction, sourceRect, sourceArtworkId }
 }
-
-// Shared ref for the FLIP source rect (not SSR-safe, only used client-side)
-const sourceRect = ref<SourceRect | null>(null)
-// Track the artwork ID so the close animation can find the card element
-const sourceArtworkId = ref<string | null>(null)
 
 function getLenis(): any {
   if (typeof window === 'undefined') return null
@@ -49,7 +46,7 @@ function getLenis(): any {
 }
 
 export function useLightbox() {
-  const { isOpen, items, currentIndex, direction } = useLightboxState()
+  const { isOpen, items, currentIndex, direction, sourceRect, sourceArtworkId } = useLightboxState()
 
   const currentItem = computed(() => items.value[currentIndex.value] || null)
   const hasNext = computed(() => currentIndex.value < items.value.length - 1)

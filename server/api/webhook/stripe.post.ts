@@ -26,7 +26,8 @@ export default defineEventHandler(async (event) => {
       config.stripeWebhookSecret as string,
     )
   } catch (err: any) {
-    throw createError({ statusCode: 400, statusMessage: `Webhook signature verification failed: ${err.message}` })
+    console.error('Stripe webhook signature verification failed:', err)
+    throw createError({ statusCode: 400, statusMessage: 'Webhook signature verification failed' })
   }
 
   const db = useDb()
@@ -37,6 +38,16 @@ export default defineEventHandler(async (event) => {
     const customerEmail = session.customer_details?.email || ''
 
     if (orderId) {
+      // Idempotency guard — skip if already processed
+      const [existingOrder] = await db
+        .select({ status: orders.status })
+        .from(orders)
+        .where(eq(orders.id, Number(orderId)))
+        .limit(1)
+      if (!existingOrder || existingOrder.status === 'paid') {
+        return { received: true }
+      }
+
       // Update order with payment info
       await db
         .update(orders)

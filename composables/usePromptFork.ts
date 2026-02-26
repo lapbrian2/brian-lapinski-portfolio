@@ -31,6 +31,13 @@ export function usePromptFork() {
   const copiedType = ref<'fork' | 'quick' | null>(null)
   const copyTimeoutId = ref<ReturnType<typeof setTimeout> | null>(null)
 
+  onUnmounted(() => {
+    if (copyTimeoutId.value) {
+      clearTimeout(copyTimeoutId.value)
+      copyTimeoutId.value = null
+    }
+  })
+
   /**
    * Generate a structured prompt template from an artwork's schema
    */

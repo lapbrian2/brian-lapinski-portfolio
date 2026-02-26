@@ -24,11 +24,13 @@ onMounted(() => {
 
 // Reset Lenis scroll position to top on each page navigation
 const router = useRouter()
-const { $lenis } = useNuxtApp()
 
 router.afterEach((to, from) => {
-  if (to.path !== from.path && $lenis) {
-    ;($lenis as any).scrollTo(0, { immediate: true })
+  if (to.path !== from.path) {
+    const lenis = useNuxtApp().$lenis as any
+    if (lenis && !lenis.isStopped) {
+      lenis.scrollTo(0, { immediate: true })
+    }
   }
 })
 </script>
