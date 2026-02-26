@@ -98,3 +98,71 @@ export const contactSubmissions = sqliteTable('contact_submissions', {
   ip: text('ip'),
   createdAt: text('created_at').default(sql`(datetime('now'))`),
 })
+
+// ─── Print Shop ───
+
+// Print Products — represents a printable version of an artwork
+export const printProducts = sqliteTable('print_products', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  artworkId: text('artwork_id').notNull().references(() => artworks.id, { onDelete: 'cascade' }),
+  active: integer('active', { mode: 'boolean' }).notNull().default(true),
+  createdAt: text('created_at').default(sql`(datetime('now'))`),
+  updatedAt: text('updated_at').default(sql`(datetime('now'))`),
+})
+
+// Print Variants — different sizes/materials for a product
+export const printVariants = sqliteTable('print_variants', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  productId: integer('product_id').notNull().references(() => printProducts.id, { onDelete: 'cascade' }),
+  sizeName: text('size_name').notNull(),
+  sizeWidth: integer('size_width').notNull(),
+  sizeHeight: integer('size_height').notNull(),
+  material: text('material').notNull().default('fine-art-paper'),
+  price: integer('price').notNull(), // cents
+  printfulVariantId: text('printful_variant_id'),
+  active: integer('active', { mode: 'boolean' }).notNull().default(true),
+  createdAt: text('created_at').default(sql`(datetime('now'))`),
+})
+
+// Orders
+export const orders = sqliteTable('orders', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  email: text('email').notNull(),
+  stripeSessionId: text('stripe_session_id').unique(),
+  stripePaymentIntentId: text('stripe_payment_intent_id'),
+  status: text('status').notNull().default('pending'),
+  total: integer('total').notNull(), // cents
+  shippingName: text('shipping_name'),
+  shippingAddress: text('shipping_address'), // JSON
+  createdAt: text('created_at').default(sql`(datetime('now'))`),
+  updatedAt: text('updated_at').default(sql`(datetime('now'))`),
+})
+
+// Order Line Items
+export const orderItems = sqliteTable('order_items', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  orderId: integer('order_id').notNull().references(() => orders.id, { onDelete: 'cascade' }),
+  variantId: integer('variant_id').notNull().references(() => printVariants.id),
+  quantity: integer('quantity').notNull().default(1),
+  unitPrice: integer('unit_price').notNull(), // cents at time of purchase
+})
+
+// ─── Collections & Curation ───
+
+export const collections = sqliteTable('collections', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  title: text('title').notNull(),
+  slug: text('slug').notNull().unique(),
+  description: text('description'),
+  coverImage: text('cover_image'),
+  sortOrder: integer('sort_order').notNull().default(0),
+  featured: integer('featured', { mode: 'boolean' }).default(false),
+  createdAt: text('created_at').default(sql`(datetime('now'))`),
+})
+
+export const collectionArtworks = sqliteTable('collection_artworks', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  collectionId: integer('collection_id').notNull().references(() => collections.id, { onDelete: 'cascade' }),
+  artworkId: text('artwork_id').notNull().references(() => artworks.id, { onDelete: 'cascade' }),
+  sortOrder: integer('sort_order').notNull().default(0),
+})

@@ -79,8 +79,11 @@ export default defineNuxtConfig({
     adminPassword: process.env.ADMIN_PASSWORD || '',
     adminSessionSecret: process.env.ADMIN_SESSION_SECRET || '',
     blobToken: process.env.BLOB_READ_WRITE_TOKEN || '',
+    stripeSecretKey: process.env.STRIPE_SECRET_KEY || '',
+    stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET || '',
     public: {
       siteUrl: process.env.SITE_URL || 'https://lapinski.art',
+      stripePublishableKey: process.env.STRIPE_PUBLISHABLE_KEY || '',
     },
   },
 

@@ -59,6 +59,9 @@ const { logout } = useAdminAuth()
 const navItems = [
   { to: '/admin', label: 'Dashboard', icon: 'dashboard' },
   { to: '/admin/artworks', label: 'Artworks', icon: 'image' },
+  { to: '/admin/shop', label: 'Print Shop', icon: 'image' },
+  { to: '/admin/orders', label: 'Orders', icon: 'mail' },
+  { to: '/admin/collections', label: 'Collections', icon: 'image' },
   { to: '/admin/content', label: 'Content', icon: 'edit' },
   { to: '/admin/credentials', label: 'Credentials', icon: 'award' },
   { to: '/admin/submissions', label: 'Submissions', icon: 'mail' },

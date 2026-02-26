@@ -3,6 +3,8 @@ import gsap from 'gsap'
 import type { SourceRect } from '~/composables/useLightbox'
 import { useIsMobile, useReducedMotion } from '~/composables/useMediaQuery'
 
+import type { PrintProduct } from '~/types/shop'
+
 const lightbox = useLightbox()
 const { copied, copiedType } = usePromptFork()
 const reducedMotion = useReducedMotion()
@@ -27,6 +29,14 @@ let activeTl: gsap.core.Timeline | null = null
 
 // Focus management state
 let previouslyFocused: Element | null = null
+
+// Buy Print link — lazy-fetch products list so we can show "Buy Print" when a print exists
+const { data: shopProductsData } = useFetch<{ data: PrintProduct[] }>('/api/shop/products', { lazy: true, server: false })
+const printProductForCurrent = computed(() => {
+  const artworkId = lightbox.currentItem.value?.id
+  if (!artworkId || !shopProductsData.value?.data) return null
+  return shopProductsData.value.data.find((p) => p.artworkId === artworkId && p.active) ?? null
+})
 
 const FOCUSABLE_SELECTOR = 'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'
 
@@ -587,6 +597,22 @@ onUnmounted(() => {
             </svg>
             <span class="hidden sm:inline">Schema</span>
           </button>
+
+          <!-- Buy Print -->
+          <NuxtLink
+            v-if="printProductForCurrent"
+            :to="`/shop/${printProductForCurrent.id}`"
+            class="btn-press schema-button group"
+            aria-label="Buy print of this artwork"
+            title="Buy print"
+            @click.stop
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-200 group-hover:scale-110">
+              <circle cx="8" cy="21" r="1" /><circle cx="19" cy="21" r="1" />
+              <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
+            </svg>
+            <span class="hidden sm:inline">Buy Print</span>
+          </NuxtLink>
 
           <!-- Info toggle -->
           <button

@@ -18,5 +18,8 @@
     </main>
     <AppFooter />
     <GalleryLightbox />
+    <ClientOnly>
+      <CartDrawer />
+    </ClientOnly>
   </div>
 </template>

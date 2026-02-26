@@ -30,3 +30,12 @@ logs
 
 .vercel
 .env*.local
+
+# Firecrawl cache
+.firecrawl/
+
+# Planning artifacts
+.planning/
+
+# Windows artifacts
+nul
