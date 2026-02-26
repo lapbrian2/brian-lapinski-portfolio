@@ -6,7 +6,7 @@
           Process
         </p>
         <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12">
-          <h2 class="font-display text-section font-bold text-lavender-100 leading-none">
+          <h2 class="font-display font-bold text-lavender-100 leading-none process-heading">
             From Feeling to Form
           </h2>
           <p class="font-body text-base text-lavender-300 max-w-sm md:text-right">
@@ -181,3 +181,10 @@ onUnmounted(() => {
   ctx?.revert()
 })
 </script>
+
+<style scoped>
+.process-heading {
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  letter-spacing: -0.03em;
+}
+</style>

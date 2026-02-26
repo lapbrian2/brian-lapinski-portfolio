@@ -174,12 +174,12 @@ const credentials = [
 
 <template>
   <section id="about" ref="sectionEl" class="section relative">
-    <!-- Pullquote -->
+    <!-- Pullquote — massive editorial typography -->
     <div class="mb-20">
       <blockquote class="relative pl-8 md:pl-12 border-l-2 border-accent-red/60">
         <p
           ref="pullquoteEl"
-          class="font-display text-section font-semibold text-lavender-100 leading-tight"
+          class="font-display font-bold text-lavender-100 leading-none about-pullquote"
         >
           I use images as a way to explore what it means to be human.
         </p>
@@ -253,6 +253,11 @@ const credentials = [
 </template>
 
 <style scoped>
+.about-pullquote {
+  font-size: clamp(2rem, 5vw, 4.5rem);
+  letter-spacing: -0.03em;
+}
+
 :deep(.word) {
   display: inline-block;
   transition: opacity 0.1s;

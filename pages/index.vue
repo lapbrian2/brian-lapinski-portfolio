@@ -4,8 +4,8 @@
     <HeroSection :ready="heroReady" />
     <StackedTypography />
     <CinematicReveal />
-    <GallerySection />
     <GalleryShowcase />
+    <CollectionCTA />
     <FeaturedGalleryStrip />
     <ScrollMarquee text="About the Artist" direction="right" />
     <AboutSection />

@@ -139,7 +139,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <section ref="sectionEl" class="cinematic-reveal">
+  <section ref="sectionEl" class="cinematic-reveal w-screen relative left-1/2 -translate-x-1/2">
     <div
       v-for="(artwork, index) in revealArtworks"
       :key="artwork!.id"

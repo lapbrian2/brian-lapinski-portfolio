@@ -142,11 +142,11 @@ onUnmounted(() => {
   <section v-if="featured.length >= 3" ref="sectionEl" class="overflow-hidden">
     <!-- Heading -->
     <div ref="headingEl" class="max-w-7xl mx-auto px-6 md:px-12 pt-24 pb-8 text-center">
-      <p class="font-body text-xs uppercase tracking-[0.3em] text-accent-red mb-3">
+      <p class="font-body text-xs uppercase tracking-[0.3em] text-accent-red mb-4">
         Featured Works
       </p>
-      <h2 class="font-display text-2xl md:text-3xl font-bold text-lavender-100">
-        Explore the Collection
+      <h2 class="font-display font-bold text-lavender-100 leading-none strip-heading">
+        The Collection
       </h2>
     </div>
 
@@ -266,6 +266,11 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
+.strip-heading {
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  letter-spacing: -0.03em;
+}
+
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
