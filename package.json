@@ -26,12 +26,10 @@
     "resend": "^6.9.2",
     "splitting": "^1.1.0",
     "stripe": "^20.4.0",
-    "three": "^0.183.1",
     "vue": "^3.5.0",
     "vue-router": "^4.5.0"
   },
   "devDependencies": {
-    "@types/three": "^0.183.1",
     "dotenv": "^17.3.1",
     "drizzle-kit": "^0.31.9",
     "tsx": "^4.21.0",
