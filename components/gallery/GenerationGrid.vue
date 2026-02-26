@@ -176,6 +176,7 @@ function handleClick(index: number) {
     mjVersion: a.mjVersion,
     refinementNotes: a.refinementNotes,
     promptNodes: a.promptNodes,
+    likeCount: a.likeCount,
   }))
   lightbox.open(items, index, rect)
 }

@@ -62,6 +62,14 @@ export const stats = sqliteTable('stats', {
   sortOrder: integer('sort_order').notNull().default(0),
 })
 
+// Artwork Likes (resonance)
+export const artworkLikes = sqliteTable('artwork_likes', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  artworkId: text('artwork_id').notNull().references(() => artworks.id, { onDelete: 'cascade' }),
+  ip: text('ip').notNull(),
+  createdAt: text('created_at').default(sql`(datetime('now'))`),
+})
+
 // Analytics: Page Views
 export const pageViews = sqliteTable('page_views', {
   id: integer('id').primaryKey({ autoIncrement: true }),

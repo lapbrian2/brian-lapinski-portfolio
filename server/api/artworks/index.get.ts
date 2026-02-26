@@ -1,5 +1,5 @@
-import { eq, asc, inArray } from 'drizzle-orm'
-import { artworks, techniques, artworkTechniques } from '~/server/db/schema'
+import { eq, asc, inArray, count } from 'drizzle-orm'
+import { artworks, techniques, artworkTechniques, artworkLikes } from '~/server/db/schema'
 import { useDb } from '~/server/db'
 
 export default defineEventHandler(async (event) => {
@@ -20,6 +20,20 @@ export default defineEventHandler(async (event) => {
       .select()
       .from(artworks)
       .orderBy(asc(artworks.sortOrder))
+  }
+
+  // Fetch like counts for all artworks
+  const likeCounts = await db
+    .select({
+      artworkId: artworkLikes.artworkId,
+      total: count(),
+    })
+    .from(artworkLikes)
+    .groupBy(artworkLikes.artworkId)
+
+  const likeMap = new Map<string, number>()
+  for (const lc of likeCounts) {
+    likeMap.set(lc.artworkId, lc.total)
   }
 
   // If nodes requested, hydrate each artwork with its technique nodes
@@ -55,6 +69,7 @@ export default defineEventHandler(async (event) => {
     const enriched = results.map((artwork) => ({
       ...artwork,
       promptNodes: nodeMap.get(artwork.id) || [],
+      likeCount: likeMap.get(artwork.id) || 0,
     }))
 
     setResponseHeaders(event, {
@@ -69,5 +84,11 @@ export default defineEventHandler(async (event) => {
     'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120',
   })
 
-  return { success: true, data: results }
+  // Add like counts to plain results
+  const withLikes = results.map((artwork) => ({
+    ...artwork,
+    likeCount: likeMap.get(artwork.id) || 0,
+  }))
+
+  return { success: true, data: withLikes }
 })

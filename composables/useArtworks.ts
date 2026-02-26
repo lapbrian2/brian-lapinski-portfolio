@@ -14,5 +14,11 @@ export function useArtworks() {
     return apiData
   })
 
+  // Seed like counts when artworks data changes
+  const likes = useLikes()
+  watch(artworks, (arts) => {
+    if (arts.length) likes.seedCounts(arts)
+  }, { immediate: true })
+
   return { artworks, pending, error, refresh }
 }

@@ -13,6 +13,7 @@ export interface LightboxItem {
   mjVersion?: string | null
   refinementNotes?: string | null
   promptNodes?: PromptNode[]
+  likeCount?: number
 }
 
 export interface SourceRect {

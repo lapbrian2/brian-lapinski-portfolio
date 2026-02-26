@@ -15,6 +15,12 @@ export function useGallery() {
     return apiData
   })
 
+  // Seed like counts when artworks data changes
+  const likes = useLikes()
+  watch(artworks, (arts) => {
+    if (arts.length) likes.seedCounts(arts)
+  }, { immediate: true })
+
   // Active technique filter
   const activeTechnique = ref<string | null>(null)
 

@@ -34,6 +34,7 @@ function openLightbox(index: number, rect: SourceRect | null) {
     mjVersion: a.mjVersion,
     refinementNotes: a.refinementNotes,
     promptNodes: a.promptNodes,
+    likeCount: a.likeCount,
   }))
   lightbox.open(items, index, rect)
 }

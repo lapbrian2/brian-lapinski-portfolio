@@ -555,6 +555,13 @@ onUnmounted(() => {
         </div>
 
         <div class="flex items-center gap-2">
+          <!-- Resonance Ripple — Like button -->
+          <ResonanceButton
+            v-if="lightbox.currentItem.value?.id"
+            :artwork-id="lightbox.currentItem.value.id"
+            size="md"
+          />
+
           <!-- Architect Panel toggle -->
           <button
             v-if="hasOssuaryData"

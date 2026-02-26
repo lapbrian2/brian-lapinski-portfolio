@@ -15,6 +15,7 @@ export interface Artwork {
   mjVersion?: string | null
   refinementNotes?: string | null
   promptNodes?: PromptNode[]
+  likeCount?: number
   createdAt?: string | null
   updatedAt?: string | null
 }

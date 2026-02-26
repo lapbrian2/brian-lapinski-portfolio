@@ -192,12 +192,15 @@ onUnmounted(() => {
               {{ artwork.medium }} &middot; {{ artwork.year }}
             </p>
           </div>
-          <span class="flex-shrink-0 w-8 h-8 rounded-full border border-lavender-400/30 flex items-center justify-center text-lavender-300 group-hover:border-accent-red/50 group-hover:text-accent-red transition-all duration-300 mt-0.5">
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-              <line x1="2" y1="10" x2="10" y2="2" />
-              <polyline points="4 2 10 2 10 8" />
-            </svg>
-          </span>
+          <div class="flex-shrink-0 flex items-center gap-2 mt-0.5">
+            <ResonanceButton v-if="artwork.id" :artwork-id="artwork.id" size="sm" />
+            <span class="w-8 h-8 rounded-full border border-lavender-400/30 flex items-center justify-center text-lavender-300 group-hover:border-accent-red/50 group-hover:text-accent-red transition-all duration-300">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                <line x1="2" y1="10" x2="10" y2="2" />
+                <polyline points="4 2 10 2 10 8" />
+              </svg>
+            </span>
+          </div>
         </div>
       </div>
     </div>
