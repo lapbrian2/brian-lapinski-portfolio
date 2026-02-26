@@ -78,14 +78,10 @@ onUnmounted(() => {
   <section ref="sectionEl" class="relative h-screen w-full overflow-hidden">
     <!-- Full-viewport image -->
     <div class="absolute inset-0">
-      <NuxtImg
+      <img
         ref="imageEl"
         :src="showcase.src"
         :alt="showcase.title"
-        width="1141"
-        height="640"
-        sizes="100vw"
-        format="webp"
         class="w-full h-full object-cover will-change-transform"
         loading="lazy"
         draggable="false"

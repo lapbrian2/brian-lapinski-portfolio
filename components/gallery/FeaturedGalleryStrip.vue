@@ -173,13 +173,9 @@ onUnmounted(() => {
             @keydown.space.prevent="openLightbox(index)"
           >
             <!-- Image with inner parallax -->
-            <NuxtImg
+            <img
               :src="artwork.src"
               :alt="artwork.title"
-              width="640"
-              height="640"
-              sizes="(max-width: 768px) 80vw, 30vw"
-              format="webp"
               class="strip-img absolute inset-[-8%] w-[116%] h-[116%] object-cover transition-transform duration-700 group-hover:scale-105"
               loading="lazy"
             />
@@ -236,13 +232,9 @@ onUnmounted(() => {
           :aria-label="`View ${artwork.title}`"
           @click="openLightbox(index)"
         >
-          <NuxtImg
+          <img
             :src="artwork.src"
             :alt="artwork.title"
-            width="640"
-            height="640"
-            sizes="75vw"
-            format="webp"
             class="absolute inset-0 w-full h-full object-cover"
             loading="lazy"
           />

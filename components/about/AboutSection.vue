@@ -227,13 +227,9 @@ const credentials = [
             >
               <div class="about-shimmer absolute inset-0" />
             </div>
-            <NuxtImg
+            <img
               src="/images/artworks/the-elder.webp"
               alt="The Elder — wisdom emerging from golden fog"
-              width="640"
-              height="640"
-              sizes="(max-width: 768px) 100vw, 40vw"
-              format="webp"
               class="w-full h-auto object-cover will-change-transform transition-opacity duration-700"
               :class="aboutImgLoaded ? 'opacity-100' : 'opacity-0'"
               loading="lazy"

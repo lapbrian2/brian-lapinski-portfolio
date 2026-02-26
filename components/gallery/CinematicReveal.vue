@@ -153,14 +153,10 @@ onUnmounted(() => {
         class="cinematic-reveal__curtain absolute inset-0"
       >
         <!-- Inner image with parallax offset -->
-        <NuxtImg
-          :ref="(el: any) => { if (el) imgEls[index] = el?.$el || el as HTMLElement }"
+        <img
+          :ref="(el: any) => { if (el) imgEls[index] = el as HTMLElement }"
           :src="artwork!.src"
           :alt="artwork!.title"
-          width="1141"
-          height="640"
-          sizes="100vw"
-          format="webp"
           class="cinematic-reveal__img absolute object-cover"
           loading="lazy"
           draggable="false"

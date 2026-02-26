@@ -2,18 +2,11 @@ import type { Artwork, PromptNode, TechniqueCategory } from '~/types/artwork'
 import { artworks as staticArtworks } from '~/data/artworks'
 
 export function useGallery() {
-  // Fetch with prompt nodes
-  const { data: response, pending, error, refresh } = useFetch('/api/artworks?nodes=true', {
-    key: 'gallery-artworks',
-    default: () => ({ success: true, data: [] as Artwork[] }),
-  })
-
-  // Fall back to static data if API fails or returns empty
-  const artworks = computed<Artwork[]>(() => {
-    const apiData = (response.value as any)?.data
-    if (error.value || !apiData?.length) return staticArtworks as unknown as Artwork[]
-    return apiData
-  })
+  // Use static artwork data as the canonical source
+  const artworks = computed<Artwork[]>(() => staticArtworks as unknown as Artwork[])
+  const pending = ref(false)
+  const error = ref<Error | null>(null)
+  const refresh = () => Promise.resolve()
 
   // Note: seedCounts is handled by useArtworks — no duplicate watcher needed here
 

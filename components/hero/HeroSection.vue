@@ -127,20 +127,15 @@ onUnmounted(() => {
   <section class="hero-section relative h-screen w-full overflow-hidden bg-dark-900">
     <!-- Artwork background layer — crossfading Ken Burns cycle -->
     <div class="absolute inset-0 z-[1]">
-      <NuxtImg
+      <img
         v-for="(src, i) in heroImages"
         :key="src"
-        :ref="(el) => { if (el) imgEls[i] = (el as any)?.$el || el as HTMLElement }"
+        :ref="(el) => { if (el) imgEls[i] = el as HTMLElement }"
         :src="src"
         alt=""
-        width="1141"
-        height="640"
-        sizes="100vw"
-        format="webp"
         class="absolute inset-0 w-full h-full object-cover hero-img"
         style="opacity: 0"
         :loading="i === 0 ? 'eager' : 'lazy'"
-        :preload="i === 0"
         draggable="false"
       />
     </div>

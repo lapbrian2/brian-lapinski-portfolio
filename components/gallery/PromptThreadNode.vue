@@ -24,15 +24,11 @@
         @mouseleave="onImageMouseLeave"
         @mousemove="onImageMouseMove"
       >
-        <NuxtImg
+        <img
           :src="artwork.src"
           :alt="artwork.title"
           class="w-full h-auto transition-opacity duration-500"
           :class="imgLoaded ? 'opacity-100' : 'opacity-0'"
-          width="640"
-          height="640"
-          sizes="(max-width: 768px) 100vw, 50vw"
-          format="webp"
           loading="lazy"
           style="object-fit: cover;"
           @load="imgLoaded = true"

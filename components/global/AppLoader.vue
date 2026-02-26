@@ -9,17 +9,13 @@
   >
     <!-- Blurred artwork background that sharpens as loading progresses -->
     <div class="absolute inset-0">
-      <NuxtImg
+      <img
         ref="bgImgEl"
         src="/images/artworks/the-threshold.webp"
         alt=""
-        width="1141"
-        height="640"
-        format="webp"
         class="absolute inset-0 w-full h-full object-cover will-change-transform"
         style="filter: blur(40px) saturate(0.4); transform: scale(1.2); opacity: 0"
         loading="eager"
-        :preload="true"
         draggable="false"
       />
     </div>

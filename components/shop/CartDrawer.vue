@@ -50,12 +50,10 @@
           class="flex gap-3 py-3 border-b border-white/[0.04] last:border-0"
         >
           <!-- Thumbnail -->
-          <NuxtImg
+          <img
             v-if="item.artworkSrc"
             :src="item.artworkSrc"
             :alt="item.artworkTitle"
-            width="80"
-            height="80"
             class="w-14 h-14 object-cover rounded-sm shrink-0"
             loading="lazy"
           />
