@@ -177,8 +177,7 @@ function handleClick(index: number) {
   lightbox.open(items, index, rect)
 }
 
-// --- Mount: clip-path reveal, image counter-movement, per-cell parallax, velocity skew ---
-let hasRevealed = false
+// --- Mount: scrub-linked per-card reveals, parallax, velocity skew ---
 
 onMounted(() => {
   canHover.value = window.matchMedia('(hover: hover)').matches
@@ -196,7 +195,6 @@ onMounted(() => {
   if (prefersReduced) {
     gsap.set(cells, { clipPath: 'inset(0% 0 0 0)', opacity: 1 })
     gsap.set(imgs, { y: 0, filter: 'blur(0px) saturate(1)' })
-    hasRevealed = true
     return
   }
 
@@ -204,41 +202,48 @@ onMounted(() => {
   gsap.set(cells, { clipPath: 'inset(100% 0 0 0)', opacity: 1 })
   gsap.set(imgs, { y: 40, filter: 'blur(20px) saturate(0)' })
 
-  const reveal = () => {
-    if (hasRevealed) return
-    hasRevealed = true
-
-    // Clip-path curtain reveal
-    gsap.to(cells, {
-      clipPath: 'inset(0% 0 0 0)',
-      duration: 1,
-      stagger: { each: 0.12, from: 'start' },
-      ease: 'power3.inOut',
-      force3D: true,
-    })
-
-    // Image slides UP + blur/desaturate resolves as frame opens
-    gsap.to(imgs, {
-      y: 0,
-      filter: 'blur(0px) saturate(1)',
-      duration: 1.4,
-      stagger: { each: 0.12, from: 'start' },
-      ease: 'power3.out',
-      force3D: true,
-    })
-  }
-
   ctx = gsap.context(() => {
-    ScrollTrigger.create({
-      trigger: gridEl.value!,
-      start: 'top 90%',
-      once: true,
-      onEnter: reveal,
-    })
+    // Per-card scrub-linked reveal — each card unmasks as you scroll through it
+    cells.forEach((cell, i) => {
+      const img = cell.querySelector('.cell-img')
 
-    // Per-cell scroll parallax (alternating direction like old GalleryCard)
-    if (canHover.value) {
-      cells.forEach((cell, i) => {
+      // Clip-path curtain reveal scrubbed to scroll
+      gsap.fromTo(cell,
+        { clipPath: 'inset(100% 0 0 0)' },
+        {
+          clipPath: 'inset(0% 0 0 0)',
+          ease: 'none',
+          force3D: true,
+          scrollTrigger: {
+            trigger: cell,
+            start: 'top 95%',
+            end: 'top 45%',
+            scrub: 0.8,
+          },
+        },
+      )
+
+      // Image slides up + blur/desaturate resolves, also scrubbed
+      if (img) {
+        gsap.fromTo(img,
+          { y: 40, filter: 'blur(20px) saturate(0)' },
+          {
+            y: 0,
+            filter: 'blur(0px) saturate(1)',
+            ease: 'none',
+            force3D: true,
+            scrollTrigger: {
+              trigger: cell,
+              start: 'top 95%',
+              end: 'top 50%',
+              scrub: 0.8,
+            },
+          },
+        )
+      }
+
+      // Per-cell alternating parallax drift (desktop only)
+      if (canHover.value) {
         const direction = i % 2 === 0 ? 1 : -1
         gsap.to(cell, {
           y: direction * 15,
@@ -251,24 +256,9 @@ onMounted(() => {
             scrub: true,
           },
         })
-      })
-    }
-  }, gridEl.value)
-
-  // Safety net: if already scrolled past trigger (e.g. hash navigation), reveal immediately
-  nextTick(() => {
-    if (!hasRevealed && gridEl.value) {
-      const rect = gridEl.value.getBoundingClientRect()
-      if (rect.top < window.innerHeight) {
-        reveal()
       }
-    }
-  })
-
-  // Absolute fallback: reveal after 2s no matter what
-  setTimeout(() => {
-    if (!hasRevealed) reveal()
-  }, 2000)
+    })
+  }, gridEl.value)
 
   // Velocity skew on pointer devices only
   if (canHover.value) {

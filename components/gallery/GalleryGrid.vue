@@ -60,10 +60,20 @@ function getSpanClass(index: number): string {
   return spanPatterns[index % spanPatterns.length]
 }
 
+// Depth-based parallax intensity — larger cards move less (farther away), smaller ones move more (closer)
+function getParallaxDepth(index: number): number {
+  const span = spanPatterns[index % spanPatterns.length]
+  if (span.includes('col-span-7')) return 25   // dominant: slow, far
+  if (span.includes('col-span-6')) return 30   // balanced: medium
+  if (span.includes('col-span-5')) return 35   // medium: mid-depth
+  if (span.includes('col-span-4')) return 45   // small triple: fast, close
+  return 30
+}
+
 // Scroll velocity skew (extracted composable)
 const velocitySkew = useVelocitySkew(gridEl, '.gallery-card')
 
-// Initial staggered entrance on scroll
+// Initial staggered entrance on scroll + depth parallax layers
 onMounted(() => {
   if (!gridEl.value) return
 
@@ -73,15 +83,17 @@ onMounted(() => {
     return
   }
 
+  const canHover = window.matchMedia('(hover: hover)').matches
+
   ctx = gsap.context(() => {
-    const cards = gridEl.value!.querySelectorAll('.gallery-card')
+    const cards = gridEl.value!.querySelectorAll<HTMLElement>('.gallery-card')
     if (!cards.length) return
 
     // Clip-path curtain reveal — each card unveils like a curtain
     gsap.set(cards, { clipPath: 'inset(100% 0 0 0)', opacity: 1 })
 
     // Inner images counter-move for parallax unmask
-    const imgs = gridEl.value!.querySelectorAll('.card-img')
+    const imgs = gridEl.value!.querySelectorAll<HTMLElement>('.card-img')
     gsap.set(imgs, { y: 40 })
 
     const revealCards = () => {
@@ -93,7 +105,6 @@ onMounted(() => {
         ease: 'power3.inOut',
         force3D: true,
       })
-      // Image slides up as the frame opens
       gsap.to(imgs, {
         y: 0,
         duration: 1.2,
@@ -114,10 +125,51 @@ onMounted(() => {
     setTimeout(() => {
       if (!hasRevealed) revealCards()
     }, 2500)
+
+    // Depth-based parallax layers (desktop only)
+    // Each card scrolls at a different speed based on its column span —
+    // creating a sense of traveling through layered depth
+    if (canHover) {
+      cards.forEach((card, i) => {
+        const depth = getParallaxDepth(i)
+        const direction = i % 2 === 0 ? 1 : -1
+
+        gsap.to(card, {
+          y: direction * depth,
+          ease: 'none',
+          force3D: true,
+          scrollTrigger: {
+            trigger: card,
+            start: 'top bottom',
+            end: 'bottom top',
+            scrub: true,
+          },
+        })
+
+        // Inner image counter-parallax — "window into depth" effect
+        const img = card.querySelector('.card-img')
+        if (img) {
+          gsap.fromTo(img,
+            { y: '-6%' },
+            {
+              y: '6%',
+              ease: 'none',
+              force3D: true,
+              scrollTrigger: {
+                trigger: card,
+                start: 'top bottom',
+                end: 'bottom top',
+                scrub: true,
+              },
+            },
+          )
+        }
+      })
+    }
   }, gridEl.value)
 
   // Only enable velocity skew on pointer devices
-  if (window.matchMedia('(hover: hover)').matches) {
+  if (canHover) {
     velocitySkew.setup()
   }
 })

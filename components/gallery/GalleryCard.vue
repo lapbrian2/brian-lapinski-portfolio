@@ -61,6 +61,10 @@ onMounted(() => {
   // Only enable magnetic + parallax on pointer devices
   if (!window.matchMedia('(hover: hover)').matches) return
 
+  // Check reduced motion
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  if (prefersReduced) return
+
   ctx = gsap.context(() => {
     // Subtle parallax offset: alternating even/odd
     const direction = props.index % 2 === 0 ? 1 : -1
@@ -73,6 +77,19 @@ onMounted(() => {
         start: 'top bottom',
         end: 'bottom top',
         scrub: true,
+      },
+    })
+
+    // Breathing scale: card grows as it approaches viewport center, shrinks as it leaves
+    // Maps scroll progress (0→0.5→1) to scale (0.96→1.0→0.96) via sine curve
+    ScrollTrigger.create({
+      trigger: cardEl.value!,
+      start: 'top bottom',
+      end: 'bottom top',
+      scrub: true,
+      onUpdate: (self) => {
+        const scale = 0.96 + 0.04 * Math.sin(self.progress * Math.PI)
+        gsap.set(cardEl.value!, { scale, force3D: true })
       },
     })
   }, cardEl.value)

@@ -5,7 +5,7 @@
     <ScrollMarquee text="Selected Works" />
     <GallerySection />
     <GalleryShowcase />
-    <FeaturedCarousel />
+    <FeaturedGalleryStrip />
     <ScrollMarquee text="About the Artist" direction="right" />
     <AboutSection />
     <SectionDivider />
