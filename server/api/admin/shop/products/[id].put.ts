@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm'
+import { eq, and } from 'drizzle-orm'
 import { printProducts, printVariants } from '~/server/db/schema'
 import { useDb } from '~/server/db'
 
@@ -46,10 +46,14 @@ export default defineEventHandler(async (event) => {
         if (variant.active !== undefined) updateData.active = variant.active
 
         if (Object.keys(updateData).length > 0) {
+          // Ownership check: ensure variant belongs to this product
           await db
             .update(printVariants)
             .set(updateData)
-            .where(eq(printVariants.id, Number(variant.id)))
+            .where(and(
+              eq(printVariants.id, Number(variant.id)),
+              eq(printVariants.productId, Number(id)),
+            ))
         }
       } else {
         // Create new variant

@@ -13,6 +13,9 @@ export default defineEventHandler(async (event) => {
   const db = useDb()
 
   for (const item of order) {
+    if (typeof item.id !== 'string' || !item.id || typeof item.sortOrder !== 'number' || isNaN(item.sortOrder)) {
+      throw createError({ statusCode: 400, statusMessage: 'Each item must have a valid string id and numeric sortOrder' })
+    }
     await db
       .update(artworks)
       .set({ sortOrder: item.sortOrder, updatedAt: new Date().toISOString() })

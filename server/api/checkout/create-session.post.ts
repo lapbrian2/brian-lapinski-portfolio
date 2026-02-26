@@ -10,10 +10,14 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Items are required' })
   }
 
+  if (items.length > 20) {
+    throw createError({ statusCode: 400, statusMessage: 'Too many items in cart (max 20)' })
+  }
+
   // Validate each item shape
   for (const item of items) {
-    if (!item.variantId || !item.quantity || item.quantity < 1) {
-      throw createError({ statusCode: 400, statusMessage: 'Each item must have a valid variantId and quantity' })
+    if (!item.variantId || !item.quantity || item.quantity < 1 || item.quantity > 10) {
+      throw createError({ statusCode: 400, statusMessage: 'Each item must have a valid variantId and quantity between 1 and 10' })
     }
   }
 

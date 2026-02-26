@@ -18,7 +18,15 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'File too large (max 10MB)' })
   }
 
-  const ext = file.filename?.split('.').pop() || 'webp'
+  // Derive extension from validated MIME type, not client-supplied filename
+  const MIME_TO_EXT: Record<string, string> = {
+    'image/jpeg': 'jpg',
+    'image/png': 'png',
+    'image/webp': 'webp',
+    'image/gif': 'gif',
+    'image/avif': 'avif',
+  }
+  const ext = MIME_TO_EXT[file.type ?? ''] || 'webp'
   const slug = file.filename
     ?.replace(/\.[^/.]+$/, '')
     .replace(/[^a-z0-9-]/gi, '-')
