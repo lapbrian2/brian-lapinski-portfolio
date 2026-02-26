@@ -174,5 +174,8 @@ useHead({
     { name: 'twitter:image', content: ogImage.value },
   ],
 })
+
+// JSON-LD structured data for category page
+useCategorySchema(categoryLabel.value, categoryDescription.value, categoryArtworks.value)
 </script>
 
