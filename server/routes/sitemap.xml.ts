@@ -1,5 +1,5 @@
 import { asc } from 'drizzle-orm'
-import { artworks } from '~/server/db/schema'
+import { artworks, collections } from '~/server/db/schema'
 import { useDb } from '~/server/db'
 
 export default defineEventHandler(async (event) => {
@@ -10,15 +10,21 @@ export default defineEventHandler(async (event) => {
 
   // Fetch all artwork IDs for individual artwork pages
   let artworkRows: Array<{ id: string; updatedAt: string | null }> = []
+  let collectionRows: Array<{ slug: string; createdAt: string | null }> = []
   try {
     const db = useDb()
     artworkRows = await db
       .select({ id: artworks.id, updatedAt: artworks.updatedAt })
       .from(artworks)
       .orderBy(asc(artworks.sortOrder))
+    collectionRows = await db
+      .select({ slug: collections.slug, createdAt: collections.createdAt })
+      .from(collections)
+      .orderBy(asc(collections.sortOrder))
   } catch {
     // If DB fails, sitemap still works with static pages
     artworkRows = []
+    collectionRows = []
   }
 
   const urls = [
@@ -28,11 +34,19 @@ export default defineEventHandler(async (event) => {
       priority: '0.8',
       changefreq: 'weekly',
     })),
+    { loc: '/shop', priority: '0.7', changefreq: 'weekly' },
+    { loc: '/collections', priority: '0.7', changefreq: 'weekly' },
     ...artworkRows.map((a) => ({
       loc: `/artwork/${a.id}`,
       priority: '0.6',
       changefreq: 'monthly',
       lastmod: a.updatedAt ? a.updatedAt.split('T')[0] : today,
+    })),
+    ...collectionRows.map((c) => ({
+      loc: `/collections/${c.slug}`,
+      priority: '0.6',
+      changefreq: 'monthly',
+      lastmod: c.createdAt ? c.createdAt.split('T')[0] : today,
     })),
   ]
 
