@@ -21,6 +21,15 @@
           <p class="font-body text-base text-lavender-400 max-w-md">
             AI artist and educator exploring what it means to be human through images.
           </p>
+          <p class="font-body text-sm text-lavender-500 mt-3 flex items-center gap-2">
+            AI Architect at
+            <a
+              href="https://www.linkedin.com/company/the-house-of-curiosity"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-lavender-300 hover:text-accent-red transition-colors duration-200"
+            >The House of Curiosity</a>
+          </p>
         </div>
 
         <!-- Right: Links columns -->
