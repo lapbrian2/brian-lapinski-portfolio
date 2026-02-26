@@ -2,7 +2,6 @@
 import type { Artwork } from '~/types/artwork'
 import type { SourceRect } from '~/composables/useLightbox'
 import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 const props = withDefaults(defineProps<{
   artwork: Artwork
@@ -48,8 +47,6 @@ const overlayEl = ref<HTMLElement | null>(null)
 const titleEl = ref<HTMLElement | null>(null)
 const mediumEl = ref<HTMLElement | null>(null)
 
-let ctx: gsap.Context | null = null
-
 onMounted(() => {
   if (!cardEl.value) return
 
@@ -58,41 +55,9 @@ onMounted(() => {
     if (!imgLoaded.value) imgLoaded.value = true
   }, 3000)
 
-  // Only enable magnetic + parallax on pointer devices
-  if (!window.matchMedia('(hover: hover)').matches) return
-
-  // Check reduced motion
-  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  if (prefersReduced) return
-
-  ctx = gsap.context(() => {
-    // Subtle parallax offset: alternating even/odd
-    const direction = props.index % 2 === 0 ? 1 : -1
-    gsap.to(cardEl.value!, {
-      y: direction * 20,
-      ease: 'none',
-      force3D: true,
-      scrollTrigger: {
-        trigger: cardEl.value!,
-        start: 'top bottom',
-        end: 'bottom top',
-        scrub: true,
-      },
-    })
-
-    // Breathing scale: card grows as it approaches viewport center, shrinks as it leaves
-    // Maps scroll progress (0→0.5→1) to scale (0.96→1.0→0.96) via sine curve
-    ScrollTrigger.create({
-      trigger: cardEl.value!,
-      start: 'top bottom',
-      end: 'bottom top',
-      scrub: true,
-      onUpdate: (self) => {
-        const scale = 0.96 + 0.04 * Math.sin(self.progress * Math.PI)
-        gsap.set(cardEl.value!, { scale, force3D: true })
-      },
-    })
-  }, cardEl.value)
+  // Note: scroll-driven parallax and depth effects are handled by the parent grid
+  // (GalleryGrid depth-parallax or GenerationGrid alternating parallax).
+  // GalleryCard only handles hover interactions (3D tilt, scale, glow) via event handlers.
 })
 
 function onMouseEnter() {
@@ -148,7 +113,6 @@ function onMouseLeaveReset() {
 
 onUnmounted(() => {
   if (imgFallbackTimeout) clearTimeout(imgFallbackTimeout)
-  ctx?.revert()
 })
 </script>
 

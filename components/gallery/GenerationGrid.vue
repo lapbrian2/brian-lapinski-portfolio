@@ -207,39 +207,50 @@ onMounted(() => {
     cells.forEach((cell, i) => {
       const img = cell.querySelector('.cell-img')
 
-      // Clip-path curtain reveal scrubbed to scroll
-      gsap.fromTo(cell,
-        { clipPath: 'inset(100% 0 0 0)' },
-        {
-          clipPath: 'inset(0% 0 0 0)',
-          ease: 'none',
-          force3D: true,
-          scrollTrigger: {
-            trigger: cell,
-            start: 'top 95%',
-            end: 'top 45%',
-            scrub: 0.8,
-          },
-        },
-      )
+      // Check if cell is already past reveal point (already in viewport on page load)
+      const cellRect = cell.getBoundingClientRect()
+      const viewportH = window.innerHeight
+      const alreadyVisible = cellRect.top < viewportH * 0.95
 
-      // Image slides up + blur/desaturate resolves, also scrubbed
-      if (img) {
-        gsap.fromTo(img,
-          { y: 40, filter: 'blur(20px) saturate(0)' },
+      if (alreadyVisible) {
+        // Already in viewport — show immediately, no scrubbed reveal
+        gsap.set(cell, { clipPath: 'inset(0% 0 0 0)' })
+        if (img) gsap.set(img, { y: 0, filter: 'blur(0px) saturate(1)' })
+      } else {
+        // Below viewport — use scrub-linked reveal as card enters
+        gsap.fromTo(cell,
+          { clipPath: 'inset(100% 0 0 0)' },
           {
-            y: 0,
-            filter: 'blur(0px) saturate(1)',
+            clipPath: 'inset(0% 0 0 0)',
             ease: 'none',
             force3D: true,
             scrollTrigger: {
               trigger: cell,
               start: 'top 95%',
-              end: 'top 50%',
+              end: 'top 45%',
               scrub: 0.8,
             },
           },
         )
+
+        // Image slides up + blur/desaturate resolves, also scrubbed
+        if (img) {
+          gsap.fromTo(img,
+            { y: 40, filter: 'blur(20px) saturate(0)' },
+            {
+              y: 0,
+              filter: 'blur(0px) saturate(1)',
+              ease: 'none',
+              force3D: true,
+              scrollTrigger: {
+                trigger: cell,
+                start: 'top 95%',
+                end: 'top 50%',
+                scrub: 0.8,
+              },
+            },
+          )
+        }
       }
 
       // Per-cell alternating parallax drift (desktop only)
@@ -259,6 +270,20 @@ onMounted(() => {
       }
     })
   }, gridEl.value)
+
+  // Safety net: if any cells are still hidden after 2s (edge case), force reveal
+  setTimeout(() => {
+    if (!gridEl.value) return
+    const stillHidden = gridEl.value.querySelectorAll<HTMLElement>('.grid-cell')
+    stillHidden.forEach((cell) => {
+      const style = window.getComputedStyle(cell)
+      if (style.clipPath && style.clipPath.includes('100%')) {
+        gsap.set(cell, { clipPath: 'inset(0% 0 0 0)' })
+        const img = cell.querySelector('.cell-img')
+        if (img) gsap.set(img, { y: 0, filter: 'blur(0px) saturate(1)' })
+      }
+    })
+  }, 2000)
 
   // Velocity skew on pointer devices only
   if (canHover.value) {

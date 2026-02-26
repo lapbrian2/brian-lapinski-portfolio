@@ -65,75 +65,49 @@ function setupDesktopScroll() {
       return -(stripEl.value!.scrollWidth - window.innerWidth)
     }
 
-    const st = ScrollTrigger.create({
-      trigger: desktopEl.value!,
-      start: 'top top',
-      end: () => `+=${Math.abs(getScrollAmount())}`,
-      pin: true,
-      scrub: 1,
-      invalidateOnRefresh: true,
-      onUpdate: (self) => {
-        // Progress bar
-        if (progressEl.value) {
-          progressEl.value.style.transform = `scaleX(${self.progress})`
-        }
-
-        // Per-card active scaling — cards near center get a scale bump + glow
-        const cards = cardEls.value
-        if (!cards.length) return
-        const vw = window.innerWidth
-        const centerX = vw / 2
-
-        cards.forEach((card, i) => {
-          if (!card) return
-          const rect = card.getBoundingClientRect()
-          const cardCenter = rect.left + rect.width / 2
-          const distance = Math.abs(cardCenter - centerX)
-          const maxDist = vw * 0.6
-          const proximity = Math.max(0, 1 - distance / maxDist)
-
-          // Scale: 1.0 → 1.04 at center
-          const scale = 1 + proximity * 0.04
-          // Glow opacity
-          const glowOpacity = proximity * 0.6
-
-          gsap.set(card, {
-            scale,
-            force3D: true,
-          })
-
-          const glow = card.querySelector('.strip-glow')
-          if (glow) {
-            gsap.set(glow, { opacity: glowOpacity })
-          }
-        })
-      },
-    })
-
-    // Animate the strip horizontally
+    // Horizontal scroll tween with pinning — follows ProcessSection pattern exactly
     gsap.to(stripEl.value!, {
       x: getScrollAmount,
       ease: 'none',
-      scrollTrigger: st,
-    })
+      scrollTrigger: {
+        trigger: desktopEl.value!,
+        start: 'top top',
+        end: () => `+=${Math.abs(getScrollAmount())}`,
+        pin: true,
+        scrub: 1,
+        invalidateOnRefresh: true,
+        onUpdate: (self) => {
+          // Progress bar
+          if (progressEl.value) {
+            progressEl.value.style.transform = `scaleX(${self.progress})`
+          }
 
-    // Inner image parallax — each image shifts slightly against the scroll
-    const imgs = stripEl.value!.querySelectorAll<HTMLElement>('.strip-img')
-    imgs.forEach((img) => {
-      gsap.fromTo(img,
-        { y: '-6%' },
-        {
-          y: '6%',
-          ease: 'none',
-          force3D: true,
-          scrollTrigger: {
-            trigger: desktopEl.value!,
-            start: 'top top',
-            end: () => `+=${Math.abs(getScrollAmount())}`,
-            scrub: true,
-          },
+          // Per-card active scaling — cards near viewport center get a scale bump + glow
+          const cards = cardEls.value
+          if (!cards.length) return
+          const vw = window.innerWidth
+          const centerX = vw / 2
+
+          cards.forEach((card) => {
+            if (!card) return
+            const rect = card.getBoundingClientRect()
+            const cardCenter = rect.left + rect.width / 2
+            const distance = Math.abs(cardCenter - centerX)
+            const maxDist = vw * 0.6
+            const proximity = Math.max(0, 1 - distance / maxDist)
+
+            const scale = 1 + proximity * 0.04
+            const glowOpacity = proximity * 0.6
+
+            gsap.set(card, { scale, force3D: true })
+
+            const glow = card.querySelector('.strip-glow')
+            if (glow) {
+              gsap.set(glow, { opacity: glowOpacity })
+            }
+          })
         },
-      )
+      },
     })
   }, desktopEl.value)
 }
