@@ -41,6 +41,8 @@ export default {
         'hero': 'clamp(3rem, 8vw, 8rem)',
         'section': 'clamp(2rem, 5vw, 4rem)',
         'heading': 'clamp(1.5rem, 3vw, 2.5rem)',
+        'stacked': 'clamp(6rem, 18vw, 20rem)',
+        'stacked-mobile': 'clamp(3rem, 14vw, 6rem)',
       },
       spacing: {
         '18': '4.5rem',

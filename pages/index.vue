@@ -2,7 +2,8 @@
   <div>
     <AppLoader @complete="onLoaderComplete" @bridge-ready="onBridgeReady" />
     <HeroSection :ready="heroReady" />
-    <ScrollMarquee text="Selected Works" />
+    <StackedTypography />
+    <CinematicReveal />
     <GallerySection />
     <GalleryShowcase />
     <FeaturedGalleryStrip />
