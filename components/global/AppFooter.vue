@@ -15,7 +15,7 @@
       <div class="grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-8 mb-16">
         <!-- Left: Large name -->
         <div class="md:col-span-7">
-          <span class="font-display text-section font-bold text-lavender-100 leading-none block mb-4">
+          <span class="font-display font-bold text-lavender-100 leading-none block mb-4 footer-name">
             Brian Lapinski
           </span>
           <p class="font-body text-base text-lavender-400 max-w-md">
@@ -210,3 +210,10 @@ onUnmounted(() => {
   ctx?.revert()
 })
 </script>
+
+<style scoped>
+.footer-name {
+  font-size: clamp(2rem, 5vw, 4rem);
+  letter-spacing: -0.03em;
+}
+</style>

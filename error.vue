@@ -52,7 +52,7 @@ onMounted(() => {
       </div>
 
       <!-- Message -->
-      <h1 class="font-display text-2xl md:text-4xl font-bold text-lavender-100">
+      <h1 class="font-display text-3xl md:text-5xl lg:text-6xl font-bold text-lavender-100 leading-none" style="letter-spacing: -0.03em">
         {{ is404 ? 'Lost in the void' : 'Something broke' }}
       </h1>
 
