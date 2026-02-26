@@ -101,13 +101,6 @@ export function useLightbox() {
     $fetch(`/api/artworks/${artworkId}/view`, { method: 'POST' }).catch(() => {})
   }
 
-  function handleKeydown(e: KeyboardEvent) {
-    if (!isOpen.value) return
-    if (e.key === 'Escape') close()
-    if (e.key === 'ArrowRight') next()
-    if (e.key === 'ArrowLeft') prev()
-  }
-
   function getSourceRect(): SourceRect | null {
     return sourceRect.value
   }
@@ -132,7 +125,6 @@ export function useLightbox() {
     close,
     next,
     prev,
-    handleKeydown,
     getSourceRect,
     getSourceArtworkId,
     clearSourceRect,

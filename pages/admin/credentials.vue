@@ -112,12 +112,7 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'admin', middleware: 'admin' })
 
-interface Credential {
-  id: number
-  name: string
-  type: string
-  sortOrder: number
-}
+import type { Credential, CredentialsApiResponse } from '~/types/api'
 
 const credentialsList = ref<Credential[]>([])
 const loading = ref(true)

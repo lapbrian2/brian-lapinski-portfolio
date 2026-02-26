@@ -42,6 +42,7 @@ const aspectClasses: Record<Artwork['aspect'], string> = {
 }
 
 const imgLoaded = ref(false)
+let imgFallbackTimeout: ReturnType<typeof setTimeout> | null = null
 const cardEl = ref<HTMLElement | null>(null)
 const overlayEl = ref<HTMLElement | null>(null)
 const titleEl = ref<HTMLElement | null>(null)
@@ -53,7 +54,7 @@ onMounted(() => {
   if (!cardEl.value) return
 
   // Safety: force imgLoaded after timeout in case @load doesn't fire (SSR hydration edge case)
-  setTimeout(() => {
+  imgFallbackTimeout = setTimeout(() => {
     if (!imgLoaded.value) imgLoaded.value = true
   }, 3000)
 
@@ -129,6 +130,7 @@ function onMouseLeaveReset() {
 }
 
 onUnmounted(() => {
+  if (imgFallbackTimeout) clearTimeout(imgFallbackTimeout)
   ctx?.revert()
 })
 </script>
@@ -159,11 +161,10 @@ onUnmounted(() => {
       width="800"
       height="600"
       sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-      quality="100"
       class="card-img absolute inset-0 w-full h-full object-cover transition-opacity duration-500"
       :class="imgLoaded ? 'opacity-100' : 'opacity-0'"
       :loading="index < 4 ? 'eager' : 'lazy'"
-      @load="imgLoaded = true"
+      @load="imgLoaded = true; if (imgFallbackTimeout) { clearTimeout(imgFallbackTimeout); imgFallbackTimeout = null }"
     />
 
     <!-- Shimmer loading placeholder -->

@@ -93,6 +93,48 @@ useScrollReveal(headingEl, { y: 30, stagger: 0.1, children: true })
 
 let ctx: gsap.Context | null = null
 
+let resizeTimer: ReturnType<typeof setTimeout> | null = null
+
+function setupDesktopScroll() {
+  ctx?.revert()
+
+  if (!desktopEl.value || !stripEl.value) return
+
+  ctx = gsap.context(() => {
+    // Calculate how far the strip overflows the viewport
+    const getScrollAmount = () => {
+      return -(stripEl.value!.scrollWidth - window.innerWidth)
+    }
+
+    // Use a standard GSAP tween with scrub — most reliable approach
+    gsap.to(stripEl.value!, {
+      x: getScrollAmount,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: desktopEl.value!,
+        start: 'top top',
+        end: () => `+=${Math.abs(getScrollAmount())}`,
+        pin: true,
+        scrub: 1,
+        invalidateOnRefresh: true,
+        onUpdate: (self) => {
+          if (progressEl.value) {
+            progressEl.value.style.transform = `scaleX(${self.progress})`
+          }
+        },
+      },
+    })
+  }, desktopEl.value)
+}
+
+function onResize() {
+  if (isMobile.value) return
+  if (resizeTimer) clearTimeout(resizeTimer)
+  resizeTimer = setTimeout(() => {
+    setupDesktopScroll()
+  }, 200)
+}
+
 onMounted(() => {
   nextTick(() => {
     // Respect reduced-motion preference — skip scroll-driven animations
@@ -127,53 +169,10 @@ onMounted(() => {
     if (!desktopEl.value || !stripEl.value) return
 
     setupDesktopScroll()
+
+    // Only register resize listener when desktop scroll is active
+    window.addEventListener('resize', onResize, { passive: true })
   })
-})
-
-function setupDesktopScroll() {
-  ctx?.revert()
-
-  if (!desktopEl.value || !stripEl.value) return
-
-  ctx = gsap.context(() => {
-    // Calculate how far the strip overflows the viewport
-    const getScrollAmount = () => {
-      return -(stripEl.value!.scrollWidth - window.innerWidth)
-    }
-
-    // Use a standard GSAP tween with scrub — most reliable approach
-    gsap.to(stripEl.value!, {
-      x: getScrollAmount,
-      ease: 'none',
-      scrollTrigger: {
-        trigger: desktopEl.value!,
-        start: 'top top',
-        end: () => `+=${Math.abs(getScrollAmount())}`,
-        pin: true,
-        scrub: 1,
-        invalidateOnRefresh: true,
-        onUpdate: (self) => {
-          if (progressEl.value) {
-            progressEl.value.style.transform = `scaleX(${self.progress})`
-          }
-        },
-      },
-    })
-  }, desktopEl.value)
-}
-
-let resizeTimer: ReturnType<typeof setTimeout> | null = null
-
-function onResize() {
-  if (isMobile.value) return
-  if (resizeTimer) clearTimeout(resizeTimer)
-  resizeTimer = setTimeout(() => {
-    setupDesktopScroll()
-  }, 200)
-}
-
-onMounted(() => {
-  window.addEventListener('resize', onResize, { passive: true })
 })
 
 onUnmounted(() => {

@@ -1,13 +1,6 @@
-export interface Artwork {
-  id: string
-  title: string
-  category: 'portraits' | 'landscapes' | 'abstract' | 'surreal'
-  medium: string
-  description: string
-  src: string
-  aspect: 'tall' | 'wide' | 'square'
-  year: number
-}
+import type { Artwork } from '~/types/artwork'
+
+export type { Artwork }
 
 export const categories = [
   { id: 'all', label: 'All' },

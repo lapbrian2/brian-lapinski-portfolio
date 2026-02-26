@@ -40,7 +40,7 @@
               ? 'text-lavender-100'
               : 'text-lavender-400 hover:text-lavender-200',
           ]"
-          :aria-current="activeSection === link.id ? 'true' : undefined"
+          :aria-current="activeSection === link.id ? 'location' : undefined"
           @click.prevent="scrollToSection(link.id)"
         >
           {{ link.label }}
@@ -328,5 +328,7 @@ onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll)
   window.removeEventListener('keydown', handleKeydown)
   menuTl?.kill()
+  // Ensure body scroll is restored if menu was open during unmount
+  document.body.style.overflow = ''
 })
 </script>

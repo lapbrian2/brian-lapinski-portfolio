@@ -45,11 +45,7 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'admin', middleware: 'admin' })
 
-interface ContentEntry {
-  key: string
-  value: string
-  section: string
-}
+import type { ContentEntry, ContentApiResponse } from '~/types/api'
 
 const contentEntries = ref<ContentEntry[]>([])
 const loading = ref(true)
@@ -67,7 +63,7 @@ const groupedContent = computed(() => {
 
 onMounted(async () => {
   try {
-    const res = await $fetch<any>('/api/admin/content')
+    const res = await $fetch<ContentApiResponse>('/api/admin/content')
     contentEntries.value = res.data || []
   } catch {
     contentEntries.value = []

@@ -10,7 +10,7 @@ export function useArtworks() {
   // Fall back to static data if API fails or returns empty
   const artworks = computed<Artwork[]>(() => {
     const apiData = (response.value as any)?.data
-    if (error.value || !apiData?.length) return staticArtworks as unknown as Artwork[]
+    if (error.value || !apiData?.length) return staticArtworks
     return apiData
   })
 

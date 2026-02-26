@@ -21,6 +21,7 @@ const taglineEl = ref<HTMLElement | null>(null)
 
 let ctx: gsap.Context | null = null
 let hasPlayed = false
+let fallbackTimeout: ReturnType<typeof setTimeout> | null = null
 
 async function playEntrance() {
   if (hasPlayed || !nameEl.value || !taglineEl.value || !roleEl.value) return
@@ -152,11 +153,12 @@ watch(
 onMounted(() => {
   // Fallback: if ready is already true or not provided, play after short delay
   if (props.ready !== false) {
-    setTimeout(playEntrance, 300)
+    fallbackTimeout = setTimeout(playEntrance, 300)
   }
 })
 
 onUnmounted(() => {
+  if (fallbackTimeout) clearTimeout(fallbackTimeout)
   ctx?.revert()
 })
 </script>

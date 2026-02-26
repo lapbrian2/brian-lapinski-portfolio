@@ -281,6 +281,9 @@ function flipEnter(el: Element, done: () => void) {
     gsap.set(backdropEl.value, { opacity: 0 })
   }
 
+  // Remove any existing clone before creating a new one (prevents orphaned DOM nodes)
+  removeFlipClone()
+
   // Create the flying clone at the source card position
   flipClone = createFlipClone(currentSrc, source)
   const dest = getViewportCenter()
@@ -390,6 +393,9 @@ function flipLeave(el: Element, done: () => void) {
     const dest = getViewportCenter()
     cloneStart = { ...dest, borderRadius: '2px' }
   }
+
+  // Remove any existing clone before creating a new one (prevents orphaned DOM nodes)
+  removeFlipClone()
 
   // Hide the real lightbox content, create clone for fly-back
   if (imageEl.value) gsap.set(imageEl.value, { opacity: 0 })
@@ -533,10 +539,10 @@ onUnmounted(() => {
       class="fixed inset-0 z-[60] flex items-center justify-center"
       role="dialog"
       aria-modal="true"
-      aria-label="Artwork lightbox"
+      :aria-label="`${lightbox.currentItem.value?.title || 'Artwork'} — Lightbox`"
       @click="onBackdropClick"
       @touchstart.passive="onTouchStart"
-      @touchmove.passive="onTouchMove"
+      @touchmove="onTouchMove"
       @touchend="onTouchEnd"
     >
       <!-- Backdrop — separate element so FLIP can control its opacity independently -->

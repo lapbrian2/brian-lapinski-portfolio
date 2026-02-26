@@ -72,17 +72,18 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import type { Artwork } from '~/types/artwork'
 
-definePageMeta({ layout: false })
+definePageMeta({
+  layout: false,
+  validate(route) {
+    const validCategories = ['portraits', 'landscapes', 'abstract', 'surreal']
+    return validCategories.includes(route.params.category as string)
+  },
+})
 
 const route = useRoute()
 const category = computed(() => route.params.category as string)
 
 const validCategories = ['portraits', 'landscapes', 'abstract', 'surreal']
-
-// Redirect if invalid category
-if (!validCategories.includes(category.value)) {
-  navigateTo('/')
-}
 
 const { artworks } = useArtworks()
 

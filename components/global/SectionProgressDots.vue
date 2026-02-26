@@ -36,7 +36,7 @@ function scrollToSection(sectionId: string): void {
       :key="section.id"
       class="group relative flex items-center justify-center p-2"
       :aria-label="`Scroll to ${section.label}`"
-      :aria-current="activeSection === section.id ? 'true' : undefined"
+      :aria-current="activeSection === section.id ? 'location' : undefined"
       @click="scrollToSection(section.id)"
     >
       <!-- Dot -->

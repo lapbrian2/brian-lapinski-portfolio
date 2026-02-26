@@ -1,25 +1,42 @@
 <script setup lang="ts">
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { useReducedMotion } from '~/composables/useMediaQuery'
+import { useArtworks } from '~/composables/useArtworks'
 
 const sectionEl = ref<HTMLElement | null>(null)
 const imageEl = ref<HTMLElement | null>(null)
 const textEl = ref<HTMLElement | null>(null)
+const reducedMotion = useReducedMotion()
 let ctx: gsap.Context | null = null
 
-// Signature piece — The Watcher as the showcase
-const showcase = {
+// Data-driven showcase: find "the-watcher" or first featured artwork, fall back to static
+const { artworks } = useArtworks()
+const staticFallback = {
   title: 'The Watcher',
   medium: 'Midjourney · 2025',
   description: 'A sentient eye erupts from organic matter, crowned with lightning — the boundary between seeing and being seen dissolves.',
   src: '/images/artworks/the-watcher.webp',
 }
+const showcase = computed(() => {
+  const found = artworks.value.find(a => a.id === 'the-watcher')
+    || artworks.value.find(a => a.featured)
+  if (found) {
+    return {
+      title: found.title,
+      medium: `${found.medium} · ${found.year}`,
+      description: found.description,
+      src: found.src,
+    }
+  }
+  return staticFallback
+})
 
 onMounted(() => {
   if (!sectionEl.value || !imageEl.value || !textEl.value) return
 
   // Respect reduced-motion preference
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+  if (reducedMotion.value) return
 
   ctx = gsap.context(() => {
     // Parallax image — drifts slower than scroll for depth
@@ -61,10 +78,13 @@ onUnmounted(() => {
   <section ref="sectionEl" class="relative h-screen w-full overflow-hidden">
     <!-- Full-viewport image -->
     <div class="absolute inset-0">
-      <img
+      <NuxtImg
         ref="imageEl"
         :src="showcase.src"
         :alt="showcase.title"
+        width="1920"
+        height="1080"
+        sizes="100vw"
         class="w-full h-full object-cover will-change-transform"
         loading="lazy"
         draggable="false"

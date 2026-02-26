@@ -44,14 +44,8 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'admin', middleware: 'admin' })
 
-interface Submission {
-  id: number
-  name: string
-  email: string
-  message: string
-  ip: string | null
-  createdAt: string
-}
+import type { Submission } from '~/types/submission'
+import type { SubmissionsApiResponse } from '~/types/api'
 
 const submissions = ref<Submission[]>([])
 const loading = ref(true)
@@ -59,7 +53,7 @@ const expandedId = ref<number | null>(null)
 
 onMounted(async () => {
   try {
-    const res = await $fetch<any>('/api/admin/submissions')
+    const res = await $fetch<SubmissionsApiResponse>('/api/admin/submissions')
     submissions.value = res.data || []
   } catch {
     submissions.value = []

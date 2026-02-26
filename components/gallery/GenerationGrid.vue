@@ -18,12 +18,8 @@ const loadedImages = reactive(new Set<string>())
 let typingInterval: ReturnType<typeof setInterval> | null = null
 let ctx: gsap.Context | null = null
 
-// Velocity skew state
-let currentSkew = 0
-const skewTarget = ref(0)
-let skewTickerFn: (() => void) | null = null
-let lenisScrollHandler: ((e: any) => void) | null = null
-let lenisInstance: any = null
+// Velocity skew (extracted composable)
+const velocitySkew = useVelocitySkew(gridEl, '.grid-cell')
 
 // Aspect ratio classes — use artwork's own aspect, never force a uniform ratio
 const aspectClasses: Record<string, string> = {
@@ -181,34 +177,6 @@ function handleClick(index: number) {
   lightbox.open(items, index, rect)
 }
 
-// --- Velocity skew via Lenis ---
-function setupVelocitySkew() {
-  if (!gridEl.value) return
-  try {
-    const { $lenis } = useNuxtApp()
-    if ($lenis) {
-      lenisInstance = $lenis
-      lenisScrollHandler = (e: any) => {
-        const velocity = e.velocity || 0
-        skewTarget.value = Math.max(-3, Math.min(3, velocity * 0.8))
-      }
-      ;($lenis as any).on('scroll', lenisScrollHandler)
-    }
-  } catch {
-    // Lenis not available — skip velocity skew
-  }
-
-  skewTickerFn = () => {
-    currentSkew += (skewTarget.value - currentSkew) * 0.1
-    skewTarget.value *= 0.95
-    if (Math.abs(currentSkew) < 0.01) currentSkew = 0
-    if (!gridEl.value) return
-    const cells = gridEl.value.querySelectorAll('.grid-cell')
-    gsap.set(cells, { skewY: currentSkew, force3D: true })
-  }
-  gsap.ticker.add(skewTickerFn)
-}
-
 // --- Mount: clip-path reveal, image counter-movement, per-cell parallax, velocity skew ---
 let hasRevealed = false
 
@@ -304,17 +272,14 @@ onMounted(() => {
 
   // Velocity skew on pointer devices only
   if (canHover.value) {
-    setupVelocitySkew()
+    velocitySkew.setup()
   }
 })
 
 // --- Cleanup ---
 onUnmounted(() => {
   stopTyping()
-  if (skewTickerFn) gsap.ticker.remove(skewTickerFn)
-  if (lenisScrollHandler && lenisInstance) {
-    lenisInstance.off('scroll', lenisScrollHandler)
-  }
+  velocitySkew.cleanup()
   ctx?.revert()
 })
 </script>
@@ -350,7 +315,6 @@ onUnmounted(() => {
         width="800"
         height="600"
         sizes="(max-width: 768px) 50vw, 33vw"
-        quality="100"
         :loading="index < 4 ? 'eager' : 'lazy'"
         @load="loadedImages.add(artwork.id)"
       />

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import gsap from 'gsap'
+import { useReducedMotion } from '~/composables/useMediaQuery'
 
 const props = defineProps<{
   ready?: boolean
@@ -30,13 +31,14 @@ const emit = defineEmits<{
 
 const heroTextDone = ref(false)
 
-const prefersReducedMotion = ref(false)
+const prefersReducedMotion = useReducedMotion()
 const activeIndex = ref(0)
 const imgEls = ref<HTMLElement[]>([])
 let cycleTl: gsap.core.Timeline | null = null
 let kenBurnsTween: gsap.core.Tween | null = null
 let cycleStarted = false
 let firstFrameShown = false
+let cycleTimeout: ReturnType<typeof setTimeout> | null = null
 
 // Phase A: Immediately bring the first image to target opacity (no Ken Burns yet).
 // This runs as soon as the loader signals bridge-ready, giving the hero a visible
@@ -95,10 +97,6 @@ function startCycle(): void {
   scheduleNext()
 }
 
-onMounted(() => {
-  prefersReducedMotion.value = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-})
-
 // When ready flips to true, show the first image immediately,
 // then kick off Ken Burns + crossfade cycle after a short beat
 // (skip cycle entirely for reduced-motion users — just show static image).
@@ -106,11 +104,12 @@ watch(() => props.ready, (isReady) => {
   if (!isReady) return
   showFirstImage()
   if (!prefersReducedMotion.value) {
-    setTimeout(startCycle, 400)
+    cycleTimeout = setTimeout(startCycle, 400)
   }
 }, { immediate: true })
 
 onUnmounted(() => {
+  if (cycleTimeout) clearTimeout(cycleTimeout)
   cycleTl?.kill()
   kenBurnsTween?.kill()
 })
@@ -120,15 +119,19 @@ onUnmounted(() => {
   <section class="hero-section relative h-screen w-full overflow-hidden bg-dark-900">
     <!-- Artwork background layer — crossfading Ken Burns cycle -->
     <div class="absolute inset-0 z-[1]">
-      <img
+      <NuxtImg
         v-for="(src, i) in heroImages"
         :key="src"
-        :ref="(el) => { if (el) imgEls[i] = el as HTMLElement }"
+        :ref="(el) => { if (el) imgEls[i] = (el as any)?.$el || el as HTMLElement }"
         :src="src"
         alt=""
+        width="1920"
+        height="1080"
+        sizes="100vw"
         class="absolute inset-0 w-full h-full object-cover hero-img"
         style="opacity: 0"
         :loading="i === 0 ? 'eager' : 'lazy'"
+        :preload="i === 0"
         draggable="false"
       />
     </div>

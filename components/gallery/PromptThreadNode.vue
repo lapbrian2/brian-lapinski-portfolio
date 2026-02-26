@@ -32,7 +32,6 @@
           width="800"
           height="600"
           sizes="(max-width: 768px) 100vw, 50vw"
-          quality="100"
           loading="lazy"
           style="object-fit: cover;"
           @load="imgLoaded = true"
@@ -83,6 +82,7 @@
 import { inject, type Ref } from 'vue'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { useReducedMotion } from '~/composables/useMediaQuery'
 import type { Artwork } from '~/types/artwork'
 import type { SourceRect } from '~/composables/useLightbox'
 
@@ -99,6 +99,7 @@ const nodeEl = ref<HTMLElement | null>(null)
 const imageWrapEl = ref<HTMLElement | null>(null)
 const textEl = ref<HTMLElement | null>(null)
 const imgLoaded = ref(false)
+const reducedMotion = useReducedMotion()
 let ctx: gsap.Context | null = null
 
 function onImageMouseMove(e: MouseEvent) {
@@ -143,7 +144,7 @@ onMounted(() => {
   if (!nodeEl.value) return
 
   // Check reduced motion
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+  if (reducedMotion.value) return
 
   ctx = gsap.context(() => {
     const imageDir = props.side === 'left' ? -60 : 60

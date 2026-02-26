@@ -30,12 +30,15 @@ definePageMeta({ layout: 'admin', middleware: 'admin' })
 const route = useRoute()
 const artworkId = route.params.id as string
 
-const artwork = ref<any>(null)
+import type { ArtworkApiResponse } from '~/types/api'
+import type { Artwork } from '~/types/artwork'
+
+const artwork = ref<Artwork | null>(null)
 const loading = ref(true)
 
 onMounted(async () => {
   try {
-    const res = await $fetch<any>(`/api/artworks/${artworkId}`)
+    const res = await $fetch<ArtworkApiResponse>(`/api/artworks/${artworkId}`)
     artwork.value = res.data
   } catch {
     artwork.value = null

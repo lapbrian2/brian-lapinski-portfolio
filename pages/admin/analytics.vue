@@ -95,12 +95,14 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'admin', middleware: 'admin' })
 
-interface DailyData { date: string; views: number; uniqueVisitors: number }
-interface ArtworkView { artworkId: string; views: number }
-interface Referrer { referrer: string; views: number }
+import type {
+  DailyData, ArtworkView, Referrer, DashboardStat,
+  AnalyticsOverviewResponse, AnalyticsDailyResponse,
+  AnalyticsArtworksResponse, AnalyticsReferrersResponse,
+} from '~/types/api'
 
 const loading = ref(true)
-const overviewCards = ref<{ label: string; value: string | number }[]>([])
+const overviewCards = ref<DashboardStat[]>([])
 const dailyData = ref<DailyData[]>([])
 const artworkViews = ref<ArtworkView[]>([])
 const referrers = ref<Referrer[]>([])
@@ -116,10 +118,10 @@ function getBarHeight(views: number) {
 onMounted(async () => {
   try {
     const [overviewRes, dailyRes, artworksRes, referrersRes] = await Promise.all([
-      $fetch<any>('/api/admin/analytics/overview').catch(() => null),
-      $fetch<any>('/api/admin/analytics/daily').catch(() => null),
-      $fetch<any>('/api/admin/analytics/artworks').catch(() => null),
-      $fetch<any>('/api/admin/analytics/referrers').catch(() => null),
+      $fetch<AnalyticsOverviewResponse>('/api/admin/analytics/overview').catch(() => null),
+      $fetch<AnalyticsDailyResponse>('/api/admin/analytics/daily').catch(() => null),
+      $fetch<AnalyticsArtworksResponse>('/api/admin/analytics/artworks').catch(() => null),
+      $fetch<AnalyticsReferrersResponse>('/api/admin/analytics/referrers').catch(() => null),
     ])
 
     if (overviewRes?.data) {

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import gsap from 'gsap'
+import { useReducedMotion } from '~/composables/useMediaQuery'
 import type { Artwork } from '~/types/artwork'
 import type { SourceRect } from '~/composables/useLightbox'
 
@@ -8,6 +9,7 @@ const props = defineProps<{
 }>()
 
 const lightbox = useLightbox()
+const reducedMotion = useReducedMotion()
 
 const containerEl = ref<HTMLElement | null>(null)
 const trackEl = ref<HTMLElement | null>(null)
@@ -207,7 +209,9 @@ function onImageLoad(id: string) {
 onMounted(() => {
   nextTick(() => {
     applyRotation()
-    startAutoRotate()
+    if (!reducedMotion.value) {
+      startAutoRotate()
+    }
   })
 })
 
@@ -257,7 +261,6 @@ onUnmounted(() => {
               width="560"
               height="760"
               sizes="280px"
-              quality="100"
               class="card-image transition-opacity duration-500"
               :class="loadedImages.has(artwork.id) ? 'opacity-100' : 'opacity-0'"
               draggable="false"

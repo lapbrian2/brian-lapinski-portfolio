@@ -72,23 +72,18 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'admin', middleware: 'admin' })
 
-interface Submission {
-  id: number
-  name: string
-  email: string
-  message: string
-  createdAt: string
-}
+import type { Submission } from '~/types/submission'
+import type { ArtworksApiResponse, SubmissionsApiResponse, DashboardStat } from '~/types/api'
 
-const dashboardStats = ref<{ label: string; value: string | number }[]>([])
+const dashboardStats = ref<DashboardStat[]>([])
 const recentSubmissions = ref<Submission[]>([])
 
 onMounted(async () => {
   try {
     const [artworksRes, statsRes, submissionsRes] = await Promise.all([
-      $fetch<any>('/api/admin/artworks'),
-      $fetch<any>('/api/admin/stats'),
-      $fetch<any>('/api/admin/submissions').catch(() => ({ data: [] })),
+      $fetch<ArtworksApiResponse>('/api/admin/artworks'),
+      $fetch<{ data: DashboardStat[] }>('/api/admin/stats'),
+      $fetch<SubmissionsApiResponse>('/api/admin/submissions').catch(() => ({ success: true, data: [] as Submission[] })),
     ])
 
     dashboardStats.value = [
@@ -99,7 +94,11 @@ onMounted(async () => {
     ]
 
     recentSubmissions.value = submissionsRes.data || []
-  } catch {
+  } catch (err: any) {
+    if (err?.statusCode === 401 || err?.response?.status === 401) {
+      navigateTo('/admin/login')
+      return
+    }
     // Silently fail on dashboard — not critical
   }
 })
