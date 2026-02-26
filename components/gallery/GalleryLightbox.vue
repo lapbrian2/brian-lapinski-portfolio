@@ -733,6 +733,9 @@ onUnmounted(() => {
               >
                 {{ lightbox.currentItem.value.description }}
               </p>
+              <div class="flex justify-center mt-3">
+                <ArtworkStats :artwork-id="lightbox.currentItem.value.id" />
+              </div>
             </div>
           </div>
         </Transition>

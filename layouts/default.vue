@@ -21,5 +21,6 @@
     <ClientOnly>
       <CartDrawer />
     </ClientOnly>
+    <ToastContainer />
   </div>
 </template>

@@ -83,6 +83,12 @@
                 {{ artwork.category }}
               </NuxtLink>
             </p>
+
+            <!-- Stats & Like -->
+            <div class="flex items-center gap-4 mt-4">
+              <ArtworkStats :artwork-id="artwork.id" />
+              <ResonanceButton :artwork-id="artwork.id" size="md" />
+            </div>
           </div>
 
           <!-- Description -->
