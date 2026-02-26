@@ -1,4 +1,4 @@
-import { ref, onUnmounted } from 'vue'
+import { ref, onUnmounted, getCurrentInstance } from 'vue'
 
 export function useMediaQuery(query: string) {
   const matches = ref(false)
@@ -15,9 +15,14 @@ export function useMediaQuery(query: string) {
     mediaQuery.addEventListener('change', update)
   }
 
-  onUnmounted(() => {
-    mediaQuery?.removeEventListener('change', update)
-  })
+  // Only register cleanup if called within a component setup context.
+  // When called from a composable outside setup, onUnmounted silently no-ops,
+  // leaving the listener dangling. Guard with getCurrentInstance().
+  if (getCurrentInstance()) {
+    onUnmounted(() => {
+      mediaQuery?.removeEventListener('change', update)
+    })
+  }
 
   return matches
 }

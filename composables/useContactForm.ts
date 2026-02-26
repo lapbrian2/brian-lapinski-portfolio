@@ -41,6 +41,7 @@ export function useContactForm() {
       form.name = ''
       form.email = ''
       form.message = ''
+      form.website = ''
     } catch (err: any) {
       status.value = 'error'
       serverError.value = err?.data?.statusMessage || 'Something went wrong. Please try again.'

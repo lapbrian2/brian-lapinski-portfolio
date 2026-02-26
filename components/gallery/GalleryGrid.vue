@@ -261,7 +261,7 @@ onUnmounted(() => {
       :key="artwork.id"
       :artwork="artwork"
       :index="index"
-      :full-width="getSpanClass(index) === 'col-span-12'"
+      :full-width="getSpanClass(index) === 'col-span-12' || getSpanClass(index).startsWith('col-span-12 md:col-span-7')"
       class="gallery-card"
       :class="getSpanClass(index)"
       @click="openLightbox(index, $event)"

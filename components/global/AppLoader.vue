@@ -207,7 +207,8 @@ function exitSequence() {
   )
 }
 
-function skip() {
+function skip(e?: KeyboardEvent | MouseEvent) {
+  if (e && 'key' in e && (e.key === 'Tab' || e.key === 'Shift' || e.key === 'Alt' || e.key === 'Control' || e.key === 'Meta')) return
   exitSequence()
 }
 

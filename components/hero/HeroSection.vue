@@ -102,13 +102,18 @@ function startCycle(): void {
 // When ready flips to true, show the first image immediately,
 // then kick off Ken Burns + crossfade cycle after a short beat
 // (skip cycle entirely for reduced-motion users — just show static image).
-watch(() => props.ready, (isReady) => {
-  if (!isReady) return
+function tryStart(): void {
+  if (!props.ready || imgEls.value.length < 2) return
   showFirstImage()
   if (!prefersReducedMotion.value) {
     cycleTimeout = setTimeout(startCycle, 400)
   }
-}, { immediate: true })
+}
+
+// Watch both ready prop and imgEls population — for returning visitors,
+// ready becomes true before refs are assigned, so we need both triggers
+watch(() => props.ready, tryStart, { immediate: true })
+watch(() => imgEls.value.length, tryStart)
 
 onUnmounted(() => {
   if (cycleTimeout) clearTimeout(cycleTimeout)

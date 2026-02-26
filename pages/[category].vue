@@ -38,26 +38,33 @@
     <!-- Prompt Thread -->
     <PromptThread :artworks="categoryArtworks" />
 
-    <!-- Category Navigation -->
+    <!-- Category Navigation — editorial text links -->
     <section ref="navEl" class="px-6 md:px-12 pb-24">
-      <div class="max-w-4xl mx-auto">
-        <p class="font-body text-xs uppercase tracking-[0.2em] text-lavender-300 text-center mb-6">
+      <div class="max-w-[1400px] mx-auto">
+        <div class="w-16 h-px bg-accent-red/40 mx-auto mb-12" />
+        <p class="font-body text-xs uppercase tracking-[0.25em] text-lavender-400 text-center mb-10">
           Explore More
         </p>
-        <div class="flex flex-wrap justify-center gap-3">
+        <nav class="flex flex-col items-center gap-2">
           <NuxtLink
             v-for="cat in otherCategories"
             :key="cat.id"
             :to="`/${cat.id}`"
-            class="btn-press px-6 py-3 rounded-full border font-body text-sm uppercase tracking-wider transition-all duration-300"
-            :class="cat.id === category
-              ? 'bg-accent-red/15 border-accent-red/40 text-accent-red'
-              : 'border-lavender-400/20 text-lavender-400 hover:border-lavender-200 hover:text-lavender-200'"
+            class="group inline-flex items-center gap-4 transition-all duration-400"
           >
-            {{ cat.label }}
-            <span class="ml-1.5 text-[10px] opacity-60">{{ cat.count }}</span>
+            <span
+              class="font-display font-bold uppercase leading-none transition-all duration-400 category-nav-link"
+              :class="cat.id === category
+                ? 'text-lavender-100'
+                : 'text-lavender-100/15 group-hover:text-lavender-100 group-hover:tracking-[0.02em]'"
+            >
+              {{ cat.label }}
+            </span>
+            <span class="font-body text-xs tabular-nums text-lavender-400/40 transition-colors duration-300 group-hover:text-accent-red">
+              {{ cat.count }}
+            </span>
           </NuxtLink>
-        </div>
+        </nav>
       </div>
     </section>
 
@@ -183,3 +190,9 @@ watchEffect(() => {
 })
 </script>
 
+<style scoped>
+.category-nav-link {
+  font-size: clamp(2rem, 6vw, 5rem);
+  letter-spacing: -0.03em;
+}
+</style>

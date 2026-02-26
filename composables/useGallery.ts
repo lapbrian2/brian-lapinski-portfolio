@@ -15,11 +15,7 @@ export function useGallery() {
     return apiData
   })
 
-  // Seed like counts when artworks data changes
-  const likes = useLikes()
-  watch(artworks, (arts) => {
-    if (arts.length) likes.seedCounts(arts)
-  }, { immediate: true })
+  // Note: seedCounts is handled by useArtworks — no duplicate watcher needed here
 
   // Active technique filter
   const activeTechnique = ref<string | null>(null)

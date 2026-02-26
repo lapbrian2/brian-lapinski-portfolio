@@ -71,7 +71,7 @@
         <div class="max-w-3xl mx-auto">
           <!-- Title & Meta -->
           <div class="mb-8">
-            <h1 class="font-display text-3xl md:text-5xl font-bold text-lavender-100 mb-3">
+            <h1 class="font-display text-4xl md:text-6xl lg:text-7xl font-bold text-lavender-100 mb-3 leading-none" style="letter-spacing: -0.03em">
               {{ artwork.title }}
             </h1>
             <p class="font-body text-sm uppercase tracking-[0.15em] text-lavender-400">
@@ -98,7 +98,7 @@
 
           <!-- Prompt Architecture -->
           <div v-if="artwork.rawPrompt || artwork.refinementNotes || (artwork.promptNodes && artwork.promptNodes.length)" class="space-y-6 mb-10">
-            <h2 class="font-display text-xl font-semibold text-lavender-100">Prompt Architecture</h2>
+            <h2 class="font-display text-2xl md:text-3xl font-bold text-lavender-100 leading-none" style="letter-spacing: -0.02em">Prompt Architecture</h2>
 
             <!-- Raw Prompt -->
             <div v-if="artwork.rawPrompt">
@@ -145,7 +145,10 @@
       <!-- Related Works -->
       <section v-if="relatedArtworks.length" class="pb-24 px-6 md:px-12">
         <div class="max-w-5xl mx-auto">
-          <h2 class="font-display text-xl font-semibold text-lavender-100 mb-6 text-center">More from {{ artwork.category }}</h2>
+          <div class="text-center mb-10">
+            <p class="font-body text-xs uppercase tracking-[0.25em] text-lavender-400 mb-3">Related Works</p>
+            <h2 class="font-display text-2xl md:text-4xl font-bold text-lavender-100 leading-none" style="letter-spacing: -0.03em">More from {{ artwork.category }}</h2>
+          </div>
           <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
             <NuxtLink
               v-for="related in relatedArtworks"

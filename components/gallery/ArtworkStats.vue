@@ -34,14 +34,29 @@ const displayLikes = ref(0)
 let viewsTween: gsap.core.Tween | null = null
 let likesTween: gsap.core.Tween | null = null
 
+// In-memory cache to avoid re-fetching stats on lightbox navigation
+const statsCache = new Map<string, { views: number; likes: number }>()
+
 watch(
   () => props.artworkId,
   async (id) => {
     if (!id) return
+
+    // Return cached stats if available
+    const cached = statsCache.get(id)
+    if (cached) {
+      views.value = cached.views
+      likes.value = cached.likes
+      displayViews.value = cached.views
+      displayLikes.value = cached.likes
+      return
+    }
+
     try {
       const res = await $fetch<{ views: number; likes: number }>(`/api/artworks/${id}/stats`)
       views.value = res.views || 0
       likes.value = res.likes || 0
+      statsCache.set(id, { views: views.value, likes: likes.value })
 
       // Animate number tween with GSAP
       if (import.meta.client) {

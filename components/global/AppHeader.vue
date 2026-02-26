@@ -83,6 +83,7 @@
       class="fixed inset-0 z-40 bg-dark-900 flex items-center justify-center"
       style="clip-path: circle(0% at calc(100% - 40px) 28px)"
       role="dialog"
+      aria-modal="true"
       aria-label="Mobile navigation"
     >
       <nav ref="mobileNavEl" class="flex flex-col items-center gap-10" aria-label="Mobile navigation">
@@ -94,6 +95,7 @@
             'mobile-link font-display text-4xl font-semibold transition-colors duration-200',
             activeSection === link.id ? 'text-accent-red' : 'text-lavender-200 hover:text-accent-red',
           ]"
+          :aria-current="activeSection === link.id ? 'location' : undefined"
           @click.prevent="scrollToSection(link.id)"
         >
           <span class="inline-block overflow-hidden">
