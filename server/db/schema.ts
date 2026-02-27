@@ -80,10 +80,12 @@ export const artworkLikes = sqliteTable('artwork_likes', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   artworkId: text('artwork_id').notNull().references(() => artworks.id, { onDelete: 'cascade' }),
   ip: text('ip').notNull(),
+  userId: text('user_id').references(() => users.id, { onDelete: 'set null' }),
   createdAt: text('created_at').default(sql`(datetime('now'))`),
 }, (table) => ({
   artworkIdx: index('artwork_likes_artwork_idx').on(table.artworkId),
   ipIdx: index('artwork_likes_ip_idx').on(table.ip),
+  userIdx: index('artwork_likes_user_idx').on(table.userId),
 }))
 
 // Analytics: Page Views

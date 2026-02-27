@@ -10,35 +10,54 @@ export default defineEventHandler(async (event) => {
   }
 
   const db = useDb()
-  const ip = getRequestHeader(event, 'x-forwarded-for')?.split(',')[0]?.trim()
-    || getRequestHeader(event, 'x-real-ip')
-    || ''
-  const hashedIp = ip ? await hashIp(ip) : 'anonymous'
 
-  // Check if this IP already liked this artwork
+  // Check if user is authenticated
+  const session = await getUserSession(event)
+  const userId = session?.user?.id as string | undefined
+
+  // Build unique constraint: prefer userId, fall back to hashed IP
+  let whereClause
+  if (userId) {
+    whereClause = and(
+      eq(artworkLikes.artworkId, artworkId),
+      eq(artworkLikes.userId, userId),
+    )
+  } else {
+    const ip = getRequestHeader(event, 'x-forwarded-for')?.split(',')[0]?.trim()
+      || getRequestHeader(event, 'x-real-ip')
+      || ''
+    const hashedIp = ip ? await hashIp(ip) : 'anonymous'
+
+    whereClause = and(
+      eq(artworkLikes.artworkId, artworkId),
+      eq(artworkLikes.ip, hashedIp),
+    )
+  }
+
+  // Check existing like
   const existing = await db
     .select()
     .from(artworkLikes)
-    .where(and(
-      eq(artworkLikes.artworkId, artworkId),
-      eq(artworkLikes.ip, hashedIp),
-    ))
+    .where(whereClause)
     .limit(1)
 
   let liked: boolean
 
   if (existing.length > 0) {
-    // Unlike — remove the existing like
-    await db.delete(artworkLikes).where(and(
-      eq(artworkLikes.artworkId, artworkId),
-      eq(artworkLikes.ip, hashedIp),
-    ))
+    // Unlike
+    await db.delete(artworkLikes).where(whereClause)
     liked = false
   } else {
-    // Like — insert new record
+    // Like — build insert values
+    const ip = getRequestHeader(event, 'x-forwarded-for')?.split(',')[0]?.trim()
+      || getRequestHeader(event, 'x-real-ip')
+      || ''
+    const hashedIp = ip ? await hashIp(ip) : 'anonymous'
+
     await db.insert(artworkLikes).values({
       artworkId,
       ip: hashedIp,
+      userId: userId || null,
     })
     liked = true
   }

@@ -4,7 +4,7 @@ const STORAGE_KEY = 'bl-likes'
 
 /**
  * Manages artwork like state with optimistic updates and localStorage persistence.
- * Uses useState for SSR-safe shared state (same pattern as useLightbox).
+ * Auth-aware: when logged in, hydrates from server and uses userId-scoped storage.
  */
 export function useLikes() {
   // SSR-safe shared state — Set of liked artwork IDs
@@ -14,27 +14,55 @@ export function useLikes() {
   // Prevent double-clicks per artwork
   const pendingRequests = useState<Set<string>>('like-pending', () => new Set())
 
+  // Auth state
+  const { loggedIn, user } = useUserSession()
+
+  function getStorageKey(): string {
+    if (loggedIn.value && user.value?.id) {
+      return `${STORAGE_KEY}-${user.value.id}`
+    }
+    return STORAGE_KEY
+  }
+
   // Hydrate from localStorage on client mount
   if (import.meta.client) {
-    onMounted(() => {
-      try {
-        const stored = localStorage.getItem(STORAGE_KEY)
-        if (stored) {
-          const ids = JSON.parse(stored) as string[]
-          if (Array.isArray(ids)) {
-            likedIds.value = new Set(ids)
+    onMounted(async () => {
+      // If logged in, hydrate from server
+      if (loggedIn.value) {
+        try {
+          const response = await $fetch<{ success: boolean; data: string[] }>('/api/user/likes')
+          if (response.data.length > 0) {
+            likedIds.value = new Set(response.data)
+            persistToStorage()
           }
+        } catch {
+          // Fall back to localStorage
+          hydrateFromStorage()
         }
-      } catch {
-        // Silently fail — corrupt localStorage
+      } else {
+        hydrateFromStorage()
       }
     })
+  }
+
+  function hydrateFromStorage() {
+    try {
+      const stored = localStorage.getItem(getStorageKey())
+      if (stored) {
+        const ids = JSON.parse(stored) as string[]
+        if (Array.isArray(ids)) {
+          likedIds.value = new Set(ids)
+        }
+      }
+    } catch {
+      // Silently fail — corrupt localStorage
+    }
   }
 
   function persistToStorage() {
     if (!import.meta.client) return
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify([...likedIds.value]))
+      localStorage.setItem(getStorageKey(), JSON.stringify([...likedIds.value]))
     } catch {
       // Storage full or unavailable
     }
