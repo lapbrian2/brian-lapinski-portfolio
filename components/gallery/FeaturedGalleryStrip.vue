@@ -9,10 +9,10 @@ const lightbox = useLightbox()
 const isMobile = useIsMobile()
 const reducedMotion = useReducedMotion()
 
-// Pick featured artworks, or the first 8 if none are explicitly featured
+// Pick featured artworks — cap at 8 for a tight, responsive horizontal scroll
 const featured = computed(() => {
   const feat = artworks.value.filter((a) => a.featured)
-  if (feat.length >= 4) return feat.slice(0, 12)
+  if (feat.length >= 4) return feat.slice(0, 8)
   return artworks.value.slice(0, 8)
 })
 
@@ -65,7 +65,20 @@ function setupDesktopScroll() {
       return -(stripEl.value!.scrollWidth - window.innerWidth)
     }
 
-    // Horizontal scroll tween with pinning — follows ProcessSection pattern exactly
+    // Pre-calculate card positions to avoid getBoundingClientRect in onUpdate
+    const cardPositions: number[] = []
+    const cards = cardEls.value
+    if (cards.length && stripEl.value) {
+      const stripRect = stripEl.value.getBoundingClientRect()
+      cards.forEach((card) => {
+        if (!card) return
+        const cardRect = card.getBoundingClientRect()
+        // Store each card's center relative to the strip's left edge
+        cardPositions.push(cardRect.left - stripRect.left + cardRect.width / 2)
+      })
+    }
+
+    // Horizontal scroll — snappy scrub, optimized proximity
     gsap.to(stripEl.value!, {
       x: getScrollAmount,
       ease: 'none',
@@ -74,36 +87,35 @@ function setupDesktopScroll() {
         start: 'top top',
         end: () => `+=${Math.abs(getScrollAmount())}`,
         pin: true,
-        scrub: 1,
+        scrub: 0.3,
         invalidateOnRefresh: true,
         onUpdate: (self) => {
-          // Progress bar
+          // Progress bar — direct style, no GSAP overhead
           if (progressEl.value) {
             progressEl.value.style.transform = `scaleX(${self.progress})`
           }
 
-          // Per-card active scaling — cards near viewport center get a scale bump + glow
-          const cards = cardEls.value
-          if (!cards.length) return
+          // Math-based proximity — zero layout thrash
+          if (!cards.length || !cardPositions.length) return
           const vw = window.innerWidth
           const centerX = vw / 2
+          const stripX = self.progress * (stripEl.value!.scrollWidth - vw)
 
-          cards.forEach((card) => {
-            if (!card) return
-            const rect = card.getBoundingClientRect()
-            const cardCenter = rect.left + rect.width / 2
+          cards.forEach((card, i) => {
+            if (!card || cardPositions[i] === undefined) return
+            // Card's visual center in viewport = original position - scroll offset
+            const cardCenter = cardPositions[i] - stripX
             const distance = Math.abs(cardCenter - centerX)
-            const maxDist = vw * 0.6
+            const maxDist = vw * 0.55
             const proximity = Math.max(0, 1 - distance / maxDist)
 
             const scale = 1 + proximity * 0.04
-            const glowOpacity = proximity * 0.6
+            const glowOpacity = proximity * 0.5
 
             gsap.set(card, { scale, force3D: true })
-
             const glow = card.querySelector('.strip-glow')
             if (glow) {
-              gsap.set(glow, { opacity: glowOpacity })
+              ;(glow as HTMLElement).style.opacity = String(glowOpacity)
             }
           })
         },
@@ -141,7 +153,7 @@ onUnmounted(() => {
 <template>
   <section v-if="featured.length >= 3" ref="sectionEl" class="overflow-hidden">
     <!-- Heading -->
-    <div ref="headingEl" class="max-w-7xl mx-auto px-6 md:px-12 pt-24 pb-8 text-center">
+    <div ref="headingEl" class="max-w-7xl mx-auto px-6 md:px-12 pt-12 pb-6 text-center">
       <p class="font-body text-xs uppercase tracking-[0.3em] text-accent-red mb-4">
         Featured Works
       </p>
@@ -164,7 +176,7 @@ onUnmounted(() => {
             :key="artwork.id"
             :ref="(el) => { if (el) cardEls[index] = el as HTMLElement }"
             class="strip-card flex-shrink-0 relative overflow-hidden rounded-xl cursor-pointer group"
-            style="width: clamp(300px, 30vw, 440px); height: clamp(400px, 55vh, 600px)"
+            style="width: clamp(280px, 26vw, 380px); height: clamp(380px, 50vh, 540px)"
             role="button"
             :tabindex="0"
             :aria-label="`View ${artwork.title}`"
