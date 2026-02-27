@@ -12,6 +12,11 @@ export const categories = [
   { id: 'sci-fi', label: 'Sci-Fi' },
 ] as const
 
+/** Valid gallery category slugs — single source of truth */
+export const validCategorySlugs = categories
+  .filter(c => c.id !== 'all')
+  .map(c => c.id) as string[]
+
 export const artworks: Artwork[] = [
   // --- Opening: ethereal portraits ---
   {

@@ -2,6 +2,7 @@
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useIsMobile, useReducedMotion } from '~/composables/useMediaQuery'
+import { categories as allCategories } from '~/data/artworks'
 
 const sectionEl = ref<HTMLElement | null>(null)
 const headingEl = ref<HTMLElement | null>(null)
@@ -10,14 +11,9 @@ const reducedMotion = useReducedMotion()
 
 let ctx: gsap.Context | null = null
 
-const categories = [
-  { label: 'Portraits', to: '/portraits' },
-  { label: 'Landscapes', to: '/landscapes' },
-  { label: 'Abstract', to: '/abstract' },
-  { label: 'Surreal', to: '/surreal' },
-  { label: 'Anime', to: '/anime' },
-  { label: 'Sci-Fi', to: '/sci-fi' },
-]
+const categories = allCategories
+  .filter(c => c.id !== 'all')
+  .map(c => ({ label: c.label, to: `/${c.id}` }))
 
 onMounted(() => {
   if (!sectionEl.value || !headingEl.value) return

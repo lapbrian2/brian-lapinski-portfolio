@@ -75,7 +75,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <section ref="sectionEl" class="relative h-screen w-full overflow-hidden">
+  <section id="work" ref="sectionEl" class="relative h-screen w-full overflow-hidden">
     <!-- Full-viewport image -->
     <div class="absolute inset-0">
       <img

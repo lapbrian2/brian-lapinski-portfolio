@@ -134,6 +134,13 @@ const reducedMotion = useReducedMotion()
 let ctx: gsap.Context | null = null
 
 function scrollToTop() {
+  // If not on the homepage, navigate there
+  const route = useRoute()
+  if (route.path !== '/') {
+    navigateTo('/')
+    return
+  }
+
   const { $lenis } = useNuxtApp()
   if ($lenis) {
     ;($lenis as any).scrollTo(0)
@@ -143,9 +150,15 @@ function scrollToTop() {
 }
 
 function scrollToSection(sectionId: string) {
-  const { $lenis } = useNuxtApp()
   const target = document.querySelector(`#${sectionId}`)
-  if (!target) return
+
+  // If the section doesn't exist on this page, navigate to homepage with hash
+  if (!target) {
+    navigateTo(`/#${sectionId}`)
+    return
+  }
+
+  const { $lenis } = useNuxtApp()
   if ($lenis) {
     ;($lenis as any).scrollTo(target, { offset: -80 })
   } else {

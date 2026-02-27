@@ -132,11 +132,8 @@
             </div>
           </div>
 
-          <!-- Like Button -->
-          <div class="flex items-center gap-4 pt-6 border-t border-white/[0.06]">
-            <ResonanceButton :artwork-id="artwork.id" />
-            <span class="text-lavender-400/40 text-sm font-body">Show some love for this piece</span>
-          </div>
+          <!-- Divider -->
+          <div class="pt-6 border-t border-white/[0.06]" />
         </div>
       </section>
 

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { NuxtError } from '#app'
 import gsap from 'gsap'
+import { validCategorySlugs } from '~/data/artworks'
 
 const props = defineProps<{
   error: NuxtError
@@ -85,7 +86,7 @@ onMounted(() => {
         <p class="font-body text-xs uppercase tracking-[0.2em] text-lavender-400/40 mb-4">Explore Categories</p>
         <div class="flex flex-wrap justify-center gap-3">
           <button
-            v-for="cat in ['portraits', 'landscapes', 'abstract', 'surreal', 'anime', 'sci-fi']"
+            v-for="cat in validCategorySlugs"
             :key="cat"
             class="btn-press px-4 py-2 rounded-full border border-lavender-400/15 text-lavender-300 font-body text-xs uppercase tracking-wider hover:border-accent-red/30 hover:text-lavender-200 transition-all duration-300"
             @click="clearError({ redirect: `/${cat}` })"

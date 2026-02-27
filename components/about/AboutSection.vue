@@ -241,7 +241,7 @@ const credentials = [
             <!-- Subtle bottom gradient for caption -->
             <div class="absolute inset-0 bg-gradient-to-t from-dark-900/60 via-transparent to-transparent pointer-events-none" />
             <div class="absolute bottom-0 left-0 right-0 p-5">
-              <p class="font-display text-sm text-lavender-100/80 leading-tight">Peeling Away</p>
+              <p class="font-display text-sm text-lavender-100/80 leading-tight">The Elder</p>
               <p class="font-body text-[10px] uppercase tracking-[0.15em] text-lavender-400/50 mt-1">Midjourney &middot; 2025</p>
             </div>
           </div>

@@ -1,6 +1,7 @@
 import { asc } from 'drizzle-orm'
 import { artworks, collections } from '~/server/db/schema'
 import { useDb } from '~/server/db'
+import { validCategorySlugs } from '~/data/artworks'
 
 function escapeXml(str: string): string {
   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
@@ -9,7 +10,7 @@ function escapeXml(str: string): string {
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig(event)
   const baseUrl = (config.public.siteUrl as string) || 'https://lapinski.art'
-  const categories = ['portraits', 'landscapes', 'abstract', 'surreal', 'anime', 'sci-fi']
+  const categories = validCategorySlugs
   const today = new Date().toISOString().split('T')[0]
 
   // Fetch all artwork IDs for individual artwork pages

@@ -231,6 +231,8 @@ onUnmounted(() => {
           :tabindex="0"
           :aria-label="`View ${artwork.title}`"
           @click="openLightbox(index)"
+          @keydown.enter="openLightbox(index)"
+          @keydown.space.prevent="openLightbox(index)"
         >
           <img
             :src="artwork.src"

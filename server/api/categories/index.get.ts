@@ -1,6 +1,7 @@
 import { sql } from 'drizzle-orm'
 import { artworks } from '~/server/db/schema'
 import { useDb } from '~/server/db'
+import { categories as staticCategories } from '~/data/artworks'
 
 export default defineEventHandler(async (event) => {
   const db = useDb()
@@ -15,15 +16,11 @@ export default defineEventHandler(async (event) => {
 
   const total = counts.reduce((sum, c) => sum + c.count, 0)
 
-  const categories = [
-    { id: 'all', label: 'All', count: total },
-    { id: 'portraits', label: 'Portraits', count: 0 },
-    { id: 'landscapes', label: 'Landscapes', count: 0 },
-    { id: 'abstract', label: 'Abstract', count: 0 },
-    { id: 'surreal', label: 'Surreal', count: 0 },
-    { id: 'anime', label: 'Anime', count: 0 },
-    { id: 'sci-fi', label: 'Sci-Fi', count: 0 },
-  ]
+  const categories = staticCategories.map(c => ({
+    id: c.id,
+    label: c.label,
+    count: c.id === 'all' ? total : 0,
+  }))
 
   for (const row of counts) {
     const cat = categories.find((c) => c.id === row.category)

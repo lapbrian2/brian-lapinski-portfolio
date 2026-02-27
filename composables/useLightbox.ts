@@ -102,10 +102,6 @@ export function useLightbox() {
     return sourceRect.value
   }
 
-  function getSourceArtworkId(): string | null {
-    return sourceArtworkId.value
-  }
-
   function clearSourceRect() {
     sourceRect.value = null
   }
@@ -123,7 +119,6 @@ export function useLightbox() {
     next,
     prev,
     getSourceRect,
-    getSourceArtworkId,
     clearSourceRect,
   }
 }

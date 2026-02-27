@@ -100,7 +100,7 @@ const reducedMotion = useReducedMotion()
 let ctx: gsap.Context | null = null
 
 function onImageMouseMove(e: MouseEvent) {
-  if (!imageWrapEl.value) return
+  if (!imageWrapEl.value || reducedMotion.value) return
   const rect = imageWrapEl.value.getBoundingClientRect()
   const centerX = rect.left + rect.width / 2
   const centerY = rect.top + rect.height / 2
@@ -116,7 +116,7 @@ function onImageMouseMove(e: MouseEvent) {
 }
 
 function onImageMouseEnter() {
-  if (!imageWrapEl.value) return
+  if (!imageWrapEl.value || reducedMotion.value) return
   const glowColor = props.artwork.dominantColor || '#ed544d'
   gsap.to(imageWrapEl.value, {
     scale: 1.02,
@@ -127,7 +127,7 @@ function onImageMouseEnter() {
 }
 
 function onImageMouseLeave() {
-  if (!imageWrapEl.value) return
+  if (!imageWrapEl.value || reducedMotion.value) return
   gsap.to(imageWrapEl.value, {
     rotateY: 0, rotateX: 0,
     scale: 1,

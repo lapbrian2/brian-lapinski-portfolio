@@ -78,19 +78,18 @@
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import type { Artwork } from '~/types/artwork'
+import { validCategorySlugs } from '~/data/artworks'
 
 definePageMeta({
   layout: false,
   validate(route) {
-    const validCategories = ['portraits', 'landscapes', 'abstract', 'surreal', 'anime', 'sci-fi']
-    return validCategories.includes(route.params.category as string)
+    const valid = ['portraits', 'landscapes', 'abstract', 'surreal', 'anime', 'sci-fi']
+    return valid.includes(route.params.category as string)
   },
 })
 
 const route = useRoute()
 const category = computed(() => route.params.category as string)
-
-const validCategories = ['portraits', 'landscapes', 'abstract', 'surreal', 'anime', 'sci-fi']
 
 const { artworks } = useArtworks()
 
@@ -126,7 +125,7 @@ const categoryDescriptions: Record<string, string> = {
 const categoryDescription = computed(() => categoryDescriptions[category.value] || '')
 
 const otherCategories = computed(() => {
-  return validCategories.map((id) => ({
+  return validCategorySlugs.map((id) => ({
     id,
     label: categoryLabels[id] || id.charAt(0).toUpperCase() + id.slice(1),
     count: artworks.value.filter((a: Artwork) => a.category === id).length,
