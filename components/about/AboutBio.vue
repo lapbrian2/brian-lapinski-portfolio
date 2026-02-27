@@ -25,7 +25,7 @@
         methodology behind the output matters as much as the output itself.
       </p>
       <p class="font-body text-base leading-relaxed text-lavender-300">
-        Today I serve as AI Architect and co-founder at
+        Today I serve as AI Architect at
         <a
           href="https://www.linkedin.com/company/the-house-of-curiosity"
           target="_blank"
