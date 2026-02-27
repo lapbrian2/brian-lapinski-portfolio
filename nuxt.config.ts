@@ -100,6 +100,14 @@ export default defineNuxtConfig({
       headers: { 'Cache-Control': 'public, max-age=31536000, immutable' },
     },
     '/admin/**': { ssr: false },
+    // ISR: cache public pages at the edge, revalidate in the background
+    '/': { isr: 600 },                  // homepage — 10 min
+    '/gallery': { isr: 600 },           // gallery listing — 10 min
+    '/artwork/**': { isr: 3600 },       // artwork detail — 1 hour
+    '/collections': { isr: 600 },       // collections index — 10 min
+    '/collections/**': { isr: 3600 },   // individual collections — 1 hour
+    '/shop': { isr: 300 },              // shop listing — 5 min (prices may change)
+    '/shop/**': { isr: 300 },           // product detail — 5 min
     '/**': {
       headers: {
         'X-Content-Type-Options': 'nosniff',
@@ -107,6 +115,16 @@ export default defineNuxtConfig({
         'X-XSS-Protection': '1; mode=block',
         'Referrer-Policy': 'strict-origin-when-cross-origin',
         'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+      },
+    },
+  },
+
+  // Prefetch on interaction (hover/focus) instead of viewport visibility
+  // Prevents 30+ simultaneous prefetches when gallery grid is in view
+  experimental: {
+    defaults: {
+      nuxtLink: {
+        prefetchOn: { interaction: true, visibility: false },
       },
     },
   },
