@@ -6,17 +6,77 @@ import { categories as allCategories } from '~/data/artworks'
 
 const sectionEl = ref<HTMLElement | null>(null)
 const headingEl = ref<HTMLElement | null>(null)
+const previewEl = ref<HTMLElement | null>(null)
 const isMobile = useIsMobile()
 const reducedMotion = useReducedMotion()
 
 let ctx: gsap.Context | null = null
 
+// Representative preview image per category
+const categoryPreviews: Record<string, string> = {
+  portraits: '/images/artworks/veiled-gaze.webp',
+  landscapes: '/images/artworks/silk-valley.webp',
+  abstract: '/images/artworks/blue-architecture.webp',
+  surreal: '/images/artworks/luminous-grove.webp',
+  anime: '/images/artworks/red-shift.webp',
+  'sci-fi': '/images/artworks/leviathan.webp',
+}
+
 const categories = allCategories
   .filter(c => c.id !== 'all')
-  .map(c => ({ label: c.label, to: `/${c.id}` }))
+  .map(c => ({ label: c.label, to: `/${c.id}`, preview: categoryPreviews[c.id] || '' }))
+
+// Hover image preview state
+const activePreview = ref('')
+const isPreviewVisible = ref(false)
+let previewXTo: gsap.QuickToFunc | null = null
+let previewYTo: gsap.QuickToFunc | null = null
+
+function onLinkEnter(preview: string) {
+  if (isMobile.value || !preview) return
+  activePreview.value = preview
+  isPreviewVisible.value = true
+  if (previewEl.value) {
+    gsap.to(previewEl.value, {
+      opacity: 1,
+      scale: 1,
+      duration: 0.35,
+      ease: 'power3.out',
+      overwrite: true,
+    })
+  }
+}
+
+function onLinkLeave() {
+  if (isMobile.value) return
+  isPreviewVisible.value = false
+  if (previewEl.value) {
+    gsap.to(previewEl.value, {
+      opacity: 0,
+      scale: 0.92,
+      duration: 0.25,
+      ease: 'power2.in',
+      overwrite: true,
+    })
+  }
+}
+
+function onNavMouseMove(e: MouseEvent) {
+  if (!previewXTo || !previewYTo || !sectionEl.value) return
+  const rect = sectionEl.value.getBoundingClientRect()
+  previewXTo(e.clientX - rect.left + 24)
+  previewYTo(e.clientY - rect.top - 80)
+}
 
 onMounted(() => {
   if (!sectionEl.value || !headingEl.value) return
+
+  // Hover preview follow — desktop only
+  if (!isMobile.value && previewEl.value) {
+    previewXTo = gsap.quickTo(previewEl.value, 'left', { duration: 0.4, ease: 'power2.out' })
+    previewYTo = gsap.quickTo(previewEl.value, 'top', { duration: 0.4, ease: 'power2.out' })
+  }
+
   if (reducedMotion.value) return
 
   // Query link elements directly from DOM — avoids function-ref timing issues
@@ -43,7 +103,7 @@ onMounted(() => {
           },
         })
 
-        // Stagger the category links
+        // Stagger the category links with their border lines drawing in
         if (linkElements.length) {
           gsap.fromTo(
             linkElements,
@@ -61,6 +121,24 @@ onMounted(() => {
               },
             },
           )
+
+          // Animate border lines drawing from left to right
+          const borderLines = Array.from(
+            sectionEl.value!.querySelectorAll('.collection-cta__border'),
+          ) as HTMLElement[]
+          if (borderLines.length) {
+            gsap.fromTo(
+              borderLines,
+              { scaleX: 0 },
+              {
+                scaleX: 1,
+                duration: 0.6,
+                stagger: 0.08,
+                delay: 0.4,
+                ease: 'power2.out',
+              },
+            )
+          }
         }
       },
     })
@@ -69,6 +147,8 @@ onMounted(() => {
 
 onUnmounted(() => {
   ctx?.revert()
+  previewXTo = null
+  previewYTo = null
 })
 </script>
 
@@ -87,13 +167,36 @@ onUnmounted(() => {
         </h2>
       </div>
 
+      <!-- Floating preview image (desktop only) -->
+      <div
+        v-if="!isMobile"
+        ref="previewEl"
+        class="collection-cta__preview pointer-events-none"
+        :style="{ opacity: 0 }"
+      >
+        <img
+          v-if="activePreview"
+          :src="activePreview"
+          alt=""
+          class="w-full h-full object-cover"
+          aria-hidden="true"
+        />
+      </div>
+
       <!-- Category links — large editorial text -->
-      <nav class="collection-cta__nav" aria-label="Art categories">
+      <nav
+        class="collection-cta__nav"
+        aria-label="Art categories"
+        @mousemove="onNavMouseMove"
+      >
+        <div class="collection-cta__border origin-left" />
         <NuxtLink
           v-for="cat in categories"
           :key="cat.to"
           :to="cat.to"
           class="collection-cta__link group"
+          @mouseenter="onLinkEnter(cat.preview)"
+          @mouseleave="onLinkLeave"
         >
           <span class="collection-cta__link-text font-display font-bold uppercase leading-none">
             {{ cat.label }}
@@ -111,6 +214,7 @@ onUnmounted(() => {
             <line x1="4" y1="20" x2="20" y2="4" />
             <polyline points="8 4 20 4 20 16" />
           </svg>
+          <div class="collection-cta__border origin-left" />
         </NuxtLink>
       </nav>
     </div>
@@ -143,6 +247,22 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   gap: 0;
+  position: relative;
+}
+
+/* Floating preview image */
+.collection-cta__preview {
+  position: absolute;
+  width: 220px;
+  height: 280px;
+  border-radius: 10px;
+  overflow: hidden;
+  z-index: 20;
+  pointer-events: none;
+  transform: scale(0.92);
+  box-shadow:
+    0 25px 50px -12px rgba(0, 0, 0, 0.6),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06);
 }
 
 .collection-cta__link {
@@ -150,13 +270,30 @@ onUnmounted(() => {
   align-items: center;
   justify-content: space-between;
   padding: 1.5rem 0;
-  border-top: 1px solid rgba(201, 210, 231, 0.08);
+  position: relative;
   text-decoration: none;
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.collection-cta__link:last-child {
-  border-bottom: 1px solid rgba(201, 210, 231, 0.08);
+/* Animated border lines */
+.collection-cta__border {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(201, 210, 231, 0.08);
+}
+
+.collection-cta__nav > .collection-cta__border {
+  position: relative;
+  height: 1px;
+  margin-bottom: 0;
+}
+
+.collection-cta__link:hover .collection-cta__border {
+  background: rgba(237, 84, 77, 0.2);
+  transition: background 0.4s ease;
 }
 
 .collection-cta__link-text {

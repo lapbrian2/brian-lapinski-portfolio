@@ -248,13 +248,16 @@ onUnmounted(() => {
     class="carousel-section"
   >
     <!-- Heading -->
-    <div class="max-w-7xl mx-auto px-6 md:px-12 pt-12 pb-4 text-center">
-      <p class="font-body text-xs uppercase tracking-[0.3em] text-accent-red mb-4">
+    <div class="max-w-7xl mx-auto px-6 md:px-12 pt-16 md:pt-20 pb-8 md:pb-12 text-center">
+      <p class="font-body text-xs uppercase tracking-[0.3em] text-accent-red mb-5 md:mb-6">
         Featured Works
       </p>
-      <h2 class="font-display font-bold text-lavender-100 leading-none carousel-heading">
+      <h2 class="font-display font-bold text-lavender-100 leading-none carousel-heading mb-4">
         The Collection
       </h2>
+      <p class="font-body text-sm text-lavender-400 max-w-md mx-auto leading-relaxed">
+        Drag to explore or click any piece to view its full story.
+      </p>
     </div>
 
     <!-- Desktop: Draggable 3D Carousel (original) -->

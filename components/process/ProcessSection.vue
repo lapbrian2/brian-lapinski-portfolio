@@ -14,6 +14,16 @@
       </div>
     </div>
 
+    <!-- Connecting timeline (desktop only) — horizontal line with step dots -->
+    <div ref="timelineEl" class="hidden lg:block relative mb-8">
+      <div class="process-timeline__line absolute top-1/2 left-0 right-0 h-px bg-lavender-400/10 -translate-y-1/2 origin-left" />
+      <div class="grid grid-cols-4 gap-6 relative">
+        <div v-for="(step, i) in steps" :key="step.number" class="flex justify-center">
+          <div class="process-timeline__dot w-3 h-3 rounded-full border-2 border-accent-red/40 bg-dark-900 relative z-10" />
+        </div>
+      </div>
+    </div>
+
     <!-- Responsive grid — no pinned scroll, clean flow -->
     <div ref="gridEl" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       <ProcessStep v-for="step in steps" :key="step.number" :step="step" />
@@ -64,6 +74,7 @@ const reducedMotion = useReducedMotion()
 const sectionEl = ref<HTMLElement | null>(null)
 const headingEl = ref<HTMLElement | null>(null)
 const gridEl = ref<HTMLElement | null>(null)
+const timelineEl = ref<HTMLElement | null>(null)
 
 useScrollReveal(headingEl, { y: 30, stagger: 0.1, children: true })
 
@@ -73,8 +84,45 @@ onMounted(() => {
   if (!gridEl.value || reducedMotion.value) return
 
   ctx = gsap.context(() => {
+    // Timeline connector animation — line draws across, then dots pop in
+    if (timelineEl.value) {
+      const line = timelineEl.value.querySelector('.process-timeline__line')
+      const dots = timelineEl.value.querySelectorAll('.process-timeline__dot')
+      if (line) gsap.set(line, { scaleX: 0 })
+      if (dots.length) gsap.set(dots, { scale: 0, opacity: 0 })
+
+      ScrollTrigger.create({
+        trigger: timelineEl.value,
+        start: 'top 85%',
+        once: true,
+        onEnter: () => {
+          if (line) {
+            gsap.to(line, {
+              scaleX: 1,
+              duration: 0.8,
+              ease: 'power2.out',
+            })
+          }
+          if (dots.length) {
+            gsap.to(dots, {
+              scale: 1,
+              opacity: 1,
+              duration: 0.4,
+              stagger: 0.1,
+              delay: 0.4,
+              ease: 'back.out(2)',
+            })
+          }
+        },
+      })
+    }
+
+    // Card entrance stagger
     const cards = gridEl.value!.children
+    const accents = gridEl.value!.querySelectorAll('.process-card__accent')
     gsap.set(cards, { opacity: 0, y: 40 })
+    if (accents.length) gsap.set(accents, { scaleX: 0 })
+
     ScrollTrigger.create({
       trigger: gridEl.value!,
       start: 'top 85%',
@@ -91,6 +139,17 @@ onMounted(() => {
             this.targets().forEach((el: HTMLElement) => gsap.set(el, { clearProps: 'transform,willChange,force3D' }))
           },
         })
+
+        // Draw accent bars after cards land
+        if (accents.length) {
+          gsap.to(accents, {
+            scaleX: 1,
+            duration: 0.5,
+            stagger: 0.1,
+            delay: 0.5,
+            ease: 'power2.out',
+          })
+        }
       },
     })
   }, gridEl.value)

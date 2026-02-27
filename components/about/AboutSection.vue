@@ -6,6 +6,7 @@ import { useScrollReveal } from '~/composables/useScrollReveal'
 import { useReducedMotion } from '~/composables/useMediaQuery'
 const sectionEl = ref<HTMLElement | null>(null)
 const pullquoteEl = ref<HTMLElement | null>(null)
+const pullquoteBorderEl = ref<HTMLElement | null>(null)
 const statsEl = ref<HTMLElement | null>(null)
 const credentialsEl = ref<HTMLElement | null>(null)
 const bioCol = ref<HTMLElement | null>(null)
@@ -44,6 +45,11 @@ onMounted(async () => {
   const { default: Splitting } = await import('splitting')
 
   ctx = gsap.context(() => {
+    // Pullquote border: draw from top to bottom
+    if (pullquoteBorderEl.value) {
+      gsap.set(pullquoteBorderEl.value, { scaleY: 0 })
+    }
+
     // Pullquote: staggered word reveal (one-shot, no scrub)
     const result = Splitting({ target: pullquoteEl.value!, by: 'words' })
     const words = result[0]?.words || []
@@ -54,6 +60,15 @@ onMounted(async () => {
         start: 'top 80%',
         once: true,
         onEnter: () => {
+          // Animate the border drawing down alongside the word reveal
+          if (pullquoteBorderEl.value) {
+            gsap.to(pullquoteBorderEl.value, {
+              scaleY: 1,
+              duration: 1.2,
+              ease: 'power2.out',
+            })
+          }
+
           gsap.to(words, {
             opacity: 1,
             stagger: { each: 0.04 },
@@ -67,7 +82,9 @@ onMounted(async () => {
     // Stats counter entrance + animated number count-up
     if (statsEl.value) {
       const statItems = statsEl.value.querySelectorAll('.stat-item')
+      const statAccents = statsEl.value.querySelectorAll('.stat-accent')
       gsap.set(statItems, { opacity: 0, y: 30 })
+      gsap.set(statAccents, { scaleX: 0 })
       ScrollTrigger.create({
         trigger: statsEl.value,
         start: 'top 85%',
@@ -87,6 +104,16 @@ onMounted(async () => {
               this.targets().forEach((el: HTMLElement) => gsap.set(el, { clearProps: 'transform,willChange' }))
             },
           })
+
+          // Draw the accent top border on each card
+          gsap.to(statAccents, {
+            scaleX: 1,
+            duration: 0.6,
+            stagger: 0.12,
+            delay: 0.3,
+            ease: 'power2.out',
+          })
+
           // Animated counter count-up for each stat
           stats.forEach((stat, i) => {
             gsap.to(counters[i], {
@@ -193,7 +220,12 @@ const credentials = [
   <section id="about" ref="sectionEl" class="section relative">
     <!-- Pullquote — massive editorial typography -->
     <div class="mb-14">
-      <blockquote class="relative pl-8 md:pl-12 border-l-2 border-accent-red/60">
+      <blockquote class="relative pl-8 md:pl-12">
+        <!-- Animated border line — draws top to bottom -->
+        <div
+          ref="pullquoteBorderEl"
+          class="absolute left-0 top-0 bottom-0 w-[2px] bg-accent-red/60 origin-top"
+        />
         <p
           ref="pullquoteEl"
           class="font-display font-bold text-lavender-100 leading-none about-pullquote"
@@ -205,7 +237,9 @@ const credentials = [
 
     <!-- Stats row -->
     <div ref="statsEl" class="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 mb-14">
-      <div v-for="(stat, index) in stats" :key="stat.label" class="stat-item glass rounded-xl p-6">
+      <div v-for="(stat, index) in stats" :key="stat.label" class="stat-item glass rounded-xl p-6 relative overflow-hidden">
+        <!-- Accent top border — draws left to right -->
+        <div class="stat-accent absolute top-0 left-0 right-0 h-[2px] bg-accent-red/50 origin-left" />
         <span class="font-display text-3xl md:text-4xl font-bold text-lavender-100 block leading-none mb-2 tabular-nums">
           {{ displayValues[index] }}
         </span>
