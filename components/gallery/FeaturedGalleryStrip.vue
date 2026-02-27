@@ -9,7 +9,7 @@ const lightbox = useLightbox()
 const isMobile = useIsMobile()
 const reducedMotion = useReducedMotion()
 
-// Pick featured artworks — cap at 8 for a tight, responsive horizontal scroll
+// Pick featured artworks — cap at 8
 const featured = computed(() => {
   const feat = artworks.value.filter((a) => a.featured)
   if (feat.length >= 4) return feat.slice(0, 8)
@@ -17,14 +17,11 @@ const featured = computed(() => {
 })
 
 const sectionEl = ref<HTMLElement | null>(null)
-const desktopEl = ref<HTMLElement | null>(null)
+const trackEl = ref<HTMLElement | null>(null)
 const stripEl = ref<HTMLElement | null>(null)
-const progressEl = ref<HTMLElement | null>(null)
-const headingEl = ref<HTMLElement | null>(null)
 const cardEls = ref<HTMLElement[]>([])
 
 let ctx: gsap.Context | null = null
-let resizeTimer: ReturnType<typeof setTimeout> | null = null
 
 function openLightbox(index: number) {
   const card = cardEls.value[index]
@@ -55,97 +52,34 @@ function openLightbox(index: number) {
   lightbox.open(items, index, rect)
 }
 
-function setupDesktopScroll() {
-  ctx?.revert()
-
-  if (!desktopEl.value || !stripEl.value) return
-
-  ctx = gsap.context(() => {
-    const getScrollAmount = () => {
-      return -(stripEl.value!.scrollWidth - window.innerWidth)
-    }
-
-    // Pre-calculate card positions to avoid getBoundingClientRect in onUpdate
-    const cardPositions: number[] = []
-    const cards = cardEls.value
-    if (cards.length && stripEl.value) {
-      const stripRect = stripEl.value.getBoundingClientRect()
-      cards.forEach((card) => {
-        if (!card) return
-        const cardRect = card.getBoundingClientRect()
-        // Store each card's center relative to the strip's left edge
-        cardPositions.push(cardRect.left - stripRect.left + cardRect.width / 2)
-      })
-    }
-
-    // Horizontal scroll — snappy scrub, optimized proximity
-    gsap.to(stripEl.value!, {
-      x: getScrollAmount,
-      ease: 'none',
-      scrollTrigger: {
-        trigger: desktopEl.value!,
-        start: 'top top',
-        end: () => `+=${Math.abs(getScrollAmount())}`,
-        pin: true,
-        scrub: 0.3,
-        invalidateOnRefresh: true,
-        onUpdate: (self) => {
-          // Progress bar — direct style, no GSAP overhead
-          if (progressEl.value) {
-            progressEl.value.style.transform = `scaleX(${self.progress})`
-          }
-
-          // Math-based proximity — zero layout thrash
-          if (!cards.length || !cardPositions.length) return
-          const vw = window.innerWidth
-          const centerX = vw / 2
-          const stripX = self.progress * (stripEl.value!.scrollWidth - vw)
-
-          cards.forEach((card, i) => {
-            if (!card || cardPositions[i] === undefined) return
-            // Card's visual center in viewport = original position - scroll offset
-            const cardCenter = cardPositions[i] - stripX
-            const distance = Math.abs(cardCenter - centerX)
-            const maxDist = vw * 0.55
-            const proximity = Math.max(0, 1 - distance / maxDist)
-
-            const scale = 1 + proximity * 0.04
-            const glowOpacity = proximity * 0.5
-
-            gsap.set(card, { scale, force3D: true })
-            const glow = card.querySelector('.strip-glow')
-            if (glow) {
-              ;(glow as HTMLElement).style.opacity = String(glowOpacity)
-            }
-          })
-        },
-      },
-    })
-  }, desktopEl.value)
-}
-
-function onResize() {
-  if (isMobile.value) return
-  if (resizeTimer) clearTimeout(resizeTimer)
-  resizeTimer = setTimeout(() => {
-    setupDesktopScroll()
-  }, 200)
-}
-
 onMounted(() => {
   nextTick(() => {
-    if (reducedMotion.value) return
-    if (isMobile.value) return
+    if (reducedMotion.value || isMobile.value) return
+    if (!trackEl.value || !stripEl.value) return
 
-    if (!desktopEl.value || !stripEl.value) return
-    setupDesktopScroll()
-    window.addEventListener('resize', onResize, { passive: true })
+    ctx = gsap.context(() => {
+      // Scroll-linked horizontal movement — NO pin, NO scroll trap.
+      // Cards slide left as user scrolls vertically past the section.
+      const getScrollAmount = () => {
+        return -(stripEl.value!.scrollWidth - window.innerWidth)
+      }
+
+      gsap.to(stripEl.value!, {
+        x: getScrollAmount,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: trackEl.value!,
+          start: 'top bottom',
+          end: 'bottom top',
+          scrub: 0.3,
+          invalidateOnRefresh: true,
+        },
+      })
+    }, trackEl.value)
   })
 })
 
 onUnmounted(() => {
-  window.removeEventListener('resize', onResize)
-  if (resizeTimer) clearTimeout(resizeTimer)
   ctx?.revert()
 })
 </script>
@@ -153,7 +87,7 @@ onUnmounted(() => {
 <template>
   <section v-if="featured.length >= 3" ref="sectionEl" class="overflow-hidden">
     <!-- Heading -->
-    <div ref="headingEl" class="max-w-7xl mx-auto px-6 md:px-12 pt-12 pb-6 text-center">
+    <div class="max-w-7xl mx-auto px-6 md:px-12 pt-12 pb-6 text-center">
       <p class="font-body text-xs uppercase tracking-[0.3em] text-accent-red mb-4">
         Featured Works
       </p>
@@ -162,70 +96,54 @@ onUnmounted(() => {
       </h2>
     </div>
 
-    <!-- Desktop: Pinned horizontal scroll -->
-    <div v-if="!isMobile" ref="desktopEl" class="relative">
-      <!-- Progress line -->
-      <div class="absolute top-0 left-0 w-full h-px bg-dark-700 z-10">
-        <div ref="progressEl" class="h-full bg-accent-red origin-left" style="transform: scaleX(0)" />
-      </div>
+    <!-- Desktop: Scroll-linked horizontal movement (no pin) -->
+    <div v-if="!isMobile" ref="trackEl" class="strip-track relative">
+      <div ref="stripEl" class="flex gap-5 pl-8 pr-8 md:pl-16 md:pr-16 md:gap-8 items-center h-full">
+        <div
+          v-for="(artwork, index) in featured"
+          :key="artwork.id"
+          :ref="(el) => { if (el) cardEls[index] = el as HTMLElement }"
+          class="strip-card flex-shrink-0 relative overflow-hidden rounded-xl cursor-pointer group"
+          role="button"
+          :tabindex="0"
+          :aria-label="`View ${artwork.title}`"
+          @click="openLightbox(index)"
+          @keydown.enter="openLightbox(index)"
+          @keydown.space.prevent="openLightbox(index)"
+        >
+          <!-- Image -->
+          <img
+            :src="artwork.src"
+            :alt="artwork.title"
+            class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            loading="lazy"
+          />
 
-      <div class="h-screen flex items-center">
-        <div ref="stripEl" class="flex gap-5 pl-8 pr-8 md:pl-16 md:pr-16 md:gap-8">
+          <!-- Bottom overlay -->
           <div
-            v-for="(artwork, index) in featured"
-            :key="artwork.id"
-            :ref="(el) => { if (el) cardEls[index] = el as HTMLElement }"
-            class="strip-card flex-shrink-0 relative overflow-hidden rounded-xl cursor-pointer group"
-            style="width: clamp(280px, 26vw, 380px); height: clamp(380px, 50vh, 540px)"
-            role="button"
-            :tabindex="0"
-            :aria-label="`View ${artwork.title}`"
-            @click="openLightbox(index)"
-            @keydown.enter="openLightbox(index)"
-            @keydown.space.prevent="openLightbox(index)"
+            class="absolute inset-x-0 bottom-0 pointer-events-none z-[3]"
+            :style="{
+              background: `linear-gradient(to top, ${artwork.dominantColor || '#000000'}cc 0%, ${artwork.dominantColor || '#000000'}40 50%, transparent 100%)`,
+            }"
           >
-            <!-- Image with inner parallax -->
-            <img
-              :src="artwork.src"
-              :alt="artwork.title"
-              class="strip-img absolute inset-[-8%] w-[116%] h-[116%] object-cover transition-transform duration-700 group-hover:scale-105"
-              loading="lazy"
-            />
-
-            <!-- Dominant color glow (driven by scroll proximity) -->
-            <div
-              class="strip-glow absolute inset-0 pointer-events-none opacity-0"
-              :style="{
-                boxShadow: `inset 0 0 60px ${artwork.dominantColor || '#ed544d'}40, 0 0 40px ${artwork.dominantColor || '#ed544d'}20`,
-              }"
-            />
-
-            <!-- Bottom overlay -->
-            <div
-              class="absolute inset-x-0 bottom-0 pointer-events-none z-[3]"
-              :style="{
-                background: `linear-gradient(to top, ${artwork.dominantColor || '#000000'}cc 0%, ${artwork.dominantColor || '#000000'}40 50%, transparent 100%)`,
-              }"
-            >
-              <div class="px-5 pt-12 pb-5">
-                <h3 class="font-display text-lg text-lavender-100 leading-tight">
-                  {{ artwork.title }}
-                </h3>
-                <p class="text-xs text-lavender-400 mt-1.5 uppercase tracking-wide">
-                  {{ artwork.medium }} &middot; {{ artwork.year }}
-                </p>
-              </div>
+            <div class="px-5 pt-12 pb-5">
+              <h3 class="font-display text-lg text-lavender-100 leading-tight">
+                {{ artwork.title }}
+              </h3>
+              <p class="text-xs text-lavender-400 mt-1.5 uppercase tracking-wide">
+                {{ artwork.medium }} &middot; {{ artwork.year }}
+              </p>
             </div>
+          </div>
 
-            <!-- Hover arrow indicator -->
-            <div class="absolute top-4 right-4 z-[4] opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <span class="w-8 h-8 rounded-full border border-lavender-400/30 flex items-center justify-center text-lavender-300 bg-dark-900/40 backdrop-blur-sm">
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-                  <line x1="2" y1="10" x2="10" y2="2" />
-                  <polyline points="4 2 10 2 10 8" />
-                </svg>
-              </span>
-            </div>
+          <!-- Hover arrow indicator -->
+          <div class="absolute top-4 right-4 z-[4] opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <span class="w-8 h-8 rounded-full border border-lavender-400/30 flex items-center justify-center text-lavender-300 bg-dark-900/40 backdrop-blur-sm">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                <line x1="2" y1="10" x2="10" y2="2" />
+                <polyline points="4 2 10 2 10 8" />
+              </svg>
+            </span>
           </div>
         </div>
       </div>
@@ -277,6 +195,15 @@ onUnmounted(() => {
 .strip-heading {
   font-size: clamp(2.5rem, 6vw, 5rem);
   letter-spacing: -0.03em;
+}
+
+.strip-track {
+  height: clamp(420px, 55vh, 580px);
+}
+
+.strip-card {
+  width: clamp(280px, 26vw, 380px);
+  height: clamp(360px, 48vh, 520px);
 }
 
 .scrollbar-hide {
