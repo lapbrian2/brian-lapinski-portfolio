@@ -188,10 +188,13 @@ onUnmounted(() => {
 }
 
 .cinematic-reveal__img {
-  /* Oversized for parallax headroom — image is 120% with 10% bleed on all sides */
+  /* Oversized for parallax headroom — image is 120% with 10% bleed on all sides.
+     max-width: none overrides Tailwind's img reset (max-width: 100%) which
+     would otherwise cap the image at the container width. */
   inset: -10%;
   width: 120%;
   height: 120%;
+  max-width: none;
   will-change: transform;
 }
 
