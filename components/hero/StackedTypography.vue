@@ -4,8 +4,6 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useIsMobile, useReducedMotion } from '~/composables/useMediaQuery'
 
 const sectionEl = ref<HTMLElement | null>(null)
-const stackEl = ref<HTMLElement | null>(null)
-const lineEls = ref<HTMLElement[]>([])
 const isMobile = useIsMobile()
 const reducedMotion = useReducedMotion()
 
@@ -21,7 +19,16 @@ const lines = [
 ]
 
 onMounted(async () => {
-  if (!sectionEl.value || !stackEl.value || !lineEls.value.length) return
+  // Wait for hydration to fully settle before querying DOM
+  await nextTick()
+
+  if (!sectionEl.value) return
+
+  // Query line elements directly from the DOM — avoids function-ref timing issues
+  const lineElements = Array.from(
+    sectionEl.value.querySelectorAll('.stacked-type__line'),
+  ) as HTMLElement[]
+  if (!lineElements.length) return
 
   // Reduced motion: show everything static, no parallax
   if (reducedMotion.value) return
@@ -31,13 +38,13 @@ onMounted(async () => {
   if (isMobile.value) {
     // Mobile: fade-in + scale stagger, no character splitting
     ctx = gsap.context(() => {
-      gsap.set(lineEls.value, { opacity: 0, y: 40, scale: 0.9 })
+      gsap.set(lineElements, { opacity: 0, y: 40, scale: 0.9 })
       ScrollTrigger.create({
         trigger: sectionEl.value!,
         start: 'top 85%',
         once: true,
         onEnter: () => {
-          gsap.to(lineEls.value, {
+          gsap.to(lineElements, {
             opacity: 1,
             y: 0,
             scale: 1,
@@ -53,29 +60,28 @@ onMounted(async () => {
   }
 
   // Desktop: character-level entrance + parallax scrub
-
-  // Dynamically import Splitting.js (same pattern as HeroText.vue)
+  // Dynamically import Splitting.js
   const { default: Splitting } = await import('splitting')
 
-  // Split each word into characters
-  const textEls = lineEls.value.map(el => el.querySelector('.stacked-type__text'))
-  const allCharsPerLine: HTMLElement[][] = []
-
-  textEls.forEach((textEl) => {
-    if (!textEl) {
-      allCharsPerLine.push([])
-      return
-    }
-    const result = Splitting({ target: textEl, by: 'chars' })
-    allCharsPerLine.push(result[0]?.chars || [])
-  })
-
-  // Hide all characters initially
-  allCharsPerLine.forEach((chars) => {
-    if (chars.length) gsap.set(chars, { opacity: 0 })
-  })
-
+  // Split each word into characters (inside context, matching ContactSection pattern)
   ctx = gsap.context(() => {
+    const allCharsPerLine: HTMLElement[][] = []
+
+    lineElements.forEach((lineEl) => {
+      const textEl = lineEl.querySelector('.stacked-type__text')
+      if (!textEl) {
+        allCharsPerLine.push([])
+        return
+      }
+      const result = Splitting({ target: textEl, by: 'chars' })
+      allCharsPerLine.push(result[0]?.chars || [])
+    })
+
+    // Hide all characters initially
+    allCharsPerLine.forEach((chars) => {
+      if (chars.length) gsap.set(chars, { opacity: 0 })
+    })
+
     // Scroll-triggered entrance — fires once when section enters viewport
     ScrollTrigger.create({
       trigger: sectionEl.value!,
@@ -131,7 +137,7 @@ onMounted(async () => {
 
     // Parallax scrub: each line scrolls at a different speed via yPercent
     lines.forEach((line, i) => {
-      const el = lineEls.value[i]
+      const el = lineElements[i]
       if (!el) return
 
       const yDistance = (line.speed - 1) * 100
@@ -162,11 +168,10 @@ onUnmounted(() => {
 
 <template>
   <section ref="sectionEl" class="stacked-type relative overflow-hidden bg-dark-900">
-    <div ref="stackEl" class="stacked-type__stack relative">
+    <div class="stacked-type__stack relative">
       <div
-        v-for="(line, index) in lines"
+        v-for="line in lines"
         :key="line.text"
-        :ref="(el) => { if (el) lineEls[index] = el as HTMLElement }"
         class="stacked-type__line"
         :aria-label="line.text"
         style="perspective: 600px"
