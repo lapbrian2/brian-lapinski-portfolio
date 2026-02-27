@@ -9,8 +9,8 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const db = useDb()
 
-  const updateData: Record<string, any> = {}
-  const fields = ['title', 'category', 'medium', 'description', 'src', 'aspect', 'year', 'sortOrder', 'featured'] as const
+  const updateData: Record<string, unknown> = {}
+  const fields = ['title', 'category', 'medium', 'description', 'src', 'aspect', 'year', 'sortOrder', 'featured', 'rawPrompt', 'mjVersion', 'refinementNotes', 'dominantColor'] as const
 
   for (const field of fields) {
     if (body[field] !== undefined) {

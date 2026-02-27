@@ -128,6 +128,94 @@
       />
     </div>
 
+    <!-- Prompt Architecture -->
+    <div class="border border-gray-800 rounded-lg p-5 space-y-4">
+      <h3 class="text-sm font-semibold text-gray-300 uppercase tracking-wider">Prompt Architecture</h3>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-400 mb-1.5">Raw Prompt</label>
+        <textarea
+          v-model="form.rawPrompt"
+          rows="4"
+          placeholder="The full Midjourney prompt used to generate this artwork..."
+          class="admin-input resize-none font-mono text-xs"
+        />
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-400 mb-1.5">MJ Version</label>
+          <input
+            v-model="form.mjVersion"
+            type="text"
+            placeholder="e.g. v6.1"
+            class="admin-input"
+          />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-400 mb-1.5">Dominant Color</label>
+          <input
+            v-model="form.dominantColor"
+            type="text"
+            placeholder="e.g. #1a1a2e"
+            class="admin-input"
+          />
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-400 mb-1.5">Refinement Notes</label>
+        <textarea
+          v-model="form.refinementNotes"
+          rows="3"
+          placeholder="Iterations, variations, and post-processing notes..."
+          class="admin-input resize-none"
+        />
+      </div>
+    </div>
+
+    <!-- Technique Selector -->
+    <div v-if="isEditing" class="border border-gray-800 rounded-lg p-5 space-y-4">
+      <h3 class="text-sm font-semibold text-gray-300 uppercase tracking-wider">Technique Tokens</h3>
+      <p class="text-xs text-gray-500">Select the prompt techniques used in this artwork.</p>
+
+      <div v-if="loadingTechniques" class="text-sm text-gray-500">Loading techniques...</div>
+      <div v-else-if="groupedTechniques.length === 0" class="text-sm text-gray-500">No techniques found. Run db:seed to populate.</div>
+      <div v-else class="space-y-4">
+        <div v-for="group in groupedTechniques" :key="group.category">
+          <h4 class="text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">{{ group.category }}</h4>
+          <div class="flex flex-wrap gap-2">
+            <label
+              v-for="tech in group.items"
+              :key="tech.id"
+              class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs cursor-pointer transition-colors"
+              :class="selectedTechniqueIds.has(tech.id)
+                ? 'bg-accent-red/20 text-accent-red border border-accent-red/40'
+                : 'bg-gray-800 text-gray-400 border border-gray-700 hover:border-gray-500'"
+            >
+              <input
+                type="checkbox"
+                :checked="selectedTechniqueIds.has(tech.id)"
+                class="sr-only"
+                @change="toggleTechnique(tech.id)"
+              />
+              {{ tech.name }}
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <button
+        v-if="techniquesChanged"
+        type="button"
+        :disabled="savingTechniques"
+        class="inline-flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white text-xs font-medium rounded-lg transition-colors disabled:opacity-50"
+        @click="saveTechniques"
+      >
+        {{ savingTechniques ? 'Saving...' : 'Save Techniques' }}
+      </button>
+    </div>
+
     <!-- Error -->
     <div v-if="error" class="text-sm text-red-400 bg-red-400/10 px-3 py-2 rounded-lg">
       {{ error }}
@@ -163,10 +251,26 @@ interface ArtworkFormData {
   src: string
   aspect: string
   year: number
+  rawPrompt: string
+  mjVersion: string
+  refinementNotes: string
+  dominantColor: string
+}
+
+interface Technique {
+  id: string
+  name: string
+  category: string
+  description: string | null
+}
+
+interface TechniqueGroup {
+  category: string
+  items: Technique[]
 }
 
 const props = defineProps<{
-  initialData?: ArtworkFormData
+  initialData?: Partial<ArtworkFormData>
 }>()
 
 const emit = defineEmits<{
@@ -189,7 +293,69 @@ const form = reactive<ArtworkFormData>({
   src: props.initialData?.src || '',
   aspect: props.initialData?.aspect || '',
   year: props.initialData?.year || new Date().getFullYear(),
+  rawPrompt: props.initialData?.rawPrompt || '',
+  mjVersion: props.initialData?.mjVersion || '',
+  refinementNotes: props.initialData?.refinementNotes || '',
+  dominantColor: props.initialData?.dominantColor || '',
 })
+
+// ─── Technique Selector ───
+const loadingTechniques = ref(false)
+const savingTechniques = ref(false)
+const groupedTechniques = ref<TechniqueGroup[]>([])
+const selectedTechniqueIds = ref<Set<string>>(new Set())
+const initialTechniqueIds = ref<Set<string>>(new Set())
+
+const techniquesChanged = computed(() => {
+  if (selectedTechniqueIds.value.size !== initialTechniqueIds.value.size) return true
+  for (const id of selectedTechniqueIds.value) {
+    if (!initialTechniqueIds.value.has(id)) return true
+  }
+  return false
+})
+
+function toggleTechnique(id: string) {
+  const next = new Set(selectedTechniqueIds.value)
+  if (next.has(id)) next.delete(id)
+  else next.add(id)
+  selectedTechniqueIds.value = next
+}
+
+async function saveTechniques() {
+  savingTechniques.value = true
+  try {
+    await $fetch(`/api/admin/artworks/${form.id}/techniques`, {
+      method: 'PUT',
+      body: { techniqueIds: [...selectedTechniqueIds.value] },
+    })
+    initialTechniqueIds.value = new Set(selectedTechniqueIds.value)
+  } catch (e: unknown) {
+    const err = e as { data?: { statusMessage?: string } }
+    error.value = err?.data?.statusMessage || 'Failed to save techniques'
+  } finally {
+    savingTechniques.value = false
+  }
+}
+
+async function loadTechniques() {
+  if (!isEditing.value) return
+  loadingTechniques.value = true
+  try {
+    const [techRes, artTechRes] = await Promise.all([
+      $fetch<{ success: boolean; data: TechniqueGroup[] }>('/api/admin/techniques'),
+      $fetch<{ success: boolean; data: string[] }>(`/api/admin/artworks/${form.id}/techniques`),
+    ])
+    groupedTechniques.value = techRes.data
+    selectedTechniqueIds.value = new Set(artTechRes.data)
+    initialTechniqueIds.value = new Set(artTechRes.data)
+  } catch {
+    // Silently fail — techniques panel will show empty state
+  } finally {
+    loadingTechniques.value = false
+  }
+}
+
+onMounted(loadTechniques)
 
 function autoGenerateId() {
   if (!isEditing.value && form.title && !form.id) {
@@ -216,13 +382,14 @@ async function uploadFile(file: File) {
   try {
     const formData = new FormData()
     formData.append('file', file)
-    const res = await $fetch<any>('/api/admin/upload', {
+    const res = await $fetch<{ data: { url: string } }>('/api/admin/upload', {
       method: 'POST',
       body: formData,
     })
     form.src = res.data.url
-  } catch (e: any) {
-    error.value = e?.data?.statusMessage || 'Upload failed'
+  } catch (e: unknown) {
+    const err = e as { data?: { statusMessage?: string } }
+    error.value = err?.data?.statusMessage || 'Upload failed'
   } finally {
     uploading.value = false
   }
@@ -255,8 +422,9 @@ async function handleSubmit() {
       })
     }
     emit('saved', form.id)
-  } catch (e: any) {
-    error.value = e?.data?.statusMessage || 'Failed to save artwork'
+  } catch (e: unknown) {
+    const err = e as { data?: { statusMessage?: string } }
+    error.value = err?.data?.statusMessage || 'Failed to save artwork'
   } finally {
     saving.value = false
   }
