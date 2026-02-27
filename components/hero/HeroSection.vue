@@ -53,7 +53,7 @@ function showFirstImage(): void {
   })
 
   gsap.to(imgEls.value[0], {
-    opacity: 0.55,
+    opacity: 0.65,
     duration: 0.3,
     ease: 'power2.out',
     onComplete: () => emit('first-frame-ready'),
@@ -92,7 +92,7 @@ function startCycle(): void {
     })
 
     crossfadeTl.to(currentEl, { opacity: 0, duration: 0.5, ease: 'power2.inOut' }, 0)
-    crossfadeTl.to(nextEl, { opacity: 0.55, duration: 0.5, ease: 'power2.inOut' }, 0)
+    crossfadeTl.to(nextEl, { opacity: 0.65, duration: 0.5, ease: 'power2.inOut' }, 0)
     crossfadeTl.to(nextEl, { scale: 1.08, duration: 1.6, ease: 'none', force3D: true }, 0)
   }
 
@@ -146,11 +146,6 @@ onUnmounted(() => {
     <!-- Ambient gradient orbs — subtle color accents on top -->
     <div class="hero-glow absolute inset-0 z-[3] pointer-events-none" />
 
-    <!-- Horizontal rule accent — thin line at ~70% down -->
-    <div class="absolute left-0 right-0 z-10 pointer-events-none" style="top: 68%">
-      <div class="hero-rule mx-auto h-px max-w-[200px] bg-gradient-to-r from-transparent via-lavender-400/15 to-transparent" />
-    </div>
-
     <!-- Text overlay -->
     <div class="absolute inset-0 z-20 flex items-center justify-center">
       <HeroText :ready="ready" style="text-shadow: 0 2px 20px rgba(0,0,0,0.5)" @entrance-complete="heroTextDone = true" />
@@ -171,11 +166,11 @@ onUnmounted(() => {
 .hero-overlay {
   background:
     linear-gradient(to bottom,
-      rgba(0, 0, 0, 0.7) 0%,
-      rgba(0, 0, 0, 0.35) 35%,
-      rgba(0, 0, 0, 0.3) 50%,
-      rgba(0, 0, 0, 0.45) 70%,
-      rgba(0, 0, 0, 0.85) 100%
+      rgba(0, 0, 0, 0.72) 0%,
+      rgba(0, 0, 0, 0.4) 30%,
+      rgba(0, 0, 0, 0.38) 50%,
+      rgba(0, 0, 0, 0.5) 70%,
+      rgba(0, 0, 0, 0.88) 100%
     );
 }
 
