@@ -288,22 +288,22 @@ html {
   transform: translateX(0);
 }
 
-/* Section spacing — generous Noomo-level breathing room */
+/* Section spacing — cinematic breathing room without dead zones */
 .section {
-  padding: 6rem 1.5rem;
+  padding: 4rem 1.5rem;
   max-width: 1400px;
   margin: 0 auto;
 }
 
 @media (min-width: 768px) {
   .section {
-    padding: 10rem 3rem;
+    padding: 6rem 3rem;
   }
 }
 
 @media (min-width: 1280px) {
   .section {
-    padding: 12rem 3rem;
+    padding: 8rem 3rem;
   }
 }
 

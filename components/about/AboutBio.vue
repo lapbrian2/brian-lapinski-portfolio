@@ -36,14 +36,14 @@
         <span class="text-lavender-200 font-medium">7 AI Fluencies</span>
         curriculum and the
         <span class="text-lavender-200 font-medium">4D Framework</span>
-        in partnership with Anthropic. As Creative Partner at ImagineArt and
+        . As Creative Partner at ImagineArt and
         Caimera, I bridge the gap between what AI tools can do and what artists
         actually need. Everything I build is meant to be taught, shared, and
         improved by others.
       </p>
       <p class="font-body text-base leading-relaxed text-lavender-300">
-        I work from the Pocono region of Pennsylvania, where I live with my two
-        kids, Noah and Maddie. The quiet out here is good for the work &mdash;
+        I work from the Pocono region of Pennsylvania, where I live with my wife
+        and two children. The quiet out here is good for the work &mdash;
         every piece still starts with a feeling or a question about what it means
         to be human, and the images I chase are the ones that create a connection
         between strangers without a single word.

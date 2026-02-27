@@ -70,9 +70,9 @@ onUnmounted(() => {
   <section ref="sectionEl" class="collection-cta relative overflow-hidden bg-dark-900">
     <div class="collection-cta__inner relative z-10">
       <!-- Subtle top rule -->
-      <div class="w-16 h-px bg-accent-red/40 mx-auto mb-12" />
+      <div class="w-16 h-px bg-accent-red/40 mx-auto mb-8" />
 
-      <div ref="headingEl" class="text-center mb-16 md:mb-24">
+      <div ref="headingEl" class="text-center mb-10 md:mb-14">
         <p class="font-body text-xs uppercase tracking-[0.25em] text-lavender-400 mb-6">
           Full Collection
         </p>
@@ -113,7 +113,13 @@ onUnmounted(() => {
 
 <style scoped>
 .collection-cta {
-  padding: 8rem 0;
+  padding: 4rem 0;
+}
+
+@media (min-width: 768px) {
+  .collection-cta {
+    padding: 5rem 0;
+  }
 }
 
 .collection-cta__inner {
@@ -148,7 +154,7 @@ onUnmounted(() => {
 }
 
 .collection-cta__link-text {
-  font-size: clamp(2.5rem, 8vw, 7rem);
+  font-size: clamp(2rem, 6vw, 5rem);
   letter-spacing: -0.03em;
   color: rgba(218, 226, 242, 0.2);
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
@@ -175,7 +181,7 @@ onUnmounted(() => {
 /* Mobile */
 @media (max-width: 767px) {
   .collection-cta {
-    padding: 5rem 0;
+    padding: 3rem 0;
   }
 
   .collection-cta__link {

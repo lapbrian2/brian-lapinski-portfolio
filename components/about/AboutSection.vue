@@ -177,7 +177,7 @@ const credentials = [
 <template>
   <section id="about" ref="sectionEl" class="section relative">
     <!-- Pullquote — massive editorial typography -->
-    <div class="mb-20">
+    <div class="mb-14">
       <blockquote class="relative pl-8 md:pl-12 border-l-2 border-accent-red/60">
         <p
           ref="pullquoteEl"
@@ -189,7 +189,7 @@ const credentials = [
     </div>
 
     <!-- Stats row -->
-    <div ref="statsEl" class="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 mb-20">
+    <div ref="statsEl" class="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 mb-14">
       <div v-for="(stat, index) in stats" :key="stat.label" class="stat-item glass rounded-xl p-6">
         <span class="font-display text-3xl md:text-4xl font-bold text-lavender-100 block leading-none mb-2 tabular-nums">
           {{ displayValues[index] }}
@@ -201,7 +201,7 @@ const credentials = [
     </div>
 
     <!-- Credentials row with separator dots -->
-    <div ref="credentialsEl" class="flex flex-wrap items-center gap-y-2 mb-16">
+    <div ref="credentialsEl" class="flex flex-wrap items-center gap-y-2 mb-10">
       <template v-for="(cred, i) in credentials" :key="cred">
         <span class="font-body text-sm text-lavender-400 tracking-wide">
           {{ cred }}

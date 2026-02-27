@@ -36,7 +36,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div ref="dividerEl" class="relative h-[120px] flex items-center justify-center overflow-hidden">
+  <div ref="dividerEl" class="relative h-[60px] flex items-center justify-center overflow-hidden">
     <!-- Gradient bleed zones -->
     <div class="absolute inset-0 bg-gradient-to-b from-transparent via-dark-800/30 to-transparent" />
 
