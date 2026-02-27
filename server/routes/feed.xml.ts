@@ -1,4 +1,4 @@
-import { desc, eq } from 'drizzle-orm'
+import { desc } from 'drizzle-orm'
 import { artworks } from '~/server/db/schema'
 import { useDb } from '~/server/db'
 
@@ -33,21 +33,11 @@ export default defineEventHandler(async (event) => {
       createdAt: artworks.createdAt,
     }
 
-    try {
-      rows = await db
-        .select(selectFields)
-        .from(artworks)
-        .where(eq(artworks.published, true))
-        .orderBy(desc(artworks.createdAt))
-        .limit(20)
-    } catch {
-      // published column may not exist yet — fall back to all artworks
-      rows = await db
-        .select(selectFields)
-        .from(artworks)
-        .orderBy(desc(artworks.createdAt))
-        .limit(20)
-    }
+    rows = await db
+      .select(selectFields)
+      .from(artworks)
+      .orderBy(desc(artworks.createdAt))
+      .limit(20)
   } catch {
     rows = []
   }

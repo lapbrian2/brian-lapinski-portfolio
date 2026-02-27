@@ -1,4 +1,4 @@
-import { asc, eq } from 'drizzle-orm'
+import { asc } from 'drizzle-orm'
 import { artworks, collections } from '~/server/db/schema'
 import { useDb } from '~/server/db'
 import { validCategorySlugs } from '~/data/artworks'
@@ -18,18 +18,10 @@ export default defineEventHandler(async (event) => {
   let collectionRows: Array<{ slug: string; createdAt: string | null }> = []
   try {
     const db = useDb()
-    try {
-      artworkRows = await db
-        .select({ id: artworks.id, updatedAt: artworks.updatedAt })
-        .from(artworks)
-        .where(eq(artworks.published, true))
-        .orderBy(asc(artworks.sortOrder))
-    } catch {
-      artworkRows = await db
-        .select({ id: artworks.id, updatedAt: artworks.updatedAt })
-        .from(artworks)
-        .orderBy(asc(artworks.sortOrder))
-    }
+    artworkRows = await db
+      .select({ id: artworks.id, updatedAt: artworks.updatedAt })
+      .from(artworks)
+      .orderBy(asc(artworks.sortOrder))
     collectionRows = await db
       .select({ slug: collections.slug, createdAt: collections.createdAt })
       .from(collections)

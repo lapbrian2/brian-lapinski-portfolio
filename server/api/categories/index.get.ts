@@ -1,4 +1,4 @@
-import { sql, eq } from 'drizzle-orm'
+import { sql } from 'drizzle-orm'
 import { artworks } from '~/server/db/schema'
 import { useDb } from '~/server/db'
 import { categories as staticCategories } from '~/data/artworks'
@@ -6,26 +6,13 @@ import { categories as staticCategories } from '~/data/artworks'
 export default defineEventHandler(async (event) => {
   const db = useDb()
 
-  let counts: Array<{ category: string; count: number }>
-  try {
-    counts = await db
-      .select({
-        category: artworks.category,
-        count: sql<number>`count(*)`,
-      })
-      .from(artworks)
-      .where(eq(artworks.published, true))
-      .groupBy(artworks.category)
-  } catch {
-    // published column may not exist yet — count all artworks
-    counts = await db
-      .select({
-        category: artworks.category,
-        count: sql<number>`count(*)`,
-      })
-      .from(artworks)
-      .groupBy(artworks.category)
-  }
+  const counts = await db
+    .select({
+      category: artworks.category,
+      count: sql<number>`count(*)`,
+    })
+    .from(artworks)
+    .groupBy(artworks.category)
 
   const total = counts.reduce((sum, c) => sum + c.count, 0)
 
