@@ -23,7 +23,7 @@ function goHome() {
 }
 
 function goGallery() {
-  clearError({ redirect: '/#work' })
+  clearError({ redirect: '/gallery' })
 }
 
 onMounted(() => {

@@ -48,10 +48,10 @@
         <!-- Actions -->
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mt-10">
           <NuxtLink
-            to="/shop"
+            to="/gallery"
             class="inline-flex items-center gap-2 px-6 py-3 bg-accent-red hover:bg-accent-red-hover text-white text-sm font-medium rounded-sm transition-colors"
           >
-            Continue Browsing
+            Browse Gallery
           </NuxtLink>
           <NuxtLink
             to="/"
