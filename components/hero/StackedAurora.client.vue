@@ -206,17 +206,24 @@ const fragmentShader = `
   }
 `
 
+function resizeRenderer(w: number, h: number) {
+  if (!renderer || !camera || w === 0 || h === 0) return
+  renderer.setSize(w, h)
+  camera.aspect = w / h
+  camera.updateProjectionMatrix()
+}
+
 function initScene() {
   if (!canvasRef.value || !containerRef.value) return
 
-  const { width, height } = containerRef.value.getBoundingClientRect()
-  const isMobile = width < 768
+  const isMobile = window.innerWidth < 768
 
   // Scene
   scene = new THREE.Scene()
 
   // Camera (per skill: PerspectiveCamera for depth)
-  camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 100)
+  // Use window dimensions as safe initial aspect — ResizeObserver corrects immediately
+  camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100)
   camera.position.z = 3
 
   // Renderer (per skill: alpha true, capped pixel ratio)
@@ -225,9 +232,14 @@ function initScene() {
     antialias: !isMobile,
     alpha: true,
   })
-  renderer.setSize(width, height)
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.5 : 2))
   renderer.setClearColor(0x000000, 0)
+
+  // Set initial size from container (may be 0 if layout hasn't settled)
+  const { width, height } = containerRef.value.getBoundingClientRect()
+  if (width > 0 && height > 0) {
+    resizeRenderer(width, height)
+  }
 
   // Geometry — large plane with many segments for smooth displacement
   const segments = isMobile ? 48 : 96
@@ -252,14 +264,12 @@ function initScene() {
   mesh = new THREE.Mesh(geometry, material)
   scene.add(mesh)
 
-  // ResizeObserver for responsive updates (per skill: handle resize)
+  // ResizeObserver handles both initial sizing (when layout settles)
+  // and responsive updates (per skill: handle resize)
   resizeObserver = new ResizeObserver((entries) => {
     for (const entry of entries) {
       const { width: w, height: h } = entry.contentRect
-      if (w === 0 || h === 0) continue
-      renderer!.setSize(w, h)
-      camera!.aspect = w / h
-      camera!.updateProjectionMatrix()
+      resizeRenderer(w, h)
     }
   })
   resizeObserver.observe(containerRef.value)
@@ -326,7 +336,9 @@ function animate() {
   renderer.render(scene, camera)
 }
 
-onMounted(() => {
+onMounted(async () => {
+  // Wait for layout to settle before measuring container
+  await nextTick()
   startTime = performance.now()
   initScene()
   setupScrollAnimation()
