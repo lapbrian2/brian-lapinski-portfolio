@@ -5,7 +5,6 @@ import { useIsMobile, useReducedMotion } from '~/composables/useMediaQuery'
 
 const sectionEl = ref<HTMLElement | null>(null)
 const headingEl = ref<HTMLElement | null>(null)
-const linkEls = ref<HTMLElement[]>([])
 const isMobile = useIsMobile()
 const reducedMotion = useReducedMotion()
 
@@ -16,11 +15,18 @@ const categories = [
   { label: 'Landscapes', to: '/landscapes' },
   { label: 'Abstract', to: '/abstract' },
   { label: 'Surreal', to: '/surreal' },
+  { label: 'Anime', to: '/anime' },
+  { label: 'Sci-Fi', to: '/sci-fi' },
 ]
 
 onMounted(() => {
   if (!sectionEl.value || !headingEl.value) return
   if (reducedMotion.value) return
+
+  // Query link elements directly from DOM — avoids function-ref timing issues
+  const linkElements = Array.from(
+    sectionEl.value.querySelectorAll('.collection-cta__link'),
+  ) as HTMLElement[]
 
   ctx = gsap.context(() => {
     // Heading fade-in
@@ -39,19 +45,21 @@ onMounted(() => {
         })
 
         // Stagger the category links
-        gsap.fromTo(
-          linkEls.value,
-          { opacity: 0, y: 30 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.7,
-            stagger: 0.1,
-            delay: 0.3,
-            ease: 'power3.out',
-            force3D: true,
-          },
-        )
+        if (linkElements.length) {
+          gsap.fromTo(
+            linkElements,
+            { opacity: 0, y: 30 },
+            {
+              opacity: 1,
+              y: 0,
+              duration: 0.7,
+              stagger: 0.1,
+              delay: 0.3,
+              ease: 'power3.out',
+              force3D: true,
+            },
+          )
+        }
       },
     })
   }, sectionEl.value)
@@ -80,10 +88,9 @@ onUnmounted(() => {
       <!-- Category links — large editorial text -->
       <nav class="collection-cta__nav" aria-label="Art categories">
         <NuxtLink
-          v-for="(cat, index) in categories"
+          v-for="cat in categories"
           :key="cat.to"
           :to="cat.to"
-          :ref="(el: any) => { if (el) linkEls[index] = el?.$el || el as HTMLElement }"
           class="collection-cta__link group"
         >
           <span class="collection-cta__link-text font-display font-bold uppercase leading-none">
