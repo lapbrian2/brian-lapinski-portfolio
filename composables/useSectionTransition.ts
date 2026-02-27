@@ -18,12 +18,12 @@ export function useSectionTransition(
   options: SectionTransitionOptions = {},
 ) {
   const {
-    parallaxIntensity = 0.12,
-    scaleFrom = 0.98,
-    opacityFrom = 0.6,
+    parallaxIntensity = 0.06,
+    scaleFrom = 0.99,
+    opacityFrom = 0.8,
     enterStart = 'top 92%',
-    enterEnd = 'top 45%',
-    scrub = 1,
+    enterEnd = 'top 50%',
+    scrub = 0.5,
   } = options
 
   const isMobile = useIsMobile()

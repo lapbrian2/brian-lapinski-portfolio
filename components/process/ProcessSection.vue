@@ -1,39 +1,21 @@
 <template>
-  <section id="process" ref="sectionEl" class="overflow-hidden md:pb-24">
-    <div class="max-w-[1400px] mx-auto px-6 md:px-12 pt-24 md:pt-32">
-      <div ref="headingEl">
-        <p class="font-body text-xs uppercase tracking-[0.2em] text-lavender-300 mb-4">
-          Process
+  <section id="process" ref="sectionEl" class="section relative">
+    <div ref="headingEl">
+      <p class="font-body text-xs uppercase tracking-[0.2em] text-lavender-300 mb-4">
+        Process
+      </p>
+      <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12">
+        <h2 class="font-display font-bold text-lavender-100 leading-none process-heading">
+          From Feeling to Form
+        </h2>
+        <p class="font-body text-base text-lavender-300 max-w-sm md:text-right">
+          How AI art comes to life &mdash; a reproducible creative methodology.
         </p>
-        <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12">
-          <h2 class="font-display font-bold text-lavender-100 leading-none process-heading">
-            From Feeling to Form
-          </h2>
-          <p class="font-body text-base text-lavender-300 max-w-sm md:text-right">
-            How AI art comes to life &mdash; a reproducible creative methodology.
-          </p>
-        </div>
       </div>
     </div>
 
-    <!-- Desktop: scroll-pinned horizontal -->
-    <div v-if="!isMobile" ref="desktopEl" class="relative">
-      <!-- Progress line -->
-      <div class="absolute top-0 left-0 w-full h-px bg-dark-700">
-        <div ref="progressEl" class="h-full bg-accent-red origin-left" style="transform: scaleX(0)" />
-      </div>
-
-      <div class="h-screen flex items-center">
-        <div ref="stripEl" class="flex gap-6 pl-6 pr-6 md:pl-12 md:pr-12 md:gap-8">
-          <div v-for="step in steps" :key="step.number" class="process-card-wrap flex-shrink-0" style="width: calc(25vw - 48px); min-width: 280px; max-width: 380px">
-            <ProcessStep :step="step" />
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Mobile: vertical stack with stagger -->
-    <div v-else ref="mobileEl" class="px-6 pb-24 space-y-6">
+    <!-- Responsive grid — no pinned scroll, clean flow -->
+    <div ref="gridEl" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       <ProcessStep v-for="step in steps" :key="step.number" :step="step" />
     </div>
   </section>
@@ -42,8 +24,7 @@
 <script setup lang="ts">
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { useIsMobile, useReducedMotion } from '~/composables/useMediaQuery'
-import { useSectionTransition } from '~/composables/useSectionTransition'
+import { useReducedMotion } from '~/composables/useMediaQuery'
 import { useScrollReveal } from '~/composables/useScrollReveal'
 
 interface ProcessStepData {
@@ -79,105 +60,40 @@ const steps: ProcessStepData[] = [
   },
 ]
 
-const isMobile = useIsMobile()
 const reducedMotion = useReducedMotion()
 const sectionEl = ref<HTMLElement | null>(null)
 const headingEl = ref<HTMLElement | null>(null)
-const desktopEl = ref<HTMLElement | null>(null)
-const stripEl = ref<HTMLElement | null>(null)
-const progressEl = ref<HTMLElement | null>(null)
-const mobileEl = ref<HTMLElement | null>(null)
+const gridEl = ref<HTMLElement | null>(null)
 
-useSectionTransition(sectionEl, { parallaxIntensity: 0.15 })
 useScrollReveal(headingEl, { y: 30, stagger: 0.1, children: true })
 
 let ctx: gsap.Context | null = null
 
-let resizeTimer: ReturnType<typeof setTimeout> | null = null
-
-function setupDesktopScroll() {
-  ctx?.revert()
-
-  if (!desktopEl.value || !stripEl.value) return
+onMounted(() => {
+  if (!gridEl.value || reducedMotion.value) return
 
   ctx = gsap.context(() => {
-    // Calculate how far the strip overflows the viewport
-    const getScrollAmount = () => {
-      return -(stripEl.value!.scrollWidth - window.innerWidth)
-    }
-
-    // Use a standard GSAP tween with scrub — most reliable approach
-    gsap.to(stripEl.value!, {
-      x: getScrollAmount,
-      ease: 'none',
-      scrollTrigger: {
-        trigger: desktopEl.value!,
-        start: 'top top',
-        end: () => `+=${Math.abs(getScrollAmount())}`,
-        pin: true,
-        scrub: 1,
-        invalidateOnRefresh: true,
-        onUpdate: (self) => {
-          if (progressEl.value) {
-            progressEl.value.style.transform = `scaleX(${self.progress})`
-          }
-        },
+    const cards = gridEl.value!.children
+    gsap.set(cards, { opacity: 0, y: 40 })
+    ScrollTrigger.create({
+      trigger: gridEl.value!,
+      start: 'top 85%',
+      once: true,
+      onEnter: () => {
+        gsap.to(cards, {
+          opacity: 1,
+          y: 0,
+          duration: 0.7,
+          stagger: 0.12,
+          ease: 'power3.out',
+          force3D: true,
+        })
       },
     })
-  }, desktopEl.value)
-}
-
-function onResize() {
-  if (isMobile.value) return
-  if (resizeTimer) clearTimeout(resizeTimer)
-  resizeTimer = setTimeout(() => {
-    setupDesktopScroll()
-  }, 200)
-}
-
-onMounted(() => {
-  nextTick(() => {
-    // Respect reduced-motion preference — skip scroll-driven animations
-    if (reducedMotion.value) return
-
-    if (isMobile.value) {
-      // Mobile: stagger step cards
-      if (mobileEl.value) {
-        ctx = gsap.context(() => {
-          const cards = mobileEl.value!.children
-          gsap.set(cards, { opacity: 0, y: 40 })
-          ScrollTrigger.create({
-            trigger: mobileEl.value!,
-            start: 'top 85%',
-            once: true,
-            onEnter: () => {
-              gsap.to(cards, {
-                opacity: 1,
-                y: 0,
-                duration: 0.7,
-                stagger: 0.12,
-                ease: 'power2.out',
-              })
-            },
-          })
-        }, mobileEl.value)
-      }
-      return
-    }
-
-    // Desktop: scroll-pinned horizontal scroll
-    if (!desktopEl.value || !stripEl.value) return
-
-    setupDesktopScroll()
-
-    // Only register resize listener when desktop scroll is active
-    window.addEventListener('resize', onResize, { passive: true })
-  })
+  }, gridEl.value)
 })
 
 onUnmounted(() => {
-  window.removeEventListener('resize', onResize)
-  if (resizeTimer) clearTimeout(resizeTimer)
   ctx?.revert()
 })
 </script>
