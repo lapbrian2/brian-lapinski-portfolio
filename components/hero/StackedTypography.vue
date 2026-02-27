@@ -168,7 +168,10 @@ onUnmounted(() => {
 
 <template>
   <section ref="sectionEl" class="stacked-type relative overflow-hidden bg-dark-900">
-    <div class="stacked-type__stack relative">
+    <!-- Three.js aurora mesh backdrop (client-only, no SSR) -->
+    <StackedAurora />
+
+    <div class="stacked-type__stack relative z-[1]">
       <div
         v-for="line in lines"
         :key="line.text"
