@@ -27,6 +27,7 @@ export default defineEventHandler(async (event) => {
     aspect,
     year: Number(year),
     sortOrder: maxOrder + 1,
+    published: body.published === true,
     rawPrompt: body.rawPrompt?.trim() || null,
     mjVersion: body.mjVersion?.trim() || null,
     refinementNotes: body.refinementNotes?.trim() || null,

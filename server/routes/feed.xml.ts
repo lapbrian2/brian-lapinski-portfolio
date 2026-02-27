@@ -1,4 +1,4 @@
-import { desc } from 'drizzle-orm'
+import { desc, eq } from 'drizzle-orm'
 import { artworks } from '~/server/db/schema'
 import { useDb } from '~/server/db'
 
@@ -34,6 +34,7 @@ export default defineEventHandler(async (event) => {
         createdAt: artworks.createdAt,
       })
       .from(artworks)
+      .where(eq(artworks.published, true))
       .orderBy(desc(artworks.createdAt))
       .limit(20)
   } catch {

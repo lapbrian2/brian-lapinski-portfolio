@@ -1,4 +1,4 @@
-import { sql } from 'drizzle-orm'
+import { sql, eq } from 'drizzle-orm'
 import { artworks } from '~/server/db/schema'
 import { useDb } from '~/server/db'
 import { categories as staticCategories } from '~/data/artworks'
@@ -12,6 +12,7 @@ export default defineEventHandler(async (event) => {
       count: sql<number>`count(*)`,
     })
     .from(artworks)
+    .where(eq(artworks.published, true))
     .groupBy(artworks.category)
 
   const total = counts.reduce((sum, c) => sum + c.count, 0)

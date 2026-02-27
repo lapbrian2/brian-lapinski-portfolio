@@ -13,6 +13,7 @@ export const artworks = sqliteTable('artworks', {
   year: integer('year').notNull(),
   sortOrder: integer('sort_order').notNull().default(0),
   featured: integer('featured', { mode: 'boolean' }).default(false),
+  published: integer('published', { mode: 'boolean' }).notNull().default(false),
   // Ossuary: prompt architecture fields
   rawPrompt: text('raw_prompt'),
   mjVersion: text('mj_version'),

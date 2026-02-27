@@ -1,4 +1,4 @@
-import { asc } from 'drizzle-orm'
+import { asc, eq } from 'drizzle-orm'
 import { artworks, collections } from '~/server/db/schema'
 import { useDb } from '~/server/db'
 import { validCategorySlugs } from '~/data/artworks'
@@ -21,6 +21,7 @@ export default defineEventHandler(async (event) => {
     artworkRows = await db
       .select({ id: artworks.id, updatedAt: artworks.updatedAt })
       .from(artworks)
+      .where(eq(artworks.published, true))
       .orderBy(asc(artworks.sortOrder))
     collectionRows = await db
       .select({ slug: collections.slug, createdAt: collections.createdAt })
@@ -61,7 +62,7 @@ ${urls
   .map(
     (u) => `  <url>
     <loc>${escapeXml(baseUrl + u.loc)}</loc>
-    <lastmod>${(u as any).lastmod || today}</lastmod>
+    <lastmod>${'lastmod' in u ? (u as { lastmod: string }).lastmod : today}</lastmod>
     <changefreq>${u.changefreq}</changefreq>
     <priority>${u.priority}</priority>
   </url>`

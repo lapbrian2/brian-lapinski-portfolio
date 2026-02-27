@@ -10,6 +10,7 @@ export interface Artwork {
   dominantColor?: string
   sortOrder?: number
   featured?: boolean | null
+  published?: boolean
   // Ossuary: prompt architecture
   rawPrompt?: string | null
   mjVersion?: string | null

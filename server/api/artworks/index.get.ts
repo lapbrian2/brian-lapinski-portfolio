@@ -1,4 +1,4 @@
-import { eq, asc, inArray, count } from 'drizzle-orm'
+import { eq, and, asc, inArray, count } from 'drizzle-orm'
 import { artworks, techniques, artworkTechniques, artworkLikes } from '~/server/db/schema'
 import { useDb } from '~/server/db'
 
@@ -8,17 +8,19 @@ export default defineEventHandler(async (event) => {
   const category = query.category as string | undefined
   const withNodes = query.nodes === 'true' // ?nodes=true to include prompt nodes
 
+  // Only return published artworks on the public API
   let results
   if (category && category !== 'all') {
     results = await db
       .select()
       .from(artworks)
-      .where(eq(artworks.category, category))
+      .where(and(eq(artworks.published, true), eq(artworks.category, category)))
       .orderBy(asc(artworks.sortOrder))
   } else {
     results = await db
       .select()
       .from(artworks)
+      .where(eq(artworks.published, true))
       .orderBy(asc(artworks.sortOrder))
   }
 

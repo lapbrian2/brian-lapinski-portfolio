@@ -216,6 +216,25 @@
       </button>
     </div>
 
+    <!-- Publish Toggle -->
+    <div class="flex items-center gap-3 p-4 border border-gray-800 rounded-lg">
+      <label class="relative inline-flex items-center cursor-pointer">
+        <input
+          v-model="form.published"
+          type="checkbox"
+          class="sr-only peer"
+        />
+        <div class="w-10 h-5 bg-gray-700 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-accent-red rounded-full peer peer-checked:bg-green-600 transition-colors" />
+        <div class="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-5" />
+      </label>
+      <div>
+        <span class="text-sm font-medium" :class="form.published ? 'text-green-400' : 'text-gray-400'">
+          {{ form.published ? 'Published' : 'Draft' }}
+        </span>
+        <p class="text-xs text-gray-500">Only published artworks appear on the public site.</p>
+      </div>
+    </div>
+
     <!-- Error -->
     <div v-if="error" class="text-sm text-red-400 bg-red-400/10 px-3 py-2 rounded-lg">
       {{ error }}
@@ -251,6 +270,7 @@ interface ArtworkFormData {
   src: string
   aspect: string
   year: number
+  published: boolean
   rawPrompt: string
   mjVersion: string
   refinementNotes: string
@@ -297,6 +317,7 @@ const form = reactive<ArtworkFormData>({
   mjVersion: props.initialData?.mjVersion || '',
   refinementNotes: props.initialData?.refinementNotes || '',
   dominantColor: props.initialData?.dominantColor || '',
+  published: props.initialData?.published ?? false,
 })
 
 // ─── Technique Selector ───
