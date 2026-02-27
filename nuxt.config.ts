@@ -4,7 +4,8 @@ export default defineNuxtConfig({
   modules: [
     '@nuxtjs/tailwindcss',
     '@nuxt/image',
-    'nuxt-auth-utils',
+    // Only load auth module when session password is configured
+    ...(process.env.NUXT_SESSION_PASSWORD ? ['nuxt-auth-utils'] as const : []),
   ],
 
   app: {
