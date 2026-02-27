@@ -15,33 +15,58 @@ const featured = computed(() => {
 })
 
 const activeIndex = ref(0)
-const stageEl = ref<HTMLElement | null>(null)
+const ringEl = ref<HTMLElement | null>(null)
 const cardEls = ref<HTMLElement[]>([])
-const isTransitioning = ref(false)
 
-// Navigation
+// Geometry: cards arranged in a circle
+const cardAngle = computed(() => 360 / featured.value.length)
+const radius = computed(() => {
+  // Radius = cardWidth / (2 * tan(halfAngle)) — keeps cards from overlapping
+  const cardWidth = 360
+  const theta = (cardAngle.value * Math.PI) / 180
+  return Math.round(cardWidth / (2 * Math.tan(theta / 2)))
+})
+
+// Current ring rotation (tracks cumulative angle for smooth wrapping)
+let currentRotation = 0
+
 function goTo(index: number) {
-  const clamped = Math.max(0, Math.min(featured.value.length - 1, index))
-  if (clamped === activeIndex.value || isTransitioning.value) return
-  isTransitioning.value = true
-  activeIndex.value = clamped
-  animateCards()
+  if (!ringEl.value) return
+  activeIndex.value = index
+  const targetAngle = -index * cardAngle.value
+
+  // Find shortest rotation path (handle wrapping)
+  const diff = targetAngle - currentRotation
+  const shortDiff = ((diff + 180) % 360) - 180
+  currentRotation += shortDiff
+
+  gsap.to(ringEl.value, {
+    rotateY: currentRotation,
+    duration: 0.8,
+    ease: 'power2.inOut',
+  })
 }
 
 function next() {
-  if (activeIndex.value < featured.value.length - 1) {
-    goTo(activeIndex.value + 1)
-  } else {
-    goTo(0) // wrap around
-  }
+  const nextIdx = (activeIndex.value + 1) % featured.value.length
+  activeIndex.value = nextIdx
+  currentRotation -= cardAngle.value
+  gsap.to(ringEl.value!, {
+    rotateY: currentRotation,
+    duration: 0.8,
+    ease: 'power2.inOut',
+  })
 }
 
 function prev() {
-  if (activeIndex.value > 0) {
-    goTo(activeIndex.value - 1)
-  } else {
-    goTo(featured.value.length - 1) // wrap around
-  }
+  const prevIdx = (activeIndex.value - 1 + featured.value.length) % featured.value.length
+  activeIndex.value = prevIdx
+  currentRotation += cardAngle.value
+  gsap.to(ringEl.value!, {
+    rotateY: currentRotation,
+    duration: 0.8,
+    ease: 'power2.inOut',
+  })
 }
 
 function onCardClick(index: number) {
@@ -81,86 +106,13 @@ function openLightbox(index: number) {
   lightbox.open(items, index, rect)
 }
 
-// 3D transform for each card based on offset from active
-function getCardTransform(index: number) {
-  const offset = index - activeIndex.value
-  const absOffset = Math.abs(offset)
-  const dir = offset < 0 ? -1 : offset > 0 ? 1 : 0
-
-  if (absOffset > 3) {
-    return { x: dir * 900, rotateY: dir * -60, z: -600, scale: 0.5, opacity: 0, zIndex: 1 }
-  }
-
-  if (absOffset === 0) {
-    return { x: 0, rotateY: 0, z: 0, scale: 1, opacity: 1, zIndex: 10 }
-  }
-
-  // Flanking cards — stagger depth and rotation
-  const xStep = 320
-  const rotateStep = 40
-  const zStep = 180
-  const scaleStep = 0.12
-
-  return {
-    x: dir * (xStep * absOffset),
-    rotateY: dir * (-rotateStep),
-    z: -(zStep * absOffset),
-    scale: Math.max(0.6, 1 - scaleStep * absOffset),
-    opacity: Math.max(0, 1 - absOffset * 0.25),
-    zIndex: 10 - absOffset,
-  }
-}
-
-function animateCards() {
-  const cards = cardEls.value
-  if (!cards.length) return
-
-  const tl = gsap.timeline({
-    onComplete: () => { isTransitioning.value = false },
-  })
-
-  cards.forEach((card, i) => {
-    if (!card) return
-    const t = getCardTransform(i)
-    tl.to(card, {
-      x: t.x,
-      rotateY: t.rotateY,
-      z: t.z,
-      scale: t.scale,
-      opacity: t.opacity,
-      zIndex: t.zIndex,
-      duration: 0.6,
-      ease: 'power3.out',
-      force3D: true,
-    }, 0)
-  })
-}
-
-// Set initial positions
-function initCards() {
-  const cards = cardEls.value
-  cards.forEach((card, i) => {
-    if (!card) return
-    const t = getCardTransform(i)
-    gsap.set(card, {
-      x: t.x,
-      rotateY: t.rotateY,
-      z: t.z,
-      scale: t.scale,
-      opacity: t.opacity,
-      zIndex: t.zIndex,
-      force3D: true,
-    })
-  })
-}
-
 // Keyboard navigation
 function onKeydown(e: KeyboardEvent) {
   if (e.key === 'ArrowLeft') { e.preventDefault(); prev() }
   if (e.key === 'ArrowRight') { e.preventDefault(); next() }
 }
 
-// Auto-advance timer
+// Auto-advance
 let autoTimer: ReturnType<typeof setInterval> | null = null
 
 function startAuto() {
@@ -174,7 +126,6 @@ function stopAuto() {
 
 onMounted(() => {
   nextTick(() => {
-    initCards()
     startAuto()
   })
 })
@@ -203,57 +154,63 @@ onUnmounted(() => {
       </h2>
     </div>
 
-    <!-- Desktop: 3D Coverflow Carousel -->
+    <!-- Desktop: Rotating 3D Cylinder Carousel -->
     <div v-if="!isMobile" class="carousel-viewport relative">
-      <div ref="stageEl" class="carousel-stage">
+      <div class="carousel-stage">
         <div
-          v-for="(artwork, index) in featured"
-          :key="artwork.id"
-          :ref="(el) => { if (el) cardEls[index] = el as HTMLElement }"
-          class="carousel-card group"
-          :class="{ 'is-active': index === activeIndex }"
-          role="button"
-          :tabindex="index === activeIndex ? 0 : -1"
-          :aria-label="index === activeIndex ? `View ${artwork.title}` : artwork.title"
-          @click="onCardClick(index)"
+          ref="ringEl"
+          class="carousel-ring"
+          :style="{ transform: `translateZ(-${radius}px) rotateY(0deg)` }"
         >
-          <img
-            :src="artwork.src"
-            :alt="artwork.title"
-            class="absolute inset-0 w-full h-full object-cover transition-transform duration-700"
-            :class="index === activeIndex ? 'group-hover:scale-105' : ''"
-            loading="lazy"
-            draggable="false"
-          />
-
-          <!-- Bottom overlay -->
           <div
-            class="absolute inset-x-0 bottom-0 pointer-events-none z-[3]"
-            :style="{
-              background: `linear-gradient(to top, ${artwork.dominantColor || '#000000'}cc 0%, ${artwork.dominantColor || '#000000'}40 50%, transparent 100%)`,
-            }"
+            v-for="(artwork, index) in featured"
+            :key="artwork.id"
+            :ref="(el) => { if (el) cardEls[index] = el as HTMLElement }"
+            class="carousel-card group"
+            :class="{ 'is-active': index === activeIndex }"
+            :style="{ transform: `rotateY(${index * cardAngle}deg) translateZ(${radius}px)` }"
+            role="button"
+            :tabindex="index === activeIndex ? 0 : -1"
+            :aria-label="index === activeIndex ? `View ${artwork.title}` : artwork.title"
+            @click="onCardClick(index)"
           >
-            <div class="px-5 pt-14 pb-5">
-              <h3 class="font-display text-lg text-lavender-100 leading-tight">
-                {{ artwork.title }}
-              </h3>
-              <p class="text-xs text-lavender-400 mt-1.5 uppercase tracking-wide">
-                {{ artwork.medium }} &middot; {{ artwork.year }}
-              </p>
+            <img
+              :src="artwork.src"
+              :alt="artwork.title"
+              class="absolute inset-0 w-full h-full object-cover"
+              loading="lazy"
+              draggable="false"
+            />
+
+            <!-- Bottom overlay -->
+            <div
+              class="absolute inset-x-0 bottom-0 pointer-events-none z-[3]"
+              :style="{
+                background: `linear-gradient(to top, ${artwork.dominantColor || '#000000'}cc 0%, ${artwork.dominantColor || '#000000'}40 50%, transparent 100%)`,
+              }"
+            >
+              <div class="px-5 pt-14 pb-5">
+                <h3 class="font-display text-lg text-lavender-100 leading-tight">
+                  {{ artwork.title }}
+                </h3>
+                <p class="text-xs text-lavender-400 mt-1.5 uppercase tracking-wide">
+                  {{ artwork.medium }} &middot; {{ artwork.year }}
+                </p>
+              </div>
             </div>
-          </div>
 
-          <!-- View indicator on active card -->
-          <div
-            v-if="index === activeIndex"
-            class="absolute top-4 right-4 z-[4] opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-          >
-            <span class="w-9 h-9 rounded-full border border-lavender-400/30 flex items-center justify-center text-lavender-300 bg-dark-900/50 backdrop-blur-sm">
-              <svg width="14" height="14" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-                <line x1="2" y1="10" x2="10" y2="2" />
-                <polyline points="4 2 10 2 10 8" />
-              </svg>
-            </span>
+            <!-- View indicator on active card -->
+            <div
+              v-if="index === activeIndex"
+              class="absolute top-4 right-4 z-[4] opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            >
+              <span class="w-9 h-9 rounded-full border border-lavender-400/30 flex items-center justify-center text-lavender-300 bg-dark-900/50 backdrop-blur-sm">
+                <svg width="14" height="14" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                  <line x1="2" y1="10" x2="10" y2="2" />
+                  <polyline points="4 2 10 2 10 8" />
+                </svg>
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -279,7 +236,7 @@ onUnmounted(() => {
       </button>
 
       <!-- Dot indicators -->
-      <div class="flex items-center justify-center gap-2 mt-6 pb-4">
+      <div class="flex items-center justify-center gap-2 mt-4 pb-4">
         <button
           v-for="(_, i) in featured"
           :key="i"
@@ -343,44 +300,57 @@ onUnmounted(() => {
   letter-spacing: -0.03em;
 }
 
-/* Viewport constrains the 3D space */
 .carousel-viewport {
   padding: 2rem 0 0;
 }
 
+/* The stage provides perspective for the entire 3D scene */
 .carousel-stage {
-  position: relative;
   width: 100%;
-  height: clamp(400px, 52vh, 560px);
+  height: clamp(420px, 55vh, 580px);
   perspective: 1200px;
   perspective-origin: 50% 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* Each card is absolutely positioned, GSAP handles transforms */
+/* The ring is the rotating cylinder — all cards are children */
+.carousel-ring {
+  position: relative;
+  width: clamp(280px, 24vw, 360px);
+  height: clamp(380px, 48vh, 520px);
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* Each card sits on the cylinder surface via rotateY + translateZ */
 .carousel-card {
   position: absolute;
-  left: 50%;
-  top: 50%;
-  width: clamp(300px, 28vw, 420px);
-  height: clamp(380px, 48vh, 530px);
-  margin-left: calc(clamp(300px, 28vw, 420px) / -2);
-  margin-top: calc(clamp(380px, 48vh, 530px) / -2);
+  inset: 0;
   border-radius: 12px;
   overflow: hidden;
   cursor: pointer;
-  transform-style: preserve-3d;
   backface-visibility: hidden;
-  will-change: transform, opacity;
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
   transition: box-shadow 0.4s ease;
 }
 
 .carousel-card.is-active {
-  box-shadow: 0 16px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(237, 84, 77, 0.08);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 50px rgba(237, 84, 77, 0.1);
 }
 
-.carousel-card:not(.is-active) {
-  cursor: pointer;
+/* Reflection floor effect */
+.carousel-stage::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 10%;
+  right: 10%;
+  height: 60px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(237, 84, 77, 0.06) 0%, transparent 70%);
+  pointer-events: none;
 }
 
 /* Navigation arrows */
