@@ -169,6 +169,8 @@ const credentials = [
   'Fundaci\u00f3n Nestl\u00e9 Barcelona',
   'FNAC Asturias',
   'Art Innovation NYC',
+  'Creativa Magazine Vol.\u00a07',
+  '2026 Choice DAO Mover & Shaker',
 ]
 </script>
 

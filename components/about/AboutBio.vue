@@ -8,49 +8,45 @@
     </h2>
     <div class="space-y-6">
       <p class="font-body text-base leading-relaxed text-lavender-200">
-        I didn't come to AI art through technology &mdash; I came through a need to
-        understand something about myself. Every piece I create starts with a
-        feeling, a question, or a moment of genuine curiosity about the human
-        experience.
+        I spent fifteen years on manufacturing floors &mdash; supervising
+        production lines, earning a Lean Six Sigma Black Belt from Villanova,
+        building systems that turned chaos into process. I have no formal art
+        training. What I brought to AI image generation was something different:
+        the belief that creativity, like manufacturing, can be both deeply
+        personal and rigorously reproducible.
       </p>
       <p class="font-body text-base leading-relaxed text-lavender-300">
-        I'm drawn to images that speak without words. The ones that stop you for
-        a second and create a quiet connection between strangers. That's what I
-        chase &mdash; not trends, not technique for its own sake, but emotional truth.
+        That belief became
+        <span class="text-lavender-200 font-medium">Style DNA</span> &mdash; my
+        methodology for reverse-engineering visual styles into reproducible
+        parameters. Where most creators treat prompting as improvisation, I treat
+        it as constraint satisfaction: isolating the variables that define a look,
+        then systematically dialing them until the output matches the intent. The
+        methodology behind the output matters as much as the output itself.
       </p>
       <p class="font-body text-base leading-relaxed text-lavender-300">
-        Teaching is central to what I do. As AI Architect at
+        Today I serve as AI Architect and co-founder at
         <a
           href="https://www.linkedin.com/company/the-house-of-curiosity"
           target="_blank"
           rel="noopener noreferrer"
           class="text-accent-red hover:text-accent-red/80 transition-colors duration-200 underline decoration-accent-red/30 underline-offset-2 hover:decoration-accent-red/60"
         >The House of Curiosity</a>,
-        Creative Partner at ImagineArt and Caimera, and a contributor to Creativa
-        Magazine Volume 7, I help others discover their own creative voice through
-        AI. My Style DNA methodology treats prompt engineering as a reproducible
-        craft &mdash; giving artists a framework to translate inner vision into
-        language machines can interpret.
+        where I designed the
+        <span class="text-lavender-200 font-medium">7 AI Fluencies</span>
+        curriculum and the
+        <span class="text-lavender-200 font-medium">4D Framework</span>
+        in partnership with Anthropic. As Creative Partner at ImagineArt and
+        Caimera, I bridge the gap between what AI tools can do and what artists
+        actually need. Everything I build is meant to be taught, shared, and
+        improved by others.
       </p>
       <p class="font-body text-base leading-relaxed text-lavender-300">
-        <a
-          href="https://www.linkedin.com/company/the-house-of-curiosity"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="text-accent-red hover:text-accent-red/80 transition-colors duration-200 underline decoration-accent-red/30 underline-offset-2 hover:decoration-accent-red/60"
-        >The House of Curiosity</a>
-        is a home for the endlessly curious &mdash; a space where real people
-        learn openly, explore ideas together, and grow through what we call
-        <span class="text-lavender-200 italic">#TheCuriosityEffect</span>.
-        Through free workshops, a welcoming community, and deeper coaching
-        programs, THC helps creators and builders turn curiosity into craft. It's
-        the philosophy behind everything I teach.
-      </p>
-      <p class="font-body text-base leading-relaxed text-lavender-300">
-        My work has been exhibited internationally &mdash; Dream AI Gallery in New
-        Jersey, Fundaci&oacute;n Nestl&eacute; Barcelona, FNAC Asturias, and Art
-        Innovation Gallery in New York. Each exhibition is a conversation with a
-        new audience, and that's what keeps this practice alive.
+        I work from the Pocono region of Pennsylvania, where I live with my two
+        kids, Noah and Maddie. The quiet out here is good for the work &mdash;
+        every piece still starts with a feeling or a question about what it means
+        to be human, and the images I chase are the ones that create a connection
+        between strangers without a single word.
       </p>
     </div>
   </div>
