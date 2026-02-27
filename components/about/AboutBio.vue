@@ -32,7 +32,7 @@
           rel="noopener noreferrer"
           class="text-accent-red hover:text-accent-red/80 transition-colors duration-200 underline decoration-accent-red/30 underline-offset-2 hover:decoration-accent-red/60"
         >The House of Curiosity</a>,
-        where I designed the
+        where I work with the
         <span class="text-lavender-200 font-medium">7 AI Fluencies</span>
         curriculum and the
         <span class="text-lavender-200 font-medium">4D Framework</span>
