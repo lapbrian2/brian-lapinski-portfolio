@@ -397,11 +397,19 @@ function setupMouseTracking() {
 }
 
 let startTime = 0
+let isVisible = true
+let visibilityObserver: IntersectionObserver | null = null
 
 function animate() {
   if (!renderer || !scene || !camera || !mesh) return
 
-  animationId = requestAnimationFrame(animate)
+  // Only schedule next frame if visible — saves full GPU pipeline when off-screen
+  if (isVisible) {
+    animationId = requestAnimationFrame(animate)
+  } else {
+    animationId = null
+    return
+  }
 
   const elapsed = (performance.now() - startTime) / 1000
 
@@ -416,6 +424,18 @@ function animate() {
   renderer.render(scene, camera)
 }
 
+function startRenderLoop() {
+  if (animationId) return // already running
+  animate()
+}
+
+function stopRenderLoop() {
+  if (animationId) {
+    cancelAnimationFrame(animationId)
+    animationId = null
+  }
+}
+
 onMounted(async () => {
   // Wait for layout to settle before measuring container
   await nextTick()
@@ -423,12 +443,30 @@ onMounted(async () => {
   initScene()
   setupScrollAnimation()
   setupMouseTracking()
+
+  // Observe visibility — pause render loop when aurora is off-screen
+  if (containerRef.value) {
+    visibilityObserver = new IntersectionObserver(
+      ([entry]) => {
+        isVisible = entry.isIntersecting
+        if (isVisible) {
+          startRenderLoop()
+        } else {
+          stopRenderLoop()
+        }
+      },
+      { threshold: 0 },
+    )
+    visibilityObserver.observe(containerRef.value)
+  }
+
   animate()
 })
 
 // Per skill: dispose everything on unmount to prevent memory leaks
 onUnmounted(() => {
-  if (animationId) cancelAnimationFrame(animationId)
+  stopRenderLoop()
+  visibilityObserver?.disconnect()
 
   if (resizeObserver && containerRef.value) {
     resizeObserver.disconnect()
