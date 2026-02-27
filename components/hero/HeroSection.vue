@@ -66,12 +66,12 @@ function startCycle(): void {
   if (cycleStarted || imgEls.value.length < 2) return
   cycleStarted = true
 
-  // Ken Burns on first image — fast zoom to feel alive
-  kenBurnsTween = gsap.to(imgEls.value[0], { scale: 1.1, duration: 2.5, ease: 'none', force3D: true })
+  // Ken Burns on first image — quick zoom to feel alive
+  kenBurnsTween = gsap.to(imgEls.value[0], { scale: 1.08, duration: 1.6, ease: 'none', force3D: true })
 
   const scheduleNext = () => {
     cycleTl = gsap.timeline()
-    cycleTl.call(crossfade, [], '+=2.0')
+    cycleTl.call(crossfade, [], '+=1.0')
   }
 
   const crossfade = () => {
@@ -91,9 +91,9 @@ function startCycle(): void {
       },
     })
 
-    crossfadeTl.to(currentEl, { opacity: 0, duration: 0.6, ease: 'power2.inOut' }, 0)
-    crossfadeTl.to(nextEl, { opacity: 0.55, duration: 0.6, ease: 'power2.inOut' }, 0)
-    crossfadeTl.to(nextEl, { scale: 1.1, duration: 2.5, ease: 'none', force3D: true }, 0)
+    crossfadeTl.to(currentEl, { opacity: 0, duration: 0.5, ease: 'power2.inOut' }, 0)
+    crossfadeTl.to(nextEl, { opacity: 0.55, duration: 0.5, ease: 'power2.inOut' }, 0)
+    crossfadeTl.to(nextEl, { scale: 1.08, duration: 1.6, ease: 'none', force3D: true }, 0)
   }
 
   scheduleNext()
