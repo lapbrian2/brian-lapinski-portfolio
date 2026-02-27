@@ -142,7 +142,7 @@ function onPointerUp() {
   })
 }
 
-function goToCard(index: number) {
+function goToCard(index: number, resumeAfter = true) {
   autoRotate.value = false
   stopAutoRotate()
   const target = -index * angleStep.value
@@ -153,6 +153,7 @@ function goToCard(index: number) {
     overwrite: true,
     onUpdate: applyRotation,
     onComplete: () => {
+      if (!resumeAfter) return
       if (resumeTimer) clearTimeout(resumeTimer)
       resumeTimer = setTimeout(() => {
         resumeTimer = null
@@ -162,6 +163,69 @@ function goToCard(index: number) {
     },
   })
 }
+
+// Keyboard navigation for 3D carousel
+function onCarouselKeydown(e: KeyboardEvent) {
+  const n = count.value
+  if (n === 0) return
+
+  switch (e.key) {
+    case 'ArrowLeft': {
+      e.preventDefault()
+      const prev = (activeIndex.value - 1 + n) % n
+      goToCard(prev, false) // don't resume auto-rotate while keyboard-navigating
+      break
+    }
+    case 'ArrowRight': {
+      e.preventDefault()
+      const next = (activeIndex.value + 1) % n
+      goToCard(next, false)
+      break
+    }
+    case 'Home': {
+      e.preventDefault()
+      goToCard(0, false)
+      break
+    }
+    case 'End': {
+      e.preventDefault()
+      goToCard(n - 1, false)
+      break
+    }
+    case 'Enter':
+    case ' ': {
+      e.preventDefault()
+      openArtwork(activeIndex.value)
+      break
+    }
+  }
+}
+
+// Pause auto-rotation when keyboard focus enters carousel
+function onCarouselFocus() {
+  autoRotate.value = false
+  stopAutoRotate()
+}
+
+// Resume auto-rotation when focus leaves carousel
+function onCarouselBlur(e: FocusEvent) {
+  // Only resume if focus truly leaves the carousel (not moving between carousel children)
+  const related = e.relatedTarget as HTMLElement | null
+  if (sceneEl.value && related && sceneEl.value.contains(related)) return
+  if (resumeTimer) clearTimeout(resumeTimer)
+  resumeTimer = setTimeout(() => {
+    resumeTimer = null
+    autoRotate.value = true
+    startAutoRotate()
+  }, 3000)
+}
+
+// Accessible label for the currently active artwork
+const activeArtworkLabel = computed(() => {
+  const artwork = featured.value[activeIndex.value]
+  if (!artwork) return ''
+  return `${artwork.title} — ${artwork.medium}, ${artwork.year}. Item ${activeIndex.value + 1} of ${count.value}.`
+})
 
 function openArtwork(index: number, e?: MouseEvent) {
   const items = featured.value.map((a) => ({
@@ -256,29 +320,47 @@ onUnmounted(() => {
         The Collection
       </h2>
       <p class="font-body text-sm text-lavender-400 max-w-md mx-auto leading-relaxed">
-        Drag to explore or click any piece to view its full story.
+        Drag to explore, use arrow keys to navigate, or click any piece to view its full story.
       </p>
     </div>
 
-    <!-- Desktop: Draggable 3D Carousel (original) -->
-    <div v-if="!isMobile" class="carousel-wrapper">
+    <!-- Desktop: Draggable 3D Carousel -->
+    <div
+      v-if="!isMobile"
+      class="carousel-wrapper"
+      role="region"
+      aria-roledescription="carousel"
+      aria-label="Featured artworks"
+    >
       <div
         ref="sceneEl"
         class="carousel-scene"
         :style="{ perspective: `${perspective}px` }"
+        tabindex="0"
+        role="group"
+        :aria-label="`Artwork carousel, ${count} items. Use arrow keys to navigate, Enter to view.`"
         @pointerdown="onPointerDown"
         @pointermove="onPointerMove"
         @pointerup="onPointerUp"
         @pointercancel="onPointerUp"
+        @keydown="onCarouselKeydown"
+        @focus="onCarouselFocus"
+        @blur="onCarouselBlur"
       >
         <div
           ref="trackEl"
           class="carousel-track"
+          aria-live="polite"
+          aria-atomic="false"
         >
           <div
             v-for="(artwork, i) in featured"
             :key="artwork.id"
             class="carousel-card"
+            role="group"
+            aria-roledescription="slide"
+            :aria-label="`${artwork.title} — ${artwork.medium}, ${artwork.year}`"
+            :aria-hidden="activeIndex !== i ? 'true' : undefined"
             :style="{
               transform: `rotateY(${i * angleStep}deg) translateZ(${radius}px)`,
             }"
@@ -305,13 +387,20 @@ onUnmounted(() => {
         </div>
       </div>
 
+      <!-- Screen reader live announcement for active card -->
+      <div class="sr-only" aria-live="polite" aria-atomic="true">
+        {{ activeArtworkLabel }}
+      </div>
+
       <!-- Dot indicators -->
-      <div class="flex justify-center gap-1 mt-6 pb-4">
+      <div class="flex justify-center gap-1 mt-6 pb-4" role="tablist" aria-label="Carousel navigation">
         <button
-          v-for="(_, i) in featured"
+          v-for="(artwork, i) in featured"
           :key="i"
+          role="tab"
+          :aria-selected="activeIndex === i"
+          :aria-label="`Go to ${artwork.title}, artwork ${i + 1} of ${count}`"
           class="relative flex items-center justify-center w-8 h-8 -mx-1 group"
-          :aria-label="`Go to artwork ${i + 1}`"
           @click="goToCard(i)"
         >
           <span
@@ -389,6 +478,30 @@ onUnmounted(() => {
 
 .carousel-scene:active {
   cursor: grabbing;
+}
+
+/* Visible focus ring for keyboard users */
+.carousel-scene:focus-visible {
+  outline: 2px solid rgba(237, 84, 77, 0.6);
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+
+.carousel-scene:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Screen reader only */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }
 
 .carousel-track {
