@@ -24,12 +24,14 @@
         @mouseleave="onImageMouseLeave"
         @mousemove="onImageMouseMove"
       >
-        <img
+        <NuxtImg
           :src="artwork.src"
           :alt="artwork.title"
           class="w-full h-auto transition-opacity duration-500"
           :class="imgLoaded ? 'opacity-100' : 'opacity-0'"
           loading="lazy"
+          placeholder
+          sizes="sm:100vw md:55vw"
           style="object-fit: cover;"
           @load="imgLoaded = true"
         />

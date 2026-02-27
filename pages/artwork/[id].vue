@@ -49,11 +49,13 @@
             :class="artwork.aspect === 'wide' ? 'max-w-5xl' : artwork.aspect === 'tall' ? 'max-w-2xl' : 'max-w-3xl'"
             @click="openInLightbox"
           >
-            <img
+            <NuxtImg
               :src="artwork.src"
               :alt="artwork.title"
               class="w-full h-auto rounded-sm transition-transform duration-500 group-hover:scale-[1.01]"
               loading="eager"
+              preload
+              sizes="100vw"
               draggable="false"
             />
             <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors rounded-sm flex items-center justify-center">
@@ -152,11 +154,13 @@
               :to="`/artwork/${related.id}`"
               class="group relative overflow-hidden rounded-sm aspect-square"
             >
-              <img
+              <NuxtImg
                 :src="related.src"
                 :alt="related.title"
                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 loading="lazy"
+                placeholder
+                sizes="sm:50vw md:33vw"
               />
               <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
                 <span class="font-display text-sm font-semibold text-white">{{ related.title }}</span>

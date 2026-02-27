@@ -78,11 +78,13 @@
             @keydown.space.prevent="openLightbox(artwork, $event)"
           >
             <!-- Image -->
-            <img
+            <NuxtImg
               :src="artwork.src"
               :alt="artwork.title"
               class="w-full h-auto block transition-transform duration-500 group-hover:scale-[1.03]"
               loading="lazy"
+              placeholder
+              sizes="sm:100vw md:50vw lg:33vw"
               draggable="false"
             />
 

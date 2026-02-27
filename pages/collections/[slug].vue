@@ -75,12 +75,14 @@
             :to="`/artwork/${artwork.id}`"
             class="group relative overflow-hidden rounded-sm aspect-square bg-dark-800 border border-white/[0.04] hover:border-white/[0.1] transition-all duration-300"
           >
-            <img
+            <NuxtImg
               v-if="artwork.src"
               :src="artwork.src"
               :alt="artwork.title"
               class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               loading="lazy"
+              placeholder
+              sizes="sm:100vw md:50vw lg:33vw"
             />
             <div v-else class="w-full h-full bg-dark-700 flex items-center justify-center">
               <span class="text-lavender-500 font-body text-sm">No image</span>

@@ -62,12 +62,14 @@
         <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
           <!-- Image -->
           <div ref="imageEl" class="relative">
-            <img
+            <NuxtImg
               v-if="product.artworkSrc"
               :src="product.artworkSrc"
               :alt="product.artworkTitle || 'Print'"
               class="w-full h-auto rounded-sm"
               loading="eager"
+              preload
+              sizes="sm:100vw lg:50vw"
               draggable="false"
             />
             <div v-else class="aspect-square bg-dark-700 rounded-sm flex items-center justify-center">
@@ -163,12 +165,14 @@
               :to="`/shop/${related.id}`"
               class="group relative overflow-hidden rounded-sm aspect-square"
             >
-              <img
+              <NuxtImg
                 v-if="related.artworkSrc"
                 :src="related.artworkSrc"
                 :alt="related.artworkTitle || 'Print'"
                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 loading="lazy"
+                placeholder
+                sizes="sm:50vw md:33vw"
               />
               <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
                 <span class="font-display text-sm font-semibold text-white">{{ related.artworkTitle }}</span>

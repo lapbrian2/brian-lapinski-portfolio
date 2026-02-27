@@ -367,11 +367,13 @@ onUnmounted(() => {
             @click.stop="openArtwork(i, $event)"
           >
             <div class="card-inner">
-              <img
+              <NuxtImg
                 :src="artwork.src"
                 :alt="artwork.title"
                 class="card-image"
                 loading="lazy"
+                placeholder
+                sizes="280px"
                 draggable="false"
               />
               <div class="card-overlay">
@@ -426,11 +428,13 @@ onUnmounted(() => {
           @keydown.enter="openArtwork(index)"
           @keydown.space.prevent="openArtwork(index)"
         >
-          <img
+          <NuxtImg
             :src="artwork.src"
             :alt="artwork.title"
             class="absolute inset-0 w-full h-full object-cover"
             loading="lazy"
+            placeholder
+            sizes="75vw"
           />
           <div
             class="absolute inset-x-0 bottom-0 pointer-events-none"
