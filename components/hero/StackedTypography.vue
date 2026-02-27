@@ -205,7 +205,7 @@ onUnmounted(() => {
 
 <style scoped>
 .stacked-type {
-  min-height: 300vh;
+  min-height: 220vh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -228,7 +228,7 @@ onUnmounted(() => {
   width: 100%;
   text-align: center;
   will-change: transform;
-  line-height: 0.85;
+  line-height: 0.9;
 }
 
 .stacked-type__text {
@@ -245,7 +245,7 @@ onUnmounted(() => {
 /* Outlined text — stroke only, transparent fill */
 .stacked-type__text--outlined {
   color: transparent;
-  -webkit-text-stroke: 2px rgba(218, 226, 242, 0.25);
+  -webkit-text-stroke: 2px rgba(218, 226, 242, 0.38);
 }
 
 /* Splitting.js character spans */
