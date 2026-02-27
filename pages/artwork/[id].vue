@@ -31,7 +31,7 @@
       <p class="font-body text-lavender-400 mb-8">The artwork you're looking for doesn't exist or has been removed.</p>
       <NuxtLink
         to="/#work"
-        class="inline-flex items-center gap-2 px-6 py-3 bg-accent-red hover:bg-accent-red-hover text-white text-sm font-medium rounded-lg transition-colors"
+        class="inline-flex items-center gap-2 px-6 py-3 bg-accent-red hover:bg-accent-red-hover text-white text-sm font-medium rounded-sm transition-colors"
       >
         Browse Gallery
       </NuxtLink>
@@ -48,14 +48,12 @@
             :class="artwork.aspect === 'wide' ? 'max-w-5xl' : artwork.aspect === 'tall' ? 'max-w-2xl' : 'max-w-3xl'"
             @click="openInLightbox"
           >
-            <NuxtImg
+            <img
               :src="artwork.src"
               :alt="artwork.title"
-              width="1920"
-              height="1080"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1100px"
               class="w-full h-auto rounded-sm transition-transform duration-500 group-hover:scale-[1.01]"
-              :preload="true"
+              loading="eager"
+              draggable="false"
             />
             <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors rounded-sm flex items-center justify-center">
               <span class="opacity-0 group-hover:opacity-100 transition-opacity text-white/80 font-body text-sm tracking-wider uppercase">
@@ -156,12 +154,9 @@
               :to="`/artwork/${related.id}`"
               class="group relative overflow-hidden rounded-sm aspect-square"
             >
-              <NuxtImg
+              <img
                 :src="related.src"
                 :alt="related.title"
-                width="400"
-                height="400"
-                sizes="(max-width: 768px) 50vw, 33vw"
                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 loading="lazy"
               />

@@ -49,7 +49,7 @@
       <p class="font-body text-lavender-400 mb-8">This print may no longer be available.</p>
       <NuxtLink
         to="/shop"
-        class="inline-flex items-center gap-2 px-6 py-3 bg-accent-red hover:bg-accent-red-hover text-white text-sm font-medium rounded-lg transition-colors"
+        class="inline-flex items-center gap-2 px-6 py-3 bg-accent-red hover:bg-accent-red-hover text-white text-sm font-medium rounded-sm transition-colors"
       >
         Browse Prints
       </NuxtLink>
@@ -61,15 +61,13 @@
         <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
           <!-- Image -->
           <div class="relative">
-            <NuxtImg
+            <img
               v-if="product.artworkSrc"
               :src="product.artworkSrc"
               :alt="product.artworkTitle || 'Print'"
-              width="1200"
-              height="1200"
-              sizes="(max-width: 1024px) 100vw, 50vw"
               class="w-full h-auto rounded-sm"
-              :preload="true"
+              loading="eager"
+              draggable="false"
             />
             <div v-else class="aspect-square bg-dark-700 rounded-sm flex items-center justify-center">
               <span class="text-lavender-500 font-body text-sm">No image available</span>
@@ -164,13 +162,10 @@
               :to="`/shop/${related.id}`"
               class="group relative overflow-hidden rounded-sm aspect-square"
             >
-              <NuxtImg
+              <img
                 v-if="related.artworkSrc"
                 :src="related.artworkSrc"
                 :alt="related.artworkTitle || 'Print'"
-                width="400"
-                height="400"
-                sizes="(max-width: 768px) 50vw, 33vw"
                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 loading="lazy"
               />
@@ -184,6 +179,9 @@
     </template>
 
     <AppFooter />
+    <ClientOnly>
+      <CartDrawer />
+    </ClientOnly>
   </div>
 </template>
 

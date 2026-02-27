@@ -49,13 +49,13 @@
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mt-10">
           <NuxtLink
             to="/shop"
-            class="inline-flex items-center gap-2 px-6 py-3 bg-accent-red hover:bg-accent-red-hover text-white text-sm font-medium rounded-lg transition-colors"
+            class="inline-flex items-center gap-2 px-6 py-3 bg-accent-red hover:bg-accent-red-hover text-white text-sm font-medium rounded-sm transition-colors"
           >
             Continue Browsing
           </NuxtLink>
           <NuxtLink
             to="/"
-            class="inline-flex items-center gap-2 px-6 py-3 border border-white/[0.08] text-lavender-300 hover:text-white hover:border-white/[0.15] text-sm font-medium rounded-lg transition-colors"
+            class="inline-flex items-center gap-2 px-6 py-3 border border-white/[0.08] text-lavender-300 hover:text-white hover:border-white/[0.15] text-sm font-medium rounded-sm transition-colors"
           >
             Return Home
           </NuxtLink>

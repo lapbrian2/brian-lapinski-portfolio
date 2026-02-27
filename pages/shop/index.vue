@@ -64,14 +64,14 @@
       <p class="font-body text-lavender-400 mb-8">Check back soon for new releases.</p>
       <NuxtLink
         to="/#work"
-        class="inline-flex items-center gap-2 px-6 py-3 bg-accent-red hover:bg-accent-red-hover text-white text-sm font-medium rounded-lg transition-colors"
+        class="inline-flex items-center gap-2 px-6 py-3 bg-accent-red hover:bg-accent-red-hover text-white text-sm font-medium rounded-sm transition-colors"
       >
         Browse Gallery
       </NuxtLink>
     </div>
 
     <!-- Products Grid -->
-    <section v-else class="pb-24 px-6 md:px-12">
+    <section v-else ref="gridEl" class="pb-24 px-6 md:px-12">
       <div class="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <NuxtLink
           v-for="product in products"
@@ -81,13 +81,10 @@
         >
           <!-- Image -->
           <div class="aspect-square overflow-hidden">
-            <NuxtImg
+            <img
               v-if="product.artworkSrc"
               :src="product.artworkSrc"
               :alt="product.artworkTitle || 'Print'"
-              width="600"
-              height="600"
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
               class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               loading="lazy"
             />
@@ -113,10 +110,15 @@
     </section>
 
     <AppFooter />
+    <ClientOnly>
+      <CartDrawer />
+    </ClientOnly>
   </div>
 </template>
 
 <script setup lang="ts">
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import type { PrintProduct } from '~/types/shop'
 import { formatPrice } from '~/types/shop'
 
@@ -129,11 +131,59 @@ const { data: productsData, pending } = useFetch<{ data: PrintProduct[] }>('/api
 const products = computed(() => productsData.value?.data ?? [])
 
 const heroEl = ref<HTMLElement | null>(null)
+const gridEl = ref<HTMLElement | null>(null)
+let ctx: gsap.Context | null = null
 
 function lowestPrice(product: PrintProduct): number | null {
   if (!product.variants || product.variants.length === 0) return null
   return Math.min(...product.variants.filter(v => v.active).map(v => v.price))
 }
+
+// Entrance animations
+onMounted(() => {
+  if (typeof window === 'undefined') return
+  gsap.registerPlugin(ScrollTrigger)
+
+  ctx = gsap.context(() => {
+    // Hero stagger reveal
+    if (heroEl.value) {
+      gsap.from(heroEl.value.children, {
+        y: 40,
+        opacity: 0,
+        duration: 0.8,
+        stagger: 0.15,
+        ease: 'power3.out',
+        delay: 0.2,
+      })
+    }
+
+    // Grid cards stagger on scroll
+    if (gridEl.value) {
+      const cards = gridEl.value.querySelectorAll('a')
+      if (cards.length) {
+        gsap.set(cards, { y: 30, opacity: 0 })
+        ScrollTrigger.create({
+          trigger: gridEl.value,
+          start: 'top 85%',
+          once: true,
+          onEnter: () => {
+            gsap.to(cards, {
+              y: 0,
+              opacity: 1,
+              duration: 0.6,
+              stagger: 0.1,
+              ease: 'power3.out',
+            })
+          },
+        })
+      }
+    }
+  })
+})
+
+onUnmounted(() => {
+  ctx?.revert()
+})
 
 useHead({
   title: 'Print Shop | Brian Lapinski',

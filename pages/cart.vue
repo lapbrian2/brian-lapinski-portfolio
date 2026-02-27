@@ -21,7 +21,7 @@
     </header>
 
     <section class="pt-32 pb-24 px-6 md:px-12">
-      <div class="max-w-4xl mx-auto">
+      <div ref="contentEl" class="max-w-4xl mx-auto">
         <h1 class="font-display text-3xl md:text-4xl font-bold text-lavender-100 mb-12 text-center">
           Your Cart
         </h1>
@@ -35,7 +35,7 @@
           <p class="font-body text-lg text-lavender-400 mb-8">Your cart is empty.</p>
           <NuxtLink
             to="/shop"
-            class="inline-flex items-center gap-2 px-6 py-3 bg-accent-red hover:bg-accent-red-hover text-white text-sm font-medium rounded-lg transition-colors"
+            class="inline-flex items-center gap-2 px-6 py-3 bg-accent-red hover:bg-accent-red-hover text-white text-sm font-medium rounded-sm transition-colors"
           >
             Browse Prints
           </NuxtLink>
@@ -51,12 +51,10 @@
             >
               <!-- Thumbnail -->
               <NuxtLink :to="`/shop/${item.productId}`" class="shrink-0">
-                <NuxtImg
+                <img
                   v-if="item.artworkSrc"
                   :src="item.artworkSrc"
                   :alt="item.artworkTitle"
-                  width="120"
-                  height="120"
                   class="w-20 h-20 md:w-24 md:h-24 object-cover rounded-sm"
                   loading="lazy"
                 />
@@ -145,13 +143,29 @@
 </template>
 
 <script setup lang="ts">
+import gsap from 'gsap'
 import { formatPrice } from '~/types/shop'
 
 definePageMeta({ layout: false })
 
 const cart = useCart()
+const contentEl = ref<HTMLElement | null>(null)
 const checkoutLoading = ref(false)
 const checkoutError = ref('')
+
+// Entrance animation
+onMounted(() => {
+  if (contentEl.value) {
+    gsap.from(contentEl.value.children, {
+      y: 30,
+      opacity: 0,
+      duration: 0.7,
+      stagger: 0.1,
+      ease: 'power3.out',
+      delay: 0.15,
+    })
+  }
+})
 
 async function handleCheckout() {
   checkoutLoading.value = true

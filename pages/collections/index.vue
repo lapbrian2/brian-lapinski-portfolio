@@ -22,7 +22,7 @@
 
     <!-- Hero -->
     <section class="pt-32 pb-12 px-6 md:px-12">
-      <div class="max-w-5xl mx-auto text-center">
+      <div ref="heroEl" class="max-w-5xl mx-auto text-center">
         <p class="font-body text-xs uppercase tracking-[0.3em] text-accent-red mb-4">
           Curated Groupings
         </p>
@@ -46,14 +46,14 @@
       <p class="font-body text-lavender-400 mb-8">Check back soon for curated groupings of artwork.</p>
       <NuxtLink
         to="/#work"
-        class="inline-flex items-center gap-2 px-6 py-3 bg-accent-red hover:bg-accent-red-hover text-white text-sm font-medium rounded-lg transition-colors"
+        class="inline-flex items-center gap-2 px-6 py-3 bg-accent-red hover:bg-accent-red-hover text-white text-sm font-medium rounded-sm transition-colors"
       >
         Browse Gallery
       </NuxtLink>
     </div>
 
     <!-- Collections Grid -->
-    <section v-else class="pb-24 px-6 md:px-12">
+    <section v-else ref="gridEl" class="pb-24 px-6 md:px-12">
       <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <NuxtLink
           v-for="collection in collections"
@@ -63,13 +63,10 @@
         >
           <!-- Cover Image -->
           <div class="aspect-[4/3] overflow-hidden">
-            <NuxtImg
+            <img
               v-if="collection.coverImage"
               :src="collection.coverImage"
               :alt="collection.title"
-              width="600"
-              height="450"
-              sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
               class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               loading="lazy"
             />
@@ -102,6 +99,9 @@
 </template>
 
 <script setup lang="ts">
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+
 interface Collection {
   id: number
   title: string
@@ -117,6 +117,54 @@ definePageMeta({ layout: false })
 const { data: collectionsData, pending } = useFetch<{ data: Collection[] }>('/api/collections')
 
 const collections = computed(() => collectionsData.value?.data ?? [])
+
+const heroEl = ref<HTMLElement | null>(null)
+const gridEl = ref<HTMLElement | null>(null)
+let ctx: gsap.Context | null = null
+
+// Entrance animations
+onMounted(() => {
+  if (typeof window === 'undefined') return
+  gsap.registerPlugin(ScrollTrigger)
+
+  ctx = gsap.context(() => {
+    if (heroEl.value) {
+      gsap.from(heroEl.value.children, {
+        y: 40,
+        opacity: 0,
+        duration: 0.8,
+        stagger: 0.15,
+        ease: 'power3.out',
+        delay: 0.2,
+      })
+    }
+
+    if (gridEl.value) {
+      const cards = gridEl.value.querySelectorAll('a')
+      if (cards.length) {
+        gsap.set(cards, { y: 30, opacity: 0 })
+        ScrollTrigger.create({
+          trigger: gridEl.value,
+          start: 'top 85%',
+          once: true,
+          onEnter: () => {
+            gsap.to(cards, {
+              y: 0,
+              opacity: 1,
+              duration: 0.6,
+              stagger: 0.1,
+              ease: 'power3.out',
+            })
+          },
+        })
+      }
+    }
+  })
+})
+
+onUnmounted(() => {
+  ctx?.revert()
+})
 
 useHead({
   title: 'Collections | Brian Lapinski',

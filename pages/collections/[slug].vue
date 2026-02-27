@@ -31,7 +31,7 @@
       <p class="font-body text-lavender-400 mb-8">The collection you're looking for doesn't exist or has been removed.</p>
       <NuxtLink
         to="/collections"
-        class="inline-flex items-center gap-2 px-6 py-3 bg-accent-red hover:bg-accent-red-hover text-white text-sm font-medium rounded-lg transition-colors"
+        class="inline-flex items-center gap-2 px-6 py-3 bg-accent-red hover:bg-accent-red-hover text-white text-sm font-medium rounded-sm transition-colors"
       >
         Browse Collections
       </NuxtLink>
@@ -41,7 +41,7 @@
     <template v-else>
       <!-- Hero -->
       <section class="pt-32 pb-12 px-6 md:px-12">
-        <div class="max-w-5xl mx-auto text-center">
+        <div ref="heroEl" class="max-w-5xl mx-auto text-center">
           <p class="font-body text-xs uppercase tracking-[0.3em] text-accent-red mb-4">
             {{ artworks.length }} {{ artworks.length === 1 ? 'Work' : 'Works' }}
           </p>
@@ -59,14 +59,14 @@
         <p class="font-body text-lavender-400 mb-8">This collection has no artworks yet.</p>
         <NuxtLink
           to="/collections"
-          class="inline-flex items-center gap-2 px-6 py-3 bg-accent-red hover:bg-accent-red-hover text-white text-sm font-medium rounded-lg transition-colors"
+          class="inline-flex items-center gap-2 px-6 py-3 bg-accent-red hover:bg-accent-red-hover text-white text-sm font-medium rounded-sm transition-colors"
         >
           Browse Collections
         </NuxtLink>
       </div>
 
       <!-- Artwork Grid -->
-      <section v-else class="pb-24 px-6 md:px-12">
+      <section v-else ref="gridEl" class="pb-24 px-6 md:px-12">
         <div class="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <NuxtLink
             v-for="artwork in artworks"
@@ -74,13 +74,10 @@
             :to="`/artwork/${artwork.id}`"
             class="group relative overflow-hidden rounded-sm aspect-square bg-dark-800 border border-white/[0.04] hover:border-white/[0.1] transition-all duration-300"
           >
-            <NuxtImg
+            <img
               v-if="artwork.src"
               :src="artwork.src"
               :alt="artwork.title"
-              width="600"
-              height="600"
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
               class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               loading="lazy"
             />
@@ -101,10 +98,14 @@
     </template>
 
     <AppFooter />
+    <GalleryLightbox />
   </div>
 </template>
 
 <script setup lang="ts">
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+
 interface CollectionArtwork {
   id: string
   title: string
@@ -144,6 +145,54 @@ const collection = computed<CollectionDetail | null>(() => {
 })
 
 const artworks = computed(() => collection.value?.artworks ?? [])
+
+const heroEl = ref<HTMLElement | null>(null)
+const gridEl = ref<HTMLElement | null>(null)
+let ctx: gsap.Context | null = null
+
+// Entrance animations
+onMounted(() => {
+  if (typeof window === 'undefined') return
+  gsap.registerPlugin(ScrollTrigger)
+
+  ctx = gsap.context(() => {
+    if (heroEl.value) {
+      gsap.from(heroEl.value.children, {
+        y: 40,
+        opacity: 0,
+        duration: 0.8,
+        stagger: 0.15,
+        ease: 'power3.out',
+        delay: 0.2,
+      })
+    }
+
+    if (gridEl.value) {
+      const cards = gridEl.value.querySelectorAll('a')
+      if (cards.length) {
+        gsap.set(cards, { y: 30, opacity: 0 })
+        ScrollTrigger.create({
+          trigger: gridEl.value,
+          start: 'top 85%',
+          once: true,
+          onEnter: () => {
+            gsap.to(cards, {
+              y: 0,
+              opacity: 1,
+              duration: 0.6,
+              stagger: 0.1,
+              ease: 'power3.out',
+            })
+          },
+        })
+      }
+    }
+  })
+})
+
+onUnmounted(() => {
+  ctx?.revert()
+})
 
 // SEO
 const config = useRuntimeConfig()
