@@ -87,57 +87,44 @@ onMounted(async () => {
         return
       }
 
-      // Desktop: scroll-scrubbed clip-path curtain reveal
+      // Desktop: one-shot clip-path reveal + subtle parallax
 
       // Initial state: fully clipped from bottom
       gsap.set(curtain, { clipPath: 'inset(100% 0 0 0)' })
       if (text) gsap.set(text, { opacity: 0, y: 30 })
       if (titleChars.length) gsap.set(titleChars, { opacity: 0, y: 20, rotateX: -40 })
 
-      // Clip-path reveal — scrubbed as frame scrolls into view
-      gsap.to(curtain, {
-        clipPath: 'inset(0% 0 0 0)',
-        ease: 'none',
-        force3D: true,
-        scrollTrigger: {
-          trigger: frame,
-          start: 'top 85%',
-          end: 'top 15%',
-          scrub: 0.6,
-        },
-      })
-
-      // Inner image parallax — image drifts slower than clip reveal
-      // creating a "window opening onto a scene" effect
-      if (img) {
-        gsap.fromTo(
-          img,
-          { yPercent: -8 },
-          {
-            yPercent: 8,
-            ease: 'none',
-            force3D: true,
-            scrollTrigger: {
-              trigger: frame,
-              start: 'top bottom',
-              end: 'bottom top',
-              scrub: true,
+      // Clip-path reveal — one-shot trigger replaces per-frame scrub
+      // (clip-path scrub causes full repaints every scroll frame)
+      ScrollTrigger.create({
+        trigger: frame,
+        start: 'top 75%',
+        once: true,
+        onEnter: () => {
+          gsap.to(curtain, {
+            clipPath: 'inset(0% 0 0 0)',
+            duration: 1.4,
+            ease: 'power2.inOut',
+            onComplete: () => {
+              gsap.set(curtain, { clearProps: 'clipPath,willChange' })
             },
-          },
-        )
-      }
+          })
 
-      // Text container slides into view
-      if (text) {
-        ScrollTrigger.create({
-          trigger: frame,
-          start: 'top 35%',
-          once: true,
-          onEnter: () => {
+          // Inner image parallax — gentle CSS-driven scale instead of per-frame scrub
+          if (img) {
+            gsap.fromTo(img,
+              { scale: 1.08 },
+              { scale: 1, duration: 1.8, ease: 'power2.out' },
+            )
+          }
+
+          // Text container slides into view with delay
+          if (text) {
             gsap.to(text, {
               opacity: 1,
               y: 0,
               duration: 0.6,
+              delay: 0.6,
               ease: 'power3.out',
             })
 
@@ -149,7 +136,7 @@ onMounted(async () => {
                 rotateX: 0,
                 duration: 0.7,
                 stagger: { each: 0.025, from: 'start' },
-                delay: 0.15,
+                delay: 0.75,
                 ease: 'power4.out',
                 force3D: true,
                 onComplete() {
@@ -159,9 +146,9 @@ onMounted(async () => {
                 },
               })
             }
-          },
-        })
-      }
+          }
+        },
+      })
     })
   }, sectionEl.value)
 })
@@ -220,19 +207,12 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-.cinematic-reveal__curtain {
-  will-change: clip-path;
-}
-
 .cinematic-reveal__img {
-  /* Oversized for parallax headroom — image is 120% with 10% bleed on all sides.
-     max-width: none overrides Tailwind's img reset (max-width: 100%) which
-     would otherwise cap the image at the container width. */
-  inset: -10%;
-  width: 120%;
-  height: 120%;
+  /* Fill container fully — max-width: none overrides Tailwind's img reset */
+  inset: 0;
+  width: 100%;
+  height: 100%;
   max-width: none;
-  will-change: transform;
 }
 
 :deep(.char) {

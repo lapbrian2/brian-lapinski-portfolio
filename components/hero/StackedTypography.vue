@@ -144,27 +144,26 @@ onMounted(async () => {
       },
     })
 
-    // Parallax scrub: each line scrolls at a different speed via yPercent
+    // Parallax scrub: single timeline moves all lines at different speeds
+    // (consolidates 5 separate ScrollTrigger instances into 1)
+    const parallaxTl = gsap.timeline({
+      scrollTrigger: {
+        trigger: sectionEl.value!,
+        start: 'top bottom',
+        end: 'bottom top',
+        scrub: 0.8,
+      },
+    })
+
     lines.forEach((line, i) => {
       const el = lineElements[i]
       if (!el) return
-
       const yDistance = (line.speed - 1) * 100
-
-      gsap.fromTo(
+      parallaxTl.fromTo(
         el,
         { yPercent: -yDistance * 0.5 },
-        {
-          yPercent: yDistance * 0.5,
-          ease: 'none',
-          force3D: true,
-          scrollTrigger: {
-            trigger: sectionEl.value!,
-            start: 'top bottom',
-            end: 'bottom top',
-            scrub: 0.8,
-          },
-        },
+        { yPercent: yDistance * 0.5, ease: 'none', force3D: true },
+        0, // all lines animate in parallel within the same timeline
       )
     })
   }, sectionEl.value)
@@ -227,7 +226,6 @@ onUnmounted(() => {
 .stacked-type__line {
   width: 100%;
   text-align: center;
-  will-change: transform;
   line-height: 0.9;
 }
 

@@ -147,7 +147,7 @@ onMounted(() => {
     const imageDir = props.side === 'left' ? -60 : 60
     const textDir = props.side === 'left' ? 30 : -30
 
-    // Image slides in from its side
+    // Image slides in from its side (one-shot, no continuous scrub)
     if (imageWrapEl.value) {
       gsap.set(imageWrapEl.value, { x: imageDir, opacity: 0 })
       ScrollTrigger.create({
@@ -160,27 +160,12 @@ onMounted(() => {
             duration: 0.8,
             ease: 'power3.out',
             force3D: true,
+            onComplete() {
+              gsap.set(this.targets()[0], { clearProps: 'transform,willChange,force3D' })
+            },
           })
         },
       })
-
-      // Continuous scroll parallax on the image itself
-      const img = imageWrapEl.value.querySelector('img')
-      if (img) {
-        gsap.fromTo(img,
-          { y: '-5%' },
-          {
-            y: '5%',
-            ease: 'none',
-            scrollTrigger: {
-              trigger: imageWrapEl.value,
-              start: 'top bottom',
-              end: 'bottom top',
-              scrub: true,
-            },
-          }
-        )
-      }
     }
 
     // Text children stagger from opposite side

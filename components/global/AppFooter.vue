@@ -204,16 +204,19 @@ onMounted(() => {
       })
     }
 
-    // Watermark parallax
+    // Watermark subtle rise — one-shot instead of continuous scrub
     if (watermarkEl.value) {
-      gsap.to(watermarkEl.value, {
-        y: -30,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: footerEl.value!,
-          start: 'top bottom',
-          end: 'bottom bottom',
-          scrub: true,
+      gsap.set(watermarkEl.value, { y: 20 })
+      ScrollTrigger.create({
+        trigger: footerEl.value!,
+        start: 'top 90%',
+        once: true,
+        onEnter: () => {
+          gsap.to(watermarkEl.value!, {
+            y: -15,
+            duration: 1.5,
+            ease: 'power2.out',
+          })
         },
       })
     }

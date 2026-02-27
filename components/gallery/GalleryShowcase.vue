@@ -72,18 +72,27 @@ onMounted(() => {
       yTo = gsap.quickTo(imageEl.value!, 'y', { duration: 0.8, ease: 'power2.out' })
     }
 
-    // Text elements reveal as section enters viewport
+    // Text elements reveal — one-shot trigger instead of scrub
     const textChildren = textEl.value!.children
-    gsap.fromTo(textChildren, { x: -40, opacity: 0 }, {
-      x: 0,
-      opacity: 1,
-      stagger: 0.08,
-      ease: 'none',
-      scrollTrigger: {
-        trigger: sectionEl.value!,
-        start: 'top 70%',
-        end: 'top 20%',
-        scrub: 1,
+    gsap.set(textChildren, { x: -40, opacity: 0 })
+    ScrollTrigger.create({
+      trigger: sectionEl.value!,
+      start: 'top 60%',
+      once: true,
+      onEnter: () => {
+        gsap.to(textChildren, {
+          x: 0,
+          opacity: 1,
+          stagger: 0.1,
+          duration: 0.7,
+          ease: 'power3.out',
+          force3D: true,
+          onComplete() {
+            this.targets().forEach((el: HTMLElement) =>
+              gsap.set(el, { clearProps: 'transform,willChange,force3D' }),
+            )
+          },
+        })
       },
     })
   }, sectionEl.value)

@@ -18,8 +18,9 @@ export default defineNuxtPlugin(() => {
     lenis.raf(time * 1000)
   })
 
-  // Disable GSAP lag smoothing for buttery Lenis sync
-  gsap.ticker.lagSmoothing(0)
+  // Re-enable GSAP lag smoothing with reasonable threshold
+  // lagSmoothing(0) disabled all protection, causing CPU spikes on heavy scroll
+  gsap.ticker.lagSmoothing(500, 33)
 
   // Refresh ScrollTrigger after Lenis initializes
   ScrollTrigger.refresh()
