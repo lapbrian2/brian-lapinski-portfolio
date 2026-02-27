@@ -39,7 +39,8 @@
     </header>
 
     <!-- Loading -->
-    <div v-if="pending" class="flex items-center justify-center pt-40 pb-20">
+    <div v-if="pending" class="flex flex-col items-center justify-center pt-40 pb-20 gap-4">
+      <div class="loading-dots"><span /><span /><span /></div>
       <div class="text-lavender-400 font-body text-sm">Loading product...</div>
     </div>
 
@@ -60,7 +61,7 @@
       <section class="pt-32 pb-16 px-6 md:px-12">
         <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
           <!-- Image -->
-          <div class="relative">
+          <div ref="imageEl" class="relative">
             <img
               v-if="product.artworkSrc"
               :src="product.artworkSrc"
@@ -75,7 +76,7 @@
           </div>
 
           <!-- Details -->
-          <div class="flex flex-col justify-center">
+          <div ref="detailsEl" class="flex flex-col justify-center">
             <p class="font-body text-xs uppercase tracking-[0.3em] text-accent-red mb-3">
               Limited Edition Print
             </p>
@@ -152,7 +153,7 @@
       </section>
 
       <!-- Related Prints -->
-      <section v-if="relatedProducts.length > 0" class="pb-24 px-6 md:px-12">
+      <section v-if="relatedProducts.length > 0" ref="relatedEl" class="pb-24 px-6 md:px-12">
         <div class="max-w-5xl mx-auto">
           <h2 class="font-display text-xl font-semibold text-lavender-100 mb-6 text-center">More Prints</h2>
           <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -186,6 +187,8 @@
 </template>
 
 <script setup lang="ts">
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import type { PrintProduct, PrintVariant, MaterialType } from '~/types/shop'
 import { formatPrice, MATERIALS } from '~/types/shop'
 
@@ -194,6 +197,9 @@ definePageMeta({ layout: false })
 const route = useRoute()
 const cart = useCart()
 const productId = computed(() => route.params.id as string)
+const imageEl = ref<HTMLElement | null>(null)
+const detailsEl = ref<HTMLElement | null>(null)
+const relatedEl = ref<HTMLElement | null>(null)
 
 const { data: productData, pending } = useFetch<{ data: PrintProduct }>(
   () => `/api/shop/products/${productId.value}`,
@@ -230,6 +236,81 @@ const relatedProducts = computed(() => {
   return allProductsData.value.data
     .filter(p => p.id !== product.value!.id && p.active)
     .slice(0, 3)
+})
+
+// GSAP entrance animations
+let ctx: gsap.Context | null = null
+
+onMounted(() => {
+  if (typeof window === 'undefined') return
+  gsap.registerPlugin(ScrollTrigger)
+
+  ctx = gsap.context(() => {
+    // Image: fade + subtle scale
+    if (imageEl.value) {
+      gsap.set(imageEl.value, { opacity: 0, scale: 0.97 })
+      gsap.to(imageEl.value, {
+        opacity: 1,
+        scale: 1,
+        duration: 0.8,
+        delay: 0.2,
+        ease: 'power3.out',
+        force3D: true,
+        onComplete() {
+          gsap.set(this.targets()[0], { clearProps: 'transform,willChange,force3D' })
+        },
+      })
+    }
+
+    // Details: staggered children
+    if (detailsEl.value) {
+      const children = detailsEl.value.children
+      gsap.set(children, { opacity: 0, y: 25 })
+      gsap.to(children, {
+        opacity: 1,
+        y: 0,
+        duration: 0.6,
+        stagger: 0.08,
+        delay: 0.35,
+        ease: 'power3.out',
+        force3D: true,
+        onComplete() {
+          this.targets().forEach((el: HTMLElement) => gsap.set(el, { clearProps: 'transform,willChange,force3D' }))
+        },
+      })
+    }
+
+    // Related prints: stagger on scroll
+    if (relatedEl.value) {
+      const cards = relatedEl.value.querySelectorAll('a')
+      if (cards.length) {
+        gsap.set(cards, { opacity: 0, y: 40, scale: 0.95 })
+        ScrollTrigger.create({
+          trigger: relatedEl.value,
+          start: 'top 85%',
+          once: true,
+          onEnter: () => {
+            gsap.to(cards, {
+              opacity: 1,
+              y: 0,
+              scale: 1,
+              duration: 0.6,
+              stagger: 0.12,
+              ease: 'power3.out',
+              force3D: true,
+              onComplete() {
+                this.targets().forEach((el: HTMLElement) => gsap.set(el, { clearProps: 'transform,willChange,force3D' }))
+              },
+            })
+          },
+        })
+      }
+    }
+  })
+})
+
+onUnmounted(() => {
+  ctx?.revert()
 })
 
 // SEO

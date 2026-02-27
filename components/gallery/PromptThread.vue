@@ -3,6 +3,8 @@
     <div class="max-w-6xl mx-auto relative">
       <!-- Vertical timeline line -->
       <div ref="lineEl" class="thread-line" />
+      <!-- Glowing dot at line leading edge -->
+      <div ref="dotEl" class="thread-glow-dot" />
 
       <!-- Nodes -->
       <PromptThreadNode
@@ -33,6 +35,7 @@ provide('threadLightbox', lightbox)
 
 const threadEl = ref<HTMLElement | null>(null)
 const lineEl = ref<HTMLElement | null>(null)
+const dotEl = ref<HTMLElement | null>(null)
 let ctx: gsap.Context | null = null
 
 onMounted(() => {
@@ -52,6 +55,26 @@ onMounted(() => {
         },
       }
     )
+
+    // Glowing dot follows the leading edge of the line
+    if (dotEl.value) {
+      gsap.fromTo(dotEl.value,
+        { top: '0%', opacity: 0 },
+        {
+          top: '100%',
+          opacity: 1,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: threadEl.value!,
+            start: 'top 80%',
+            end: 'bottom 20%',
+            scrub: 1,
+            onEnter: () => gsap.set(dotEl.value!, { opacity: 1 }),
+            onLeaveBack: () => gsap.set(dotEl.value!, { opacity: 0 }),
+          },
+        }
+      )
+    }
   }, threadEl.value)
 })
 
@@ -76,8 +99,27 @@ onUnmounted(() => { ctx?.revert() })
   transform-origin: top center;
 }
 
+.thread-glow-dot {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-accent-red, #ed544d);
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  z-index: 3;
+  box-shadow:
+    0 0 8px rgba(237, 84, 77, 0.6),
+    0 0 24px rgba(237, 84, 77, 0.25);
+}
+
 @media (max-width: 767px) {
   .thread-line {
+    left: 20px;
+  }
+  .thread-glow-dot {
     left: 20px;
   }
 }

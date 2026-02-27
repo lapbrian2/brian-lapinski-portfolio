@@ -36,7 +36,8 @@
     </section>
 
     <!-- Loading -->
-    <div v-if="pending" class="flex items-center justify-center py-20">
+    <div v-if="pending" class="flex flex-col items-center justify-center py-20 gap-4">
+      <div class="loading-dots"><span /><span /><span /></div>
       <div class="text-lavender-400 font-body text-sm">Loading collections...</div>
     </div>
 
