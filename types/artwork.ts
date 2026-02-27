@@ -1,7 +1,7 @@
 export interface Artwork {
   id: string
   title: string
-  category: 'portraits' | 'landscapes' | 'abstract' | 'surreal'
+  category: 'portraits' | 'landscapes' | 'abstract' | 'surreal' | 'anime' | 'sci-fi'
   medium: string
   description: string
   src: string

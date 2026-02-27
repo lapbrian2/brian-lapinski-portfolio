@@ -21,6 +21,8 @@ export default defineEventHandler(async (event) => {
     { id: 'landscapes', label: 'Landscapes', count: 0 },
     { id: 'abstract', label: 'Abstract', count: 0 },
     { id: 'surreal', label: 'Surreal', count: 0 },
+    { id: 'anime', label: 'Anime', count: 0 },
+    { id: 'sci-fi', label: 'Sci-Fi', count: 0 },
   ]
 
   for (const row of counts) {

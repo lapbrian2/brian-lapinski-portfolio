@@ -85,7 +85,7 @@ onMounted(() => {
         <p class="font-body text-xs uppercase tracking-[0.2em] text-lavender-400/40 mb-4">Explore Categories</p>
         <div class="flex flex-wrap justify-center gap-3">
           <button
-            v-for="cat in ['portraits', 'landscapes', 'abstract', 'surreal']"
+            v-for="cat in ['portraits', 'landscapes', 'abstract', 'surreal', 'anime', 'sci-fi']"
             :key="cat"
             class="btn-press px-4 py-2 rounded-full border border-lavender-400/15 text-lavender-300 font-body text-xs uppercase tracking-wider hover:border-accent-red/30 hover:text-lavender-200 transition-all duration-300"
             @click="clearError({ redirect: `/${cat}` })"

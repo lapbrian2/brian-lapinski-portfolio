@@ -82,7 +82,7 @@ import type { Artwork } from '~/types/artwork'
 definePageMeta({
   layout: false,
   validate(route) {
-    const validCategories = ['portraits', 'landscapes', 'abstract', 'surreal']
+    const validCategories = ['portraits', 'landscapes', 'abstract', 'surreal', 'anime', 'sci-fi']
     return validCategories.includes(route.params.category as string)
   },
 })
@@ -90,7 +90,7 @@ definePageMeta({
 const route = useRoute()
 const category = computed(() => route.params.category as string)
 
-const validCategories = ['portraits', 'landscapes', 'abstract', 'surreal']
+const validCategories = ['portraits', 'landscapes', 'abstract', 'surreal', 'anime', 'sci-fi']
 
 const { artworks } = useArtworks()
 
@@ -101,8 +101,17 @@ const categoryArtworks = computed(() =>
   artworks.value.filter((a: Artwork) => a.category === category.value)
 )
 
+const categoryLabels: Record<string, string> = {
+  portraits: 'Portraits',
+  landscapes: 'Landscapes',
+  abstract: 'Abstract',
+  surreal: 'Surreal',
+  anime: 'Anime',
+  'sci-fi': 'Sci-Fi',
+}
+
 const categoryLabel = computed(() => {
-  return category.value.charAt(0).toUpperCase() + category.value.slice(1)
+  return categoryLabels[category.value] || category.value.charAt(0).toUpperCase() + category.value.slice(1)
 })
 
 const categoryDescriptions: Record<string, string> = {
@@ -110,6 +119,8 @@ const categoryDescriptions: Record<string, string> = {
   landscapes: 'Impossible vistas and liminal spaces where architecture meets atmosphere in dreamlike harmony.',
   abstract: 'Raw emotion rendered in color and form — chaos distilled into visual frequency.',
   surreal: 'Where logic ends and wonder begins — creatures, machines, and visions from the edge of consciousness.',
+  anime: 'Cel-shaded worlds and characters born from Midjourney\'s Niji mode — manga energy meets AI imagination.',
+  'sci-fi': 'Vast alien environments and deep-sea frontiers — photorealistic science fiction at the edge of the known.',
 }
 
 const categoryDescription = computed(() => categoryDescriptions[category.value] || '')
@@ -117,7 +128,7 @@ const categoryDescription = computed(() => categoryDescriptions[category.value] 
 const otherCategories = computed(() => {
   return validCategories.map((id) => ({
     id,
-    label: id.charAt(0).toUpperCase() + id.slice(1),
+    label: categoryLabels[id] || id.charAt(0).toUpperCase() + id.slice(1),
     count: artworks.value.filter((a: Artwork) => a.category === id).length,
   }))
 })

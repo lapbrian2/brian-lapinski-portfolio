@@ -9,7 +9,7 @@ function escapeXml(str: string): string {
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig(event)
   const baseUrl = (config.public.siteUrl as string) || 'https://lapinski.art'
-  const categories = ['portraits', 'landscapes', 'abstract', 'surreal']
+  const categories = ['portraits', 'landscapes', 'abstract', 'surreal', 'anime', 'sci-fi']
   const today = new Date().toISOString().split('T')[0]
 
   // Fetch all artwork IDs for individual artwork pages

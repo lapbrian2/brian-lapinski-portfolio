@@ -8,6 +8,8 @@ export const categories = [
   { id: 'landscapes', label: 'Landscapes' },
   { id: 'abstract', label: 'Abstract' },
   { id: 'surreal', label: 'Surreal' },
+  { id: 'anime', label: 'Anime' },
+  { id: 'sci-fi', label: 'Sci-Fi' },
 ] as const
 
 export const artworks: Artwork[] = [
@@ -291,11 +293,11 @@ export const artworks: Artwork[] = [
     year: 2025,
     dominantColor: '#5a7a8a',
   },
-  // --- Surreal: cyberpunk ---
+  // --- Anime: cyberpunk ---
   {
     id: 'red-shift',
     title: 'Red Shift',
-    category: 'surreal',
+    category: 'anime',
     medium: 'Midjourney',
     description: 'A crimson motorcycle tears through neon streets, rider leaning into impossible speed — velocity rendered as light trails and adrenaline.',
     src: '/images/artworks/red-shift.webp',
@@ -306,7 +308,7 @@ export const artworks: Artwork[] = [
   {
     id: 'night-patrol',
     title: 'Night Patrol',
-    category: 'surreal',
+    category: 'anime',
     medium: 'Midjourney',
     description: 'Helmeted riders crowd a dark alley between towering buildings — urban tension compressed into a single frame.',
     src: '/images/artworks/night-patrol.webp',
@@ -318,7 +320,7 @@ export const artworks: Artwork[] = [
   {
     id: 'the-infiltrator',
     title: 'The Infiltrator',
-    category: 'surreal',
+    category: 'anime',
     medium: 'Midjourney',
     description: 'A black-suited figure moves through industrial corridors, weapon drawn — paranoia and purpose given form.',
     src: '/images/artworks/the-infiltrator.webp',
@@ -329,7 +331,7 @@ export const artworks: Artwork[] = [
   {
     id: 'the-operator',
     title: 'The Operator',
-    category: 'surreal',
+    category: 'anime',
     medium: 'Midjourney',
     description: 'A small figure hunches before a wall of glowing screens in darkness — the weight of omniscience, the loneliness of control.',
     src: '/images/artworks/the-operator.webp',
@@ -338,11 +340,11 @@ export const artworks: Artwork[] = [
     dominantColor: '#2a3a5a',
     featured: true,
   },
-  // --- Surreal: whimsical machines ---
+  // --- Anime: whimsical machines ---
   {
     id: 'the-submersible',
     title: 'The Submersible',
-    category: 'surreal',
+    category: 'anime',
     medium: 'Midjourney',
     description: 'A spherical fish-shaped vessel with a tiny pilot peering out — wonder compressed into a machine, adventure made adorable.',
     src: '/images/artworks/the-submersible.webp',
@@ -354,7 +356,7 @@ export const artworks: Artwork[] = [
   {
     id: 'the-scouts',
     title: 'The Scouts',
-    category: 'surreal',
+    category: 'anime',
     medium: 'Midjourney',
     description: 'A bug-eyed yellow vehicle and its tiny green companion survey the clouds from a cliff edge — exploration at the scale of toys.',
     src: '/images/artworks/the-scouts.webp',
@@ -366,7 +368,7 @@ export const artworks: Artwork[] = [
   {
     id: 'city-of-lights',
     title: 'City of Lights',
-    category: 'surreal',
+    category: 'anime',
     medium: 'Midjourney',
     description: 'A small figure stands atop a building overlooking a vast illuminated metropolis at twilight — the city as organism, witnessed from above.',
     src: '/images/artworks/city-of-lights.webp',
@@ -420,11 +422,11 @@ export const artworks: Artwork[] = [
     year: 2025,
     dominantColor: '#b88a50',
   },
-  // --- Surreal: the abyss ---
+  // --- Sci-Fi: the abyss ---
   {
     id: 'the-deep',
     title: 'The Deep',
-    category: 'surreal',
+    category: 'sci-fi',
     medium: 'Midjourney',
     description: 'A figure stands beneath a massive organic cavern of teal and shadow — the alien rendered as architecture, scale as terror.',
     src: '/images/artworks/the-deep.webp',
@@ -435,7 +437,7 @@ export const artworks: Artwork[] = [
   {
     id: 'bioluminescence',
     title: 'Bioluminescence',
-    category: 'surreal',
+    category: 'sci-fi',
     medium: 'Midjourney',
     description: 'An underwater world glows with scattered lights as a tiny explorer walks its floor — the ocean reimagined as cathedral.',
     src: '/images/artworks/bioluminescence.webp',
@@ -447,7 +449,7 @@ export const artworks: Artwork[] = [
   {
     id: 'leviathan',
     title: 'Leviathan',
-    category: 'surreal',
+    category: 'sci-fi',
     medium: 'Midjourney',
     description: 'A diver with a single light encounters the mouth of something vast and dark — the sublime terror of being small in an enormous world.',
     src: '/images/artworks/leviathan.webp',

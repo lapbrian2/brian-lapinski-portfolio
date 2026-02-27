@@ -12,7 +12,6 @@ const reducedMotion = useReducedMotion()
 let ctx: gsap.Context | null = null
 
 // Identity words + parallax speed multiplier for each line
-// Higher speed = moves faster relative to scroll (more parallax depth)
 const lines = [
   { text: 'AI', speed: 1.6, outlined: false },
   { text: 'Artist', speed: 0.8, outlined: true },
@@ -21,16 +20,18 @@ const lines = [
   { text: 'Visionary', speed: 1.1, outlined: false },
 ]
 
-onMounted(() => {
+onMounted(async () => {
   if (!sectionEl.value || !stackEl.value || !lineEls.value.length) return
 
   // Reduced motion: show everything static, no parallax
   if (reducedMotion.value) return
 
-  ctx = gsap.context(() => {
-    if (isMobile.value) {
-      // Mobile: simple fade-in stagger, no parallax
-      gsap.set(lineEls.value, { opacity: 0, y: 40 })
+  gsap.registerPlugin(ScrollTrigger)
+
+  if (isMobile.value) {
+    // Mobile: fade-in + scale stagger, no character splitting
+    ctx = gsap.context(() => {
+      gsap.set(lineEls.value, { opacity: 0, y: 40, scale: 0.9 })
       ScrollTrigger.create({
         trigger: sectionEl.value!,
         start: 'top 85%',
@@ -39,6 +40,7 @@ onMounted(() => {
           gsap.to(lineEls.value, {
             opacity: 1,
             y: 0,
+            scale: 1,
             duration: 0.8,
             stagger: 0.12,
             ease: 'power3.out',
@@ -46,16 +48,92 @@ onMounted(() => {
           })
         },
       })
+    }, sectionEl.value)
+    return
+  }
+
+  // Desktop: character-level entrance + parallax scrub
+
+  // Dynamically import Splitting.js (same pattern as HeroText.vue)
+  const { default: Splitting } = await import('splitting')
+
+  // Split each word into characters
+  const textEls = lineEls.value.map(el => el.querySelector('.stacked-type__text'))
+  const allCharsPerLine: HTMLElement[][] = []
+
+  textEls.forEach((textEl) => {
+    if (!textEl) {
+      allCharsPerLine.push([])
       return
     }
+    const result = Splitting({ target: textEl, by: 'chars' })
+    allCharsPerLine.push(result[0]?.chars || [])
+  })
 
-    // Desktop: each line scrolls at a different speed via yPercent scrub
+  // Hide all characters initially
+  allCharsPerLine.forEach((chars) => {
+    if (chars.length) gsap.set(chars, { opacity: 0 })
+  })
+
+  ctx = gsap.context(() => {
+    // Scroll-triggered entrance — fires once when section enters viewport
+    ScrollTrigger.create({
+      trigger: sectionEl.value!,
+      start: 'top 75%',
+      once: true,
+      onEnter: () => {
+        const tl = gsap.timeline()
+
+        lines.forEach((line, i) => {
+          const chars = allCharsPerLine[i]
+          if (!chars.length) return
+
+          const lineDelay = i * 0.15
+
+          if (line.outlined) {
+            // Outlined text: slide in horizontally with rotateY
+            // Alternate direction for visual rhythm
+            const fromLeft = i === 1 // "Artist" from left, "Creative" from right
+            gsap.set(chars, {
+              opacity: 0,
+              x: fromLeft ? -30 : 30,
+              rotateY: fromLeft ? 45 : -45,
+            })
+            tl.to(chars, {
+              opacity: 1,
+              x: 0,
+              rotateY: 0,
+              duration: 0.8,
+              stagger: { each: 0.03, from: fromLeft ? 'start' : 'end' },
+              ease: 'power4.out',
+              force3D: true,
+            }, lineDelay)
+          } else {
+            // Filled text: 3D flip from below, staggered from center
+            gsap.set(chars, {
+              opacity: 0,
+              y: 60,
+              rotateX: -90,
+            })
+            tl.to(chars, {
+              opacity: 1,
+              y: 0,
+              rotateX: 0,
+              duration: 0.9,
+              stagger: { each: 0.03, from: 'center' },
+              ease: 'power4.out',
+              force3D: true,
+            }, lineDelay)
+          }
+        })
+      },
+    })
+
+    // Parallax scrub: each line scrolls at a different speed via yPercent
     lines.forEach((line, i) => {
       const el = lineEls.value[i]
       if (!el) return
 
-      // Each line gets a different yPercent range based on its speed multiplier
-      // This creates the parallax depth effect where lines separate as you scroll
       const yDistance = (line.speed - 1) * 100
 
       gsap.fromTo(
@@ -74,22 +152,6 @@ onMounted(() => {
         },
       )
     })
-
-    // Overall section opacity: fade in when entering
-    gsap.fromTo(
-      stackEl.value!,
-      { opacity: 0.3 },
-      {
-        opacity: 1,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: sectionEl.value!,
-          start: 'top 80%',
-          end: 'top 20%',
-          scrub: true,
-        },
-      },
-    )
   }, sectionEl.value)
 })
 
@@ -107,6 +169,7 @@ onUnmounted(() => {
         :ref="(el) => { if (el) lineEls[index] = el as HTMLElement }"
         class="stacked-type__line"
         :aria-label="line.text"
+        style="perspective: 600px"
       >
         <span
           class="stacked-type__text font-display font-bold uppercase leading-none select-none"
@@ -166,6 +229,11 @@ onUnmounted(() => {
 .stacked-type__text--outlined {
   color: transparent;
   -webkit-text-stroke: 2px rgba(218, 226, 242, 0.25);
+}
+
+/* Splitting.js character spans */
+:deep(.char) {
+  display: inline-block;
 }
 
 /* Mobile */
