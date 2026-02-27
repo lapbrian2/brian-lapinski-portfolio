@@ -70,6 +70,15 @@
                 {{ link.label }}
                 <span class="absolute bottom-0 left-0 w-full h-px bg-accent-red/50 origin-left scale-x-0 group-hover/link:scale-x-100 transition-transform duration-300 ease-out" />
               </a>
+              <NuxtLink
+                v-for="page in pageLinks"
+                :key="page.to"
+                :to="page.to"
+                class="footer-link group/link relative font-body text-sm text-lavender-300 hover:text-accent-red transition-colors duration-200 w-fit"
+              >
+                {{ page.label }}
+                <span class="absolute bottom-0 left-0 w-full h-px bg-accent-red/50 origin-left scale-x-0 group-hover/link:scale-x-100 transition-transform duration-300 ease-out" />
+              </NuxtLink>
             </nav>
           </div>
         </div>
@@ -125,6 +134,11 @@ const navLinks = [
   { id: 'about', label: 'About' },
   { id: 'process', label: 'Process' },
   { id: 'contact', label: 'Contact' },
+]
+
+const pageLinks = [
+  { to: '/shop', label: 'Shop' },
+  { to: '/collections', label: 'Collections' },
 ]
 
 const footerEl = ref<HTMLElement | null>(null)

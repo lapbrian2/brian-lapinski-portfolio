@@ -45,6 +45,17 @@
         >
           {{ link.label }}
         </a>
+
+        <!-- Page links (routes, not sections) -->
+        <span class="w-px h-4 bg-lavender-400/20" aria-hidden="true" />
+        <NuxtLink
+          v-for="page in pageLinks"
+          :key="page.to"
+          :to="page.to"
+          class="relative font-body text-sm uppercase tracking-wider transition-colors duration-200 hover-reveal text-lavender-400 hover:text-lavender-200"
+        >
+          {{ page.label }}
+        </NuxtLink>
       </nav>
 
       <!-- Mobile Hamburger Button -->
@@ -102,6 +113,22 @@
             <span class="mobile-link-inner inline-block">{{ link.label }}</span>
           </span>
         </a>
+
+        <!-- Divider -->
+        <span class="w-8 h-px bg-lavender-400/20" aria-hidden="true" />
+
+        <!-- Page links -->
+        <NuxtLink
+          v-for="page in pageLinks"
+          :key="page.to"
+          :to="page.to"
+          class="mobile-link font-display text-4xl font-semibold text-lavender-200 hover:text-accent-red transition-colors duration-200"
+          @click="closeMobileMenu"
+        >
+          <span class="inline-block overflow-hidden">
+            <span class="mobile-link-inner inline-block">{{ page.label }}</span>
+          </span>
+        </NuxtLink>
       </nav>
     </div>
   </header>
@@ -112,6 +139,11 @@ import gsap from 'gsap'
 import { useActiveSection } from '~/composables/useActiveSection'
 
 const { activeSection, sections } = useActiveSection()
+
+const pageLinks = [
+  { to: '/shop', label: 'Shop' },
+  { to: '/collections', label: 'Collections' },
+]
 
 const scrolled = ref(false)
 const navHidden = ref(false)
