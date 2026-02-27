@@ -236,16 +236,16 @@ const fragmentShader = `
     float ribbon2 = snoise(vec3(vUv.x * 2.0 + 5.0, vUv.y * 2.0 - uTime * 0.06, uTime * 0.07 + 3.0));
     float ribbon3 = snoise(vec3(vUv.x * 4.0 + 10.0, vUv.y * 0.8 + uTime * 0.1, uTime * 0.04 + 7.0));
 
-    // Sharp aurora bands — use pow to concentrate brightness into narrow ribbons
-    float band1 = pow(max(0.0, ribbon1), 3.0) * 2.5;
-    float band2 = pow(max(0.0, ribbon2), 3.0) * 1.8;
-    float band3 = pow(max(0.0, ribbon3), 4.0) * 2.0;
+    // Sharp aurora bands — pow concentrates brightness into narrow ribbons
+    float band1 = pow(max(0.0, ribbon1), 3.0) * 1.6;
+    float band2 = pow(max(0.0, ribbon2), 3.0) * 1.1;
+    float band3 = pow(max(0.0, ribbon3), 4.0) * 1.2;
 
     // ── Base: deep dark with subtle violet undertone ──
     vec3 baseColor = mix(dark900, mix(dark800, deepViolet * 0.3, 0.4), gradientY * 0.5 + vDisplacement * 0.4);
 
-    // ── Primary lavender aurora glow — much stronger ──
-    float glowIntensity = smoothstep(-0.3, 0.5, vDisplacement) * 0.7;
+    // ── Primary lavender aurora glow ──
+    float glowIntensity = smoothstep(-0.3, 0.6, vDisplacement) * 0.5;
     vec3 glowColor = mix(lavender400, lavender300, gradientX + sin(uTime * 0.25) * 0.4);
     baseColor = mix(baseColor, glowColor, glowIntensity);
 
@@ -254,33 +254,33 @@ const fragmentShader = `
     vec3 ribbon2Color = mix(lavender300, hotMagenta, 0.4);
     vec3 ribbon3Color = mix(lavender100, accentRed, 0.25 + cos(uTime * 0.12) * 0.15);
 
-    baseColor += ribbon1Color * band1 * 0.5;
-    baseColor += ribbon2Color * band2 * 0.35;
-    baseColor += ribbon3Color * band3 * 0.25;
+    baseColor += ribbon1Color * band1 * 0.35;
+    baseColor += ribbon2Color * band2 * 0.25;
+    baseColor += ribbon3Color * band3 * 0.15;
 
     // ── Bright peaks — hot spots where displacement is strongest ──
-    float peakIntensity = smoothstep(0.3, 1.0, vDisplacement);
+    float peakIntensity = smoothstep(0.4, 1.0, vDisplacement);
     vec3 peakColor = mix(lavender300, lavender100, peakIntensity);
-    baseColor = mix(baseColor, peakColor, peakIntensity * 0.45);
+    baseColor = mix(baseColor, peakColor, peakIntensity * 0.3);
 
     // ── Accent red ember glow on highest peaks ──
-    float emberIntensity = smoothstep(0.7, 1.4, vDisplacement) * 0.35;
+    float emberIntensity = smoothstep(0.7, 1.4, vDisplacement) * 0.25;
     baseColor = mix(baseColor, accentRed, emberIntensity);
 
-    // ── Scroll-driven color evolution: warmer + more saturated as user scrolls ──
-    float warmth = uScrollProgress * 0.25;
-    baseColor += vec3(warmth * 0.4, warmth * 0.08, -warmth * 0.15);
-    // Boost saturation with scroll
+    // ── Scroll-driven color evolution: warmer as user scrolls ──
+    float warmth = uScrollProgress * 0.18;
+    baseColor += vec3(warmth * 0.3, warmth * 0.06, -warmth * 0.1);
+    // Gentle saturation boost with scroll
     float luminance = dot(baseColor, vec3(0.299, 0.587, 0.114));
-    baseColor = mix(vec3(luminance), baseColor, 1.0 + uScrollProgress * 0.3);
+    baseColor = mix(vec3(luminance), baseColor, 1.0 + uScrollProgress * 0.15);
 
     // ── Edge fade — wider visible area, softer fade ──
     float edgeFade = smoothstep(0.0, 0.08, vUv.x) * smoothstep(1.0, 0.92, vUv.x)
                    * smoothstep(0.0, 0.1, vUv.y) * smoothstep(1.0, 0.9, vUv.y);
 
-    // ── Alpha: much higher base, displacement boosts it further ──
-    float displacementBoost = smoothstep(-0.2, 0.8, vDisplacement) * 0.2;
-    float alpha = edgeFade * (0.8 + displacementBoost);
+    // ── Alpha: visible but not overwhelming, displacement adds punch ──
+    float displacementBoost = smoothstep(-0.2, 0.8, vDisplacement) * 0.15;
+    float alpha = edgeFade * (0.65 + displacementBoost);
 
     gl_FragColor = vec4(baseColor, alpha);
   }
@@ -361,7 +361,7 @@ function setupScrollAnimation() {
   // Per skill: GSAP animates proxy, render loop reads proxy
   gsap.to(proxy, {
     scrollProgress: 1,
-    waveAmplitude: 2.0,
+    waveAmplitude: 1.5,
     colorMix: 1,
     ease: 'none',
     scrollTrigger: {
