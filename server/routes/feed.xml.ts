@@ -25,18 +25,29 @@ export default defineEventHandler(async (event) => {
 
   try {
     const db = useDb()
-    rows = await db
-      .select({
-        id: artworks.id,
-        title: artworks.title,
-        description: artworks.description,
-        src: artworks.src,
-        createdAt: artworks.createdAt,
-      })
-      .from(artworks)
-      .where(eq(artworks.published, true))
-      .orderBy(desc(artworks.createdAt))
-      .limit(20)
+    const selectFields = {
+      id: artworks.id,
+      title: artworks.title,
+      description: artworks.description,
+      src: artworks.src,
+      createdAt: artworks.createdAt,
+    }
+
+    try {
+      rows = await db
+        .select(selectFields)
+        .from(artworks)
+        .where(eq(artworks.published, true))
+        .orderBy(desc(artworks.createdAt))
+        .limit(20)
+    } catch {
+      // published column may not exist yet — fall back to all artworks
+      rows = await db
+        .select(selectFields)
+        .from(artworks)
+        .orderBy(desc(artworks.createdAt))
+        .limit(20)
+    }
   } catch {
     rows = []
   }

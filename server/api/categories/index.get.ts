@@ -6,14 +6,26 @@ import { categories as staticCategories } from '~/data/artworks'
 export default defineEventHandler(async (event) => {
   const db = useDb()
 
-  const counts = await db
-    .select({
-      category: artworks.category,
-      count: sql<number>`count(*)`,
-    })
-    .from(artworks)
-    .where(eq(artworks.published, true))
-    .groupBy(artworks.category)
+  let counts: Array<{ category: string; count: number }>
+  try {
+    counts = await db
+      .select({
+        category: artworks.category,
+        count: sql<number>`count(*)`,
+      })
+      .from(artworks)
+      .where(eq(artworks.published, true))
+      .groupBy(artworks.category)
+  } catch {
+    // published column may not exist yet — count all artworks
+    counts = await db
+      .select({
+        category: artworks.category,
+        count: sql<number>`count(*)`,
+      })
+      .from(artworks)
+      .groupBy(artworks.category)
+  }
 
   const total = counts.reduce((sum, c) => sum + c.count, 0)
 

@@ -18,11 +18,18 @@ export default defineEventHandler(async (event) => {
   let collectionRows: Array<{ slug: string; createdAt: string | null }> = []
   try {
     const db = useDb()
-    artworkRows = await db
-      .select({ id: artworks.id, updatedAt: artworks.updatedAt })
-      .from(artworks)
-      .where(eq(artworks.published, true))
-      .orderBy(asc(artworks.sortOrder))
+    try {
+      artworkRows = await db
+        .select({ id: artworks.id, updatedAt: artworks.updatedAt })
+        .from(artworks)
+        .where(eq(artworks.published, true))
+        .orderBy(asc(artworks.sortOrder))
+    } catch {
+      artworkRows = await db
+        .select({ id: artworks.id, updatedAt: artworks.updatedAt })
+        .from(artworks)
+        .orderBy(asc(artworks.sortOrder))
+    }
     collectionRows = await db
       .select({ slug: collections.slug, createdAt: collections.createdAt })
       .from(collections)

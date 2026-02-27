@@ -2,6 +2,18 @@ import { eq, and, asc, inArray, count } from 'drizzle-orm'
 import { artworks, techniques, artworkTechniques, artworkLikes } from '~/server/db/schema'
 import { useDb } from '~/server/db'
 
+// Known artwork IDs that have image files — fallback when published column doesn't exist yet
+const KNOWN_IMAGE_IDS = new Set([
+  'veiled-gaze', 'the-unraveling', 'through-glass', 'the-other-side', 'beneath-the-surface',
+  'half-remembered', 'erosion', 'gilt-veil', 'the-elder', 'the-patriarch', 'the-youth',
+  'the-vanishing', 'signal-fade', 'bloom-and-bone', 'impasto-man', 'silk-valley', 'the-grove',
+  'mountain-veil', 'wind-song', 'the-wanderer', 'blue-architecture', 'luminous-grove',
+  'twisted-sentinels', 'the-canopy', 'red-shift', 'night-patrol', 'the-infiltrator',
+  'the-operator', 'the-submersible', 'the-scouts', 'city-of-lights', 'the-threshold',
+  'golden-passage', 'desert-cathedral', 'the-departure', 'the-deep', 'bioluminescence',
+  'leviathan', 'the-wreckage', 'the-procession', 'the-colonnade',
+])
+
 export default defineEventHandler(async (event) => {
   const db = useDb()
   const query = getQuery(event)
@@ -9,19 +21,37 @@ export default defineEventHandler(async (event) => {
   const withNodes = query.nodes === 'true' // ?nodes=true to include prompt nodes
 
   // Only return published artworks on the public API
+  // Falls back to known image IDs if the published column hasn't been added yet
   let results
-  if (category && category !== 'all') {
-    results = await db
-      .select()
-      .from(artworks)
-      .where(and(eq(artworks.published, true), eq(artworks.category, category)))
-      .orderBy(asc(artworks.sortOrder))
-  } else {
-    results = await db
-      .select()
-      .from(artworks)
-      .where(eq(artworks.published, true))
-      .orderBy(asc(artworks.sortOrder))
+  try {
+    if (category && category !== 'all') {
+      results = await db
+        .select()
+        .from(artworks)
+        .where(and(eq(artworks.published, true), eq(artworks.category, category)))
+        .orderBy(asc(artworks.sortOrder))
+    } else {
+      results = await db
+        .select()
+        .from(artworks)
+        .where(eq(artworks.published, true))
+        .orderBy(asc(artworks.sortOrder))
+    }
+  } catch {
+    // published column may not exist yet — fall back to all artworks filtered by known IDs
+    if (category && category !== 'all') {
+      results = await db
+        .select()
+        .from(artworks)
+        .where(eq(artworks.category, category))
+        .orderBy(asc(artworks.sortOrder))
+    } else {
+      results = await db
+        .select()
+        .from(artworks)
+        .orderBy(asc(artworks.sortOrder))
+    }
+    results = results.filter((a) => KNOWN_IMAGE_IDS.has(a.id))
   }
 
   // Fetch like counts for all artworks
