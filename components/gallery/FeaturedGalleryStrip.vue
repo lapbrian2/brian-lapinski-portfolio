@@ -196,17 +196,39 @@ function openArtwork(index: number, e?: MouseEvent) {
   lightbox.open(items, index, rect)
 }
 
+// Pause carousel when scrolled off-screen to save GPU
+let observer: IntersectionObserver | null = null
+const isVisible = ref(true)
+
 onMounted(() => {
   nextTick(() => {
     applyRotation()
     if (!reducedMotion.value) {
       startAutoRotate()
     }
+
+    // Observe visibility — pause 3D rotation when off-screen
+    if (sceneEl.value) {
+      observer = new IntersectionObserver(
+        ([entry]) => {
+          isVisible.value = entry.isIntersecting
+          if (entry.isIntersecting) {
+            if (autoTween) autoTween.resume()
+            else if (autoRotate.value) startAutoRotate()
+          } else {
+            if (autoTween) autoTween.pause()
+          }
+        },
+        { threshold: 0 },
+      )
+      observer.observe(sceneEl.value)
+    }
   })
 })
 
 onUnmounted(() => {
   stopAutoRotate()
+  observer?.disconnect()
 })
 </script>
 
