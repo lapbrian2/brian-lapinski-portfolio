@@ -207,7 +207,17 @@ import gsap from 'gsap'
 import { useActiveSection } from '~/composables/useActiveSection'
 
 const { activeSection, sections } = useActiveSection()
-const { loggedIn, user } = useUserSession()
+
+// Auth state — gracefully handle missing NUXT_SESSION_PASSWORD
+let loggedIn = ref(false)
+let user = ref<{ id?: string; name?: string; avatar?: string } | null>(null)
+try {
+  const session = useUserSession()
+  loggedIn = session.loggedIn
+  user = session.user
+} catch {
+  // nuxt-auth-utils not configured
+}
 const userMenuOpen = ref(false)
 
 const pageLinks = [
