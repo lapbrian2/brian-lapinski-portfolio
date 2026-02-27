@@ -10,92 +10,160 @@ const reducedMotion = useReducedMotion()
 
 const featured = computed(() => {
   const feat = artworks.value.filter((a) => a.featured)
-  if (feat.length >= 4) return feat.slice(0, 8)
+  if (feat.length >= 4) return feat.slice(0, 12)
   return artworks.value.slice(0, 8)
 })
 
-const activeIndex = ref(0)
-const ringEl = ref<HTMLElement | null>(null)
-const cardEls = ref<HTMLElement[]>([])
+const sceneEl = ref<HTMLElement | null>(null)
+const trackEl = ref<HTMLElement | null>(null)
+const currentAngle = ref(0)
+const isDragging = ref(false)
+const autoRotate = ref(true)
 
-// Geometry: cards arranged in a circle
-const cardAngle = computed(() => 360 / featured.value.length)
+const count = computed(() => featured.value.length)
+const angleStep = computed(() => count.value > 0 ? 360 / count.value : 360)
+
+// Radius — arc between adjacent cards >= cardWidth + gap
 const radius = computed(() => {
-  // Radius = cardWidth / (2 * tan(halfAngle)) — keeps cards from overlapping
-  const cardWidth = 360
-  const theta = (cardAngle.value * Math.PI) / 180
-  return Math.round(cardWidth / (2 * Math.tan(theta / 2)))
+  const n = count.value
+  if (n <= 1) return 300
+  const cardWidth = 280
+  const gap = 40
+  const minRadius = Math.round((n * (cardWidth + gap)) / (2 * Math.PI))
+  return Math.max(300, minRadius)
 })
 
-// Continuous rotation state
-let currentRotation = 0
-let autoRotating = true
-let navigating = false
-let tickerFn: (() => void) | null = null
-const ROTATION_SPEED = 0.15 // degrees per tick ≈ 9°/s ≈ 40s per full revolution
+// Perspective scales with radius so depth effect stays proportional
+const perspective = computed(() => Math.max(1600, radius.value * 2.2))
 
-// Continuous turntable rotation via GSAP ticker
-function tick() {
-  if (!autoRotating || navigating || !ringEl.value) return
-  currentRotation -= ROTATION_SPEED
-  gsap.set(ringEl.value, { rotateY: currentRotation })
+// Active card index based on current rotation
+const activeIndex = computed(() => {
+  if (count.value === 0) return 0
+  const step = angleStep.value
+  const normalized = (((-currentAngle.value % 360) + 360) % 360)
+  return Math.round(normalized / step) % count.value
+})
 
-  // Track which card faces the viewer
-  const normalized = ((-currentRotation % 360) + 360) % 360
-  const idx = Math.round(normalized / cardAngle.value) % featured.value.length
-  if (idx !== activeIndex.value) activeIndex.value = idx
+let dragStartX = 0
+let dragStartAngle = 0
+let autoTween: gsap.core.Tween | null = null
+let resumeTimer: ReturnType<typeof setTimeout> | null = null
+
+// Velocity tracking for momentum flick
+let lastPointerX = 0
+let lastPointerTime = 0
+let velocity = 0
+
+function startAutoRotate() {
+  if (!autoRotate.value || !trackEl.value || count.value === 0) return
+  stopAutoRotate()
+  autoTween = gsap.to(currentAngle, {
+    value: currentAngle.value - 360,
+    duration: 80,
+    ease: 'none',
+    repeat: -1,
+    onUpdate: applyRotation,
+  })
 }
 
-function goTo(index: number) {
-  if (!ringEl.value) return
-  navigating = true
-  activeIndex.value = index
-  const target = -index * cardAngle.value
-  // Shortest-path rotation (maps diff to [-180, 180])
-  const diff = target - currentRotation
-  const shortDiff = ((diff % 360) + 540) % 360 - 180
-  const finalRotation = currentRotation + shortDiff
+function stopAutoRotate() {
+  if (resumeTimer) {
+    clearTimeout(resumeTimer)
+    resumeTimer = null
+  }
+  if (autoTween) {
+    autoTween.kill()
+    autoTween = null
+  }
+}
 
-  gsap.to(ringEl.value, {
-    rotateY: finalRotation,
-    duration: 0.8,
-    ease: 'power2.inOut',
+function applyRotation() {
+  if (!trackEl.value) return
+  trackEl.value.style.transform = `rotateY(${currentAngle.value}deg)`
+}
+
+function onPointerDown(e: PointerEvent) {
+  isDragging.value = true
+  autoRotate.value = false
+  stopAutoRotate()
+  dragStartX = e.clientX
+  dragStartAngle = currentAngle.value
+  lastPointerX = e.clientX
+  lastPointerTime = performance.now()
+  velocity = 0
+  ;(e.target as HTMLElement)?.setPointerCapture?.(e.pointerId)
+}
+
+function onPointerMove(e: PointerEvent) {
+  if (!isDragging.value) return
+
+  const now = performance.now()
+  const dt = now - lastPointerTime
+  if (dt > 0) {
+    velocity = (e.clientX - lastPointerX) / dt
+  }
+  lastPointerX = e.clientX
+  lastPointerTime = now
+
+  const delta = e.clientX - dragStartX
+  const sensitivity = e.pointerType === 'touch' ? 0.45 : 0.3
+  currentAngle.value = dragStartAngle + delta * sensitivity
+  applyRotation()
+}
+
+function onPointerUp() {
+  if (!isDragging.value) return
+  isDragging.value = false
+
+  const step = angleStep.value
+  const nearestSnap = Math.round(currentAngle.value / step) * step
+
+  // Determine flick offset based on velocity
+  const flickThreshold = 0.3
+  const flickCards = Math.abs(velocity) > flickThreshold
+    ? Math.sign(velocity) * Math.ceil(Math.abs(velocity) / flickThreshold)
+    : 0
+
+  const maxFlick = 3
+  const clampedFlick = Math.max(-maxFlick, Math.min(maxFlick, flickCards))
+  const targetAngle = nearestSnap + clampedFlick * step
+  const isFlick = clampedFlick !== 0
+
+  gsap.to(currentAngle, {
+    value: targetAngle,
+    duration: isFlick ? 0.8 : 0.6,
+    ease: 'power3.out',
+    overwrite: true,
+    onUpdate: applyRotation,
     onComplete: () => {
-      currentRotation = finalRotation
-      navigating = false
+      autoRotate.value = true
+      startAutoRotate()
     },
   })
 }
 
-function next() {
-  goTo((activeIndex.value + 1) % featured.value.length)
+function goToCard(index: number) {
+  autoRotate.value = false
+  stopAutoRotate()
+  const target = -index * angleStep.value
+  gsap.to(currentAngle, {
+    value: target,
+    duration: 0.8,
+    ease: 'power3.out',
+    overwrite: true,
+    onUpdate: applyRotation,
+    onComplete: () => {
+      if (resumeTimer) clearTimeout(resumeTimer)
+      resumeTimer = setTimeout(() => {
+        resumeTimer = null
+        autoRotate.value = true
+        startAutoRotate()
+      }, 3000)
+    },
+  })
 }
 
-function prev() {
-  goTo((activeIndex.value - 1 + featured.value.length) % featured.value.length)
-}
-
-function onCardClick(index: number) {
-  if (index === activeIndex.value) {
-    openLightbox(index)
-  } else {
-    goTo(index)
-  }
-}
-
-function openLightbox(index: number) {
-  const card = cardEls.value[index]
-  let rect: SourceRect | null = null
-  if (card) {
-    const domRect = card.getBoundingClientRect()
-    rect = {
-      top: domRect.top,
-      left: domRect.left,
-      width: domRect.width,
-      height: domRect.height,
-      borderRadius: '12px',
-    }
-  }
+function openArtwork(index: number, e?: MouseEvent) {
   const items = featured.value.map((a) => ({
     id: a.id,
     src: a.src,
@@ -109,42 +177,43 @@ function openLightbox(index: number) {
     promptNodes: a.promptNodes,
     likeCount: a.likeCount,
   }))
+
+  let rect: SourceRect | null = null
+  if (e) {
+    const cardInner = (e.currentTarget as HTMLElement)?.querySelector('.card-inner')
+    if (cardInner) {
+      const domRect = cardInner.getBoundingClientRect()
+      rect = {
+        top: domRect.top,
+        left: domRect.left,
+        width: domRect.width,
+        height: domRect.height,
+        borderRadius: '14px',
+      }
+    }
+  }
+
   lightbox.open(items, index, rect)
 }
 
-// Keyboard navigation
-function onKeydown(e: KeyboardEvent) {
-  if (e.key === 'ArrowLeft') { e.preventDefault(); prev() }
-  if (e.key === 'ArrowRight') { e.preventDefault(); next() }
-}
-
-function pauseRotation() {
-  autoRotating = false
-}
-
-function resumeRotation() {
-  autoRotating = true
-}
-
 onMounted(() => {
-  if (reducedMotion.value) return
-  tickerFn = tick
-  gsap.ticker.add(tickerFn)
+  nextTick(() => {
+    applyRotation()
+    if (!reducedMotion.value) {
+      startAutoRotate()
+    }
+  })
 })
 
 onUnmounted(() => {
-  if (tickerFn) gsap.ticker.remove(tickerFn)
+  stopAutoRotate()
 })
 </script>
 
 <template>
   <section
     v-if="featured.length >= 3"
-    class="carousel-section overflow-hidden"
-    @keydown="onKeydown"
-    tabindex="0"
-    @mouseenter="pauseRotation"
-    @mouseleave="resumeRotation"
+    class="carousel-section"
   >
     <!-- Heading -->
     <div class="max-w-7xl mx-auto px-6 md:px-12 pt-12 pb-4 text-center">
@@ -156,97 +225,65 @@ onUnmounted(() => {
       </h2>
     </div>
 
-    <!-- Desktop: Rotating 3D Cylinder Carousel -->
-    <div v-if="!isMobile" class="carousel-viewport relative">
-      <div class="carousel-stage">
+    <!-- Desktop: Draggable 3D Carousel (original) -->
+    <div v-if="!isMobile" class="carousel-wrapper">
+      <div
+        ref="sceneEl"
+        class="carousel-scene"
+        :style="{ perspective: `${perspective}px` }"
+        @pointerdown="onPointerDown"
+        @pointermove="onPointerMove"
+        @pointerup="onPointerUp"
+        @pointercancel="onPointerUp"
+      >
         <div
-          ref="ringEl"
-          class="carousel-ring"
-          :style="{ transform: `translateZ(-${radius}px) rotateY(0deg)` }"
+          ref="trackEl"
+          class="carousel-track"
         >
           <div
-            v-for="(artwork, index) in featured"
+            v-for="(artwork, i) in featured"
             :key="artwork.id"
-            :ref="(el) => { if (el) cardEls[index] = el as HTMLElement }"
-            class="carousel-card group"
-            :class="{ 'is-active': index === activeIndex }"
-            :style="{ transform: `rotateY(${index * cardAngle}deg) translateZ(${radius}px)` }"
-            role="button"
-            :tabindex="index === activeIndex ? 0 : -1"
-            :aria-label="index === activeIndex ? `View ${artwork.title}` : artwork.title"
-            @click="onCardClick(index)"
+            class="carousel-card"
+            :style="{
+              transform: `rotateY(${i * angleStep}deg) translateZ(${radius}px)`,
+            }"
+            @click.stop="openArtwork(i, $event)"
           >
-            <img
-              :src="artwork.src"
-              :alt="artwork.title"
-              class="absolute inset-0 w-full h-full object-cover"
-              loading="lazy"
-              draggable="false"
-            />
-
-            <!-- Bottom overlay -->
-            <div
-              class="absolute inset-x-0 bottom-0 pointer-events-none z-[3]"
-              :style="{
-                background: `linear-gradient(to top, ${artwork.dominantColor || '#000000'}cc 0%, ${artwork.dominantColor || '#000000'}40 50%, transparent 100%)`,
-              }"
-            >
-              <div class="px-5 pt-14 pb-5">
-                <h3 class="font-display text-lg text-lavender-100 leading-tight">
+            <div class="card-inner">
+              <img
+                :src="artwork.src"
+                :alt="artwork.title"
+                class="card-image"
+                loading="lazy"
+                draggable="false"
+              />
+              <div class="card-overlay">
+                <h3 class="font-display text-lg font-semibold text-lavender-100 mb-1">
                   {{ artwork.title }}
                 </h3>
-                <p class="text-xs text-lavender-400 mt-1.5 uppercase tracking-wide">
+                <p class="font-body text-xs text-lavender-400 uppercase tracking-wide">
                   {{ artwork.medium }} &middot; {{ artwork.year }}
                 </p>
               </div>
-            </div>
-
-            <!-- View indicator on active card -->
-            <div
-              v-if="index === activeIndex"
-              class="absolute top-4 right-4 z-[4] opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-            >
-              <span class="w-9 h-9 rounded-full border border-lavender-400/30 flex items-center justify-center text-lavender-300 bg-dark-900/50 backdrop-blur-sm">
-                <svg width="14" height="14" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-                  <line x1="2" y1="10" x2="10" y2="2" />
-                  <polyline points="4 2 10 2 10 8" />
-                </svg>
-              </span>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Navigation arrows -->
-      <button
-        class="carousel-nav carousel-nav--prev"
-        aria-label="Previous artwork"
-        @click="prev"
-      >
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="13 4 7 10 13 16" />
-        </svg>
-      </button>
-      <button
-        class="carousel-nav carousel-nav--next"
-        aria-label="Next artwork"
-        @click="next"
-      >
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="7 4 13 10 7 16" />
-        </svg>
-      </button>
-
       <!-- Dot indicators -->
-      <div class="flex items-center justify-center gap-2 mt-4 pb-4">
+      <div class="flex justify-center gap-1 mt-6 pb-4">
         <button
           v-for="(_, i) in featured"
           :key="i"
-          class="carousel-dot"
-          :class="{ 'is-active': i === activeIndex }"
+          class="relative flex items-center justify-center w-8 h-8 -mx-1 group"
           :aria-label="`Go to artwork ${i + 1}`"
-          @click="goTo(i)"
-        />
+          @click="goToCard(i)"
+        >
+          <span
+            class="block h-2 rounded-full transition-all duration-300"
+            :class="activeIndex === i ? 'bg-accent-red w-6' : 'bg-lavender-400/30 group-hover:bg-lavender-400/50 w-2'"
+          />
+        </button>
       </div>
     </div>
 
@@ -261,9 +298,9 @@ onUnmounted(() => {
           role="button"
           :tabindex="0"
           :aria-label="`View ${artwork.title}`"
-          @click="openLightbox(index)"
-          @keydown.enter="openLightbox(index)"
-          @keydown.space.prevent="openLightbox(index)"
+          @click="openArtwork(index)"
+          @keydown.enter="openArtwork(index)"
+          @keydown.space.prevent="openArtwork(index)"
         >
           <img
             :src="artwork.src"
@@ -294,7 +331,7 @@ onUnmounted(() => {
 
 <style scoped>
 .carousel-section {
-  outline: none;
+  overflow: hidden;
 }
 
 .carousel-heading {
@@ -302,113 +339,87 @@ onUnmounted(() => {
   letter-spacing: -0.03em;
 }
 
-.carousel-viewport {
-  padding: 2rem 0 0;
-}
-
-/* The stage provides perspective for the entire 3D scene */
-.carousel-stage {
+.carousel-wrapper {
   width: 100%;
-  height: clamp(420px, 55vh, 580px);
-  perspective: 1200px;
-  perspective-origin: 50% 50%;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  padding: 2rem 0;
 }
 
-/* The ring is the rotating cylinder — all cards are children */
-.carousel-ring {
+.carousel-scene {
+  width: 100%;
+  height: 520px;
+  overflow: visible;
+  cursor: grab;
+  touch-action: pan-y;
+}
+
+.carousel-scene:active {
+  cursor: grabbing;
+}
+
+.carousel-track {
+  width: 100%;
+  height: 100%;
   position: relative;
-  width: clamp(280px, 24vw, 360px);
-  height: clamp(380px, 48vh, 520px);
+  transform-style: preserve-3d;
+  transform: rotateY(0deg);
+  will-change: transform;
+}
+
+.carousel-card {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 280px;
+  height: 380px;
+  margin-left: -140px;
+  margin-top: -190px;
   transform-style: preserve-3d;
   will-change: transform;
 }
 
-/* Each card sits on the cylinder surface via rotateY + translateZ */
-.carousel-card {
-  position: absolute;
-  inset: 0;
-  border-radius: 12px;
+.card-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 14px;
   overflow: hidden;
+  position: relative;
+  box-shadow:
+    0 25px 50px -12px rgba(0, 0, 0, 0.6),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+  transition: box-shadow 0.3s ease;
   cursor: pointer;
-  backface-visibility: hidden;
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
-  transition: box-shadow 0.4s ease;
 }
 
-.carousel-card.is-active {
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 50px rgba(237, 84, 77, 0.1);
+.card-inner:hover {
+  box-shadow:
+    0 25px 60px -8px rgba(237, 84, 77, 0.25),
+    inset 0 0 0 1px rgba(237, 84, 77, 0.15);
 }
 
-/* Reflection floor effect */
-.carousel-stage::after {
-  content: '';
+.card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  pointer-events: none;
+  user-select: none;
+}
+
+.card-overlay {
   position: absolute;
   bottom: 0;
-  left: 10%;
-  right: 10%;
-  height: 60px;
-  background: radial-gradient(ellipse at 50% 0%, rgba(237, 84, 77, 0.06) 0%, transparent 70%);
-  pointer-events: none;
+  left: 0;
+  right: 0;
+  padding: 1.5rem;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.85), transparent);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-/* Navigation arrows */
-.carousel-nav {
-  position: absolute;
-  top: 50%;
-  transform: translateY(calc(-50% - 1rem));
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  border: 1px solid rgba(201, 210, 231, 0.12);
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(8px);
-  color: rgba(218, 226, 242, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  z-index: 20;
-}
-
-.carousel-nav:hover {
-  border-color: rgba(237, 84, 77, 0.4);
-  color: #ed544d;
-  background: rgba(0, 0, 0, 0.7);
-}
-
-.carousel-nav--prev {
-  left: max(1rem, 4vw);
-}
-
-.carousel-nav--next {
-  right: max(1rem, 4vw);
-}
-
-/* Dot indicators */
-.carousel-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: rgba(201, 210, 231, 0.15);
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  padding: 0;
-}
-
-.carousel-dot:hover {
-  background: rgba(201, 210, 231, 0.3);
-}
-
-.carousel-dot.is-active {
-  background: #ed544d;
-  width: 24px;
-  border-radius: 4px;
+.card-inner:hover .card-overlay {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 /* Mobile scrollbar hide */
@@ -418,5 +429,18 @@ onUnmounted(() => {
 }
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+@media (max-width: 768px) {
+  .carousel-scene {
+    height: 420px;
+  }
+
+  .carousel-card {
+    width: 220px;
+    height: 300px;
+    margin-left: -110px;
+    margin-top: -150px;
+  }
 }
 </style>
