@@ -207,16 +207,26 @@ onMounted(() => {
       startAutoRotate()
     }
 
-    // Observe visibility — pause 3D rotation when off-screen
+    // Observe visibility — pause 3D rotation and release GPU layers when off-screen
     if (sceneEl.value) {
       observer = new IntersectionObserver(
         ([entry]) => {
           isVisible.value = entry.isIntersecting
           if (entry.isIntersecting) {
+            // Restore 3D compositing and resume rotation
+            if (trackEl.value) {
+              trackEl.value.style.visibility = ''
+              trackEl.value.style.willChange = 'transform'
+            }
             if (autoTween) autoTween.resume()
             else if (autoRotate.value) startAutoRotate()
           } else {
+            // Pause rotation and release GPU layers
             if (autoTween) autoTween.pause()
+            if (trackEl.value) {
+              trackEl.value.style.willChange = 'auto'
+              trackEl.value.style.visibility = 'hidden'
+            }
           }
         },
         { threshold: 0 },
@@ -384,7 +394,7 @@ onUnmounted(() => {
   position: relative;
   transform-style: preserve-3d;
   transform: rotateY(0deg);
-  will-change: transform;
+  /* will-change set dynamically via IntersectionObserver */
 }
 
 .carousel-card {
@@ -396,7 +406,6 @@ onUnmounted(() => {
   margin-left: -140px;
   margin-top: -190px;
   transform-style: preserve-3d;
-  will-change: transform;
 }
 
 .card-inner {

@@ -64,6 +64,11 @@ export function useScrollReveal(
             stagger,
             ease,
             force3D: true,
+            onComplete() {
+              // Release compositor layers after reveal completes
+              const t = this.targets()
+              t.forEach((el: HTMLElement) => gsap.set(el, { clearProps: 'willChange,force3D' }))
+            },
           })
         },
       })

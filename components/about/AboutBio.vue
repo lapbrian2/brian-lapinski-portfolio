@@ -84,6 +84,9 @@ onMounted(() => {
             delay: i * 0.1,
             ease: 'power2.out',
             force3D: true,
+            onComplete() {
+              gsap.set(this.targets()[0], { clearProps: 'transform,willChange,force3D' })
+            },
           })
         },
       })

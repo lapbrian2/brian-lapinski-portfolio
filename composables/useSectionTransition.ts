@@ -53,6 +53,9 @@ export function useSectionTransition(
               duration: 0.7,
               ease: 'power2.out',
               force3D: true,
+              onComplete() {
+                gsap.set(this.targets()[0], { clearProps: 'willChange,force3D' })
+              },
             })
           },
         })
@@ -78,6 +81,10 @@ export function useSectionTransition(
             duration: 0.8,
             ease: 'power2.out',
             force3D: true,
+            onComplete() {
+              // Release compositor layer after one-shot reveal
+              gsap.set(this.targets()[0], { clearProps: 'willChange,force3D' })
+            },
           })
         },
       })

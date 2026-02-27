@@ -38,6 +38,9 @@ onMounted(() => {
           duration: 0.8,
           ease: 'power3.out',
           force3D: true,
+          onComplete() {
+            gsap.set(this.targets()[0], { clearProps: 'transform,willChange,force3D' })
+          },
         })
 
         // Stagger the category links
@@ -53,6 +56,9 @@ onMounted(() => {
               delay: 0.3,
               ease: 'power3.out',
               force3D: true,
+              onComplete() {
+                this.targets().forEach((el: HTMLElement) => gsap.set(el, { clearProps: 'transform,willChange,force3D' }))
+              },
             },
           )
         }

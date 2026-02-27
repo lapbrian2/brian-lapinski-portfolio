@@ -126,6 +126,9 @@ onMounted(async () => {
             stagger: { each: 0.03, from: 'center' },
             ease: 'power4.out',
             force3D: true,
+            onComplete() {
+              this.targets().forEach((el: HTMLElement) => gsap.set(el, { clearProps: 'transform,willChange,force3D' }))
+            },
           })
 
           // Subtitle fades in after heading

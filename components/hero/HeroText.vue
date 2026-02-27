@@ -70,7 +70,14 @@ async function playEntrance() {
     const tagResult = Splitting({ target: taglineEl.value!, by: 'words' })
     const words = tagResult[0]?.words || []
 
-    const tl = gsap.timeline({ onComplete: () => emit('entrance-complete') })
+    const tl = gsap.timeline({
+      onComplete: () => {
+        emit('entrance-complete')
+        // Release character/word compositor layers after entrance
+        chars.forEach((el: HTMLElement) => gsap.set(el, { clearProps: 'transform,willChange,force3D' }))
+        words.forEach((el: HTMLElement) => gsap.set(el, { clearProps: 'transform,willChange,filter' }))
+      },
+    })
 
     // Phase 1: Role label fades in
     tl.fromTo(

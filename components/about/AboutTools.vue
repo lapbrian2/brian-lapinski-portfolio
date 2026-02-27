@@ -86,6 +86,9 @@ onMounted(() => {
           stagger: { each: 0.06, from: 'start' },
           ease: 'power3.out',
           force3D: true,
+          onComplete() {
+            this.targets().forEach((el: HTMLElement) => gsap.set(el, { clearProps: 'transform,willChange,force3D' }))
+          },
         })
       },
     })

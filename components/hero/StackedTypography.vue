@@ -52,6 +52,9 @@ onMounted(async () => {
             stagger: 0.12,
             ease: 'power3.out',
             force3D: true,
+            onComplete() {
+              this.targets().forEach((el: HTMLElement) => gsap.set(el, { clearProps: 'willChange,force3D' }))
+            },
           })
         },
       })
@@ -88,7 +91,14 @@ onMounted(async () => {
       start: 'top 75%',
       once: true,
       onEnter: () => {
-        const tl = gsap.timeline()
+        const tl = gsap.timeline({
+          onComplete: () => {
+            // Release character compositor layers after entrance
+            allCharsPerLine.forEach((chars) => {
+              chars.forEach((el) => gsap.set(el, { clearProps: 'transform,willChange,force3D' }))
+            })
+          },
+        })
 
         lines.forEach((line, i) => {
           const chars = allCharsPerLine[i]
@@ -98,7 +108,6 @@ onMounted(async () => {
 
           if (line.outlined) {
             // Outlined text: slide in horizontally with rotateY
-            // Alternate direction for visual rhythm
             const fromLeft = i === 1 // "Artist" from left, "Creative" from right
             gsap.set(chars, {
               opacity: 0,

@@ -83,6 +83,9 @@ onMounted(async () => {
             duration: 0.7,
             stagger: 0.1,
             ease: 'power3.out',
+            onComplete() {
+              this.targets().forEach((el: HTMLElement) => gsap.set(el, { clearProps: 'transform,willChange' }))
+            },
           })
           // Animated counter count-up for each stat
           stats.forEach((stat, i) => {
@@ -112,6 +115,9 @@ onMounted(async () => {
             duration: 0.6,
             stagger: 0.08,
             ease: 'power2.out',
+            onComplete() {
+              this.targets().forEach((el: HTMLElement) => gsap.set(el, { clearProps: 'transform,willChange' }))
+            },
           })
         },
       })
@@ -125,7 +131,10 @@ onMounted(async () => {
         start: 'top 85%',
         once: true,
         onEnter: () => {
-          gsap.to(bioCol.value, { opacity: 1, x: 0, duration: 0.8, ease: 'power2.out' })
+          gsap.to(bioCol.value, {
+            opacity: 1, x: 0, duration: 0.8, ease: 'power2.out',
+            onComplete() { gsap.set(this.targets()[0], { clearProps: 'transform,willChange' }) },
+          })
         },
       })
     }
@@ -137,7 +146,10 @@ onMounted(async () => {
         start: 'top 85%',
         once: true,
         onEnter: () => {
-          gsap.to(toolsCol.value, { opacity: 1, x: 0, duration: 0.8, delay: 0.2, ease: 'power2.out' })
+          gsap.to(toolsCol.value, {
+            opacity: 1, x: 0, duration: 0.8, delay: 0.2, ease: 'power2.out',
+            onComplete() { gsap.set(this.targets()[0], { clearProps: 'transform,willChange' }) },
+          })
         },
       })
     }
@@ -155,6 +167,7 @@ onMounted(async () => {
             y: 0,
             duration: 0.8,
             ease: 'power2.out',
+            onComplete() { gsap.set(this.targets()[0], { clearProps: 'transform,willChange' }) },
           })
         },
       })
