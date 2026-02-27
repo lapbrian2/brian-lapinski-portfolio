@@ -1,12 +1,15 @@
 import type { Artwork } from '~/types/artwork'
-import { artworks as staticArtworks } from '~/data/artworks'
 
 export function useArtworks() {
-  // Use static artwork data as the canonical source
-  const artworks = computed<Artwork[]>(() => staticArtworks)
-  const pending = ref(false)
-  const error = ref<Error | null>(null)
-  const refresh = () => Promise.resolve()
+  const { data: response, pending, error, refresh } = useFetch<{ success: boolean; data: Artwork[] }>(
+    '/api/artworks',
+    {
+      key: 'artworks-list',
+      default: () => ({ success: true, data: [] }),
+    },
+  )
+
+  const artworks = computed<Artwork[]>(() => response.value?.data || [])
 
   // Seed like counts when artworks data changes
   const likes = useLikes()
