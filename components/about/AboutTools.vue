@@ -71,8 +71,10 @@ onMounted(() => {
 
   ctx = gsap.context(() => {
     const cards = gridRef.value!.querySelectorAll('.tool-card')
+    const icons = gridRef.value!.querySelectorAll('.tool-icon')
 
     gsap.set(cards, { opacity: 0, y: 20 })
+    if (icons.length) gsap.set(icons, { boxShadow: '0 0 0 0 rgba(237, 84, 77, 0)' })
 
     ScrollTrigger.create({
       trigger: gridRef.value!,
@@ -90,6 +92,26 @@ onMounted(() => {
             this.targets().forEach((el: HTMLElement) => gsap.set(el, { clearProps: 'transform,willChange,force3D' }))
           },
         })
+
+        // Animated border glow pulse on icon rings after cards land
+        if (icons.length) {
+          gsap.to(icons, {
+            borderColor: 'rgba(237, 84, 77, 0.3)',
+            boxShadow: '0 0 12px rgba(237, 84, 77, 0.1)',
+            duration: 0.6,
+            stagger: { each: 0.06, from: 'start' },
+            delay: 0.4,
+            ease: 'power2.out',
+            onComplete() {
+              gsap.to(icons, {
+                borderColor: '',
+                boxShadow: '0 0 0 0 rgba(237, 84, 77, 0)',
+                duration: 1,
+                ease: 'power2.out',
+              })
+            },
+          })
+        }
       },
     })
   }, gridRef.value)

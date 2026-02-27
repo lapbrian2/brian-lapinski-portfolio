@@ -26,6 +26,7 @@
         <p class="font-body text-xs uppercase tracking-[0.3em] text-accent-red mb-4">
           {{ categoryArtworks.length }} Works
         </p>
+        <div class="w-12 h-px bg-accent-red/40 mx-auto mb-6" />
         <h1 class="font-display text-hero font-bold text-lavender-100 leading-none mb-6 capitalize">
           {{ categoryLabel }}
         </h1>
@@ -50,7 +51,7 @@
             v-for="cat in otherCategories"
             :key="cat.id"
             :to="`/${cat.id}`"
-            class="group inline-flex items-center gap-4 transition-all duration-400"
+            class="group relative inline-flex items-center gap-4 transition-all duration-400"
           >
             <span
               class="font-display font-bold uppercase leading-none transition-all duration-400 category-nav-link"
@@ -63,6 +64,8 @@
             <span class="font-body text-xs tabular-nums text-lavender-400/40 transition-colors duration-300 group-hover:text-accent-red">
               {{ cat.count }}
             </span>
+            <!-- Hover underline -->
+            <span class="absolute -bottom-1 left-0 right-0 h-px bg-accent-red/40 origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-400 ease-out" />
           </NuxtLink>
         </nav>
       </div>

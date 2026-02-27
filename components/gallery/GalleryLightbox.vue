@@ -763,6 +763,30 @@ onUnmounted(() => {
         @close="showArchitect = false"
       />
 
+      <!-- Keyboard hints (desktop only) -->
+      <Transition name="caption-fade">
+        <div
+          v-if="!isMobile && !showArchitect && showCaption"
+          class="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 pointer-events-none"
+        >
+          <div class="flex items-center gap-4 px-4 py-2 rounded-full bg-white/[0.04] backdrop-blur-sm border border-white/[0.06]">
+            <span class="flex items-center gap-1.5 text-[10px] text-lavender-400/40 font-body tracking-wide">
+              <kbd class="px-1.5 py-0.5 rounded bg-white/[0.06] text-lavender-300/50 font-mono text-[9px]">&larr;</kbd>
+              <kbd class="px-1.5 py-0.5 rounded bg-white/[0.06] text-lavender-300/50 font-mono text-[9px]">&rarr;</kbd>
+              Navigate
+            </span>
+            <span v-if="hasOssuaryData" class="flex items-center gap-1.5 text-[10px] text-lavender-400/40 font-body tracking-wide">
+              <kbd class="px-1.5 py-0.5 rounded bg-white/[0.06] text-lavender-300/50 font-mono text-[9px]">A</kbd>
+              Schema
+            </span>
+            <span class="flex items-center gap-1.5 text-[10px] text-lavender-400/40 font-body tracking-wide">
+              <kbd class="px-1.5 py-0.5 rounded bg-white/[0.06] text-lavender-300/50 font-mono text-[9px]">Esc</kbd>
+              Close
+            </span>
+          </div>
+        </div>
+      </Transition>
+
       <!-- Toast notification -->
       <Transition name="toast-fade">
         <div

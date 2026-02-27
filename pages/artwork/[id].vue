@@ -65,11 +65,11 @@
       </section>
 
       <!-- Info -->
-      <section class="pb-16 px-6 md:px-12">
+      <section ref="infoEl" class="pb-16 px-6 md:px-12">
         <div class="max-w-3xl mx-auto">
           <!-- Title & Meta -->
           <div class="mb-8">
-            <h1 class="font-display text-4xl md:text-6xl lg:text-7xl font-bold text-lavender-100 mb-3 leading-none" style="letter-spacing: -0.03em">
+            <h1 class="artwork-title font-display text-4xl md:text-6xl lg:text-7xl font-bold text-lavender-100 mb-3 leading-none" style="letter-spacing: -0.03em">
               {{ artwork.title }}
             </h1>
             <p class="font-body text-sm uppercase tracking-[0.15em] text-lavender-400">
@@ -138,7 +138,7 @@
       </section>
 
       <!-- Related Works -->
-      <section v-if="relatedArtworks.length" class="pb-24 px-6 md:px-12">
+      <section v-if="relatedArtworks.length" ref="relatedEl" class="pb-24 px-6 md:px-12">
         <div class="max-w-5xl mx-auto">
           <div class="text-center mb-10">
             <p class="font-body text-xs uppercase tracking-[0.25em] text-lavender-400 mb-3">Related Works</p>
@@ -172,6 +172,8 @@
 </template>
 
 <script setup lang="ts">
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import type { Artwork } from '~/types/artwork'
 import type { ArtworkApiResponse } from '~/types/api'
 import type { TechniqueCategory } from '~/types/artwork'
@@ -184,6 +186,8 @@ const artworkId = computed(() => route.params.id as string)
 
 const lightbox = useLightbox()
 const imageWrapEl = ref<HTMLElement | null>(null)
+const infoEl = ref<HTMLElement | null>(null)
+const relatedEl = ref<HTMLElement | null>(null)
 
 // Fetch artwork from API
 const { data: response, pending, error } = useFetch<ArtworkApiResponse>(
@@ -256,6 +260,68 @@ function openInLightbox() {
 
   lightbox.open(items, 0, rect)
 }
+
+// GSAP entrance animations
+let ctx: gsap.Context | null = null
+
+onMounted(() => {
+  if (typeof window === 'undefined') return
+  gsap.registerPlugin(ScrollTrigger)
+
+  ctx = gsap.context(() => {
+    // Info section: title + description stagger
+    if (infoEl.value) {
+      const title = infoEl.value.querySelector('.artwork-title')
+      const children = infoEl.value.querySelectorAll('.max-w-3xl > *')
+      if (children.length) {
+        gsap.set(children, { opacity: 0, y: 30 })
+        gsap.to(children, {
+          opacity: 1,
+          y: 0,
+          duration: 0.7,
+          stagger: 0.1,
+          delay: 0.3,
+          ease: 'power3.out',
+          force3D: true,
+          onComplete() {
+            this.targets().forEach((el: HTMLElement) => gsap.set(el, { clearProps: 'transform,willChange,force3D' }))
+          },
+        })
+      }
+    }
+
+    // Related works: stagger on scroll
+    if (relatedEl.value) {
+      const cards = relatedEl.value.querySelectorAll('.grid > a')
+      if (cards.length) {
+        gsap.set(cards, { opacity: 0, y: 40, scale: 0.95 })
+        ScrollTrigger.create({
+          trigger: relatedEl.value,
+          start: 'top 85%',
+          once: true,
+          onEnter: () => {
+            gsap.to(cards, {
+              opacity: 1,
+              y: 0,
+              scale: 1,
+              duration: 0.6,
+              stagger: 0.12,
+              ease: 'power3.out',
+              force3D: true,
+              onComplete() {
+                this.targets().forEach((el: HTMLElement) => gsap.set(el, { clearProps: 'transform,willChange,force3D' }))
+              },
+            })
+          },
+        })
+      }
+    }
+  })
+})
+
+onUnmounted(() => {
+  ctx?.revert()
+})
 
 // SEO: Dynamic head
 const config = useRuntimeConfig()

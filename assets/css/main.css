@@ -208,6 +208,19 @@ html {
   will-change: transform;
 }
 
+/* Glowing tip at progress leading edge */
+.scroll-progress::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: -2px;
+  width: 80px;
+  height: 7px;
+  background: linear-gradient(to left, var(--color-accent-red), transparent);
+  box-shadow: 0 0 12px rgba(237, 84, 77, 0.6), 0 0 30px rgba(237, 84, 77, 0.2);
+  border-radius: 0 4px 4px 0;
+}
+
 /* Custom cursor — dot + trailing ring (desktop only) */
 @media (hover: hover) {
   * {
