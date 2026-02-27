@@ -26,7 +26,7 @@
         <p class="font-body text-xs uppercase tracking-[0.3em] text-accent-red mb-4">
           Curated Groupings
         </p>
-        <h1 class="font-display text-hero font-bold text-lavender-100 leading-none mb-6">
+        <h1 ref="titleEl" class="font-display text-hero font-bold text-lavender-100 leading-none mb-6">
           Collections
         </h1>
         <p class="font-body text-lg text-lavender-300 max-w-xl mx-auto">
@@ -102,6 +102,7 @@
 <script setup lang="ts">
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { useReducedMotion } from '~/composables/useMediaQuery'
 
 interface Collection {
   id: number
@@ -120,17 +121,25 @@ const { data: collectionsData, pending } = useFetch<{ data: Collection[] }>('/ap
 const collections = computed(() => collectionsData.value?.data ?? [])
 
 const heroEl = ref<HTMLElement | null>(null)
+const titleEl = ref<HTMLElement | null>(null)
 const gridEl = ref<HTMLElement | null>(null)
+const reducedMotion = useReducedMotion()
 let ctx: gsap.Context | null = null
 
 // Entrance animations
-onMounted(() => {
+onMounted(async () => {
   if (typeof window === 'undefined') return
   gsap.registerPlugin(ScrollTrigger)
 
+  if (reducedMotion.value) return
+
+  const { default: Splitting } = await import('splitting')
+
   ctx = gsap.context(() => {
-    if (heroEl.value) {
-      gsap.from(heroEl.value.children, {
+    // Hero supporting elements (label, subtitle — excluding title)
+    if (heroEl.value && titleEl.value) {
+      const others = Array.from(heroEl.value.children).filter(el => el !== titleEl.value)
+      gsap.from(others, {
         y: 40,
         opacity: 0,
         duration: 0.8,
@@ -138,6 +147,27 @@ onMounted(() => {
         ease: 'power3.out',
         delay: 0.2,
       })
+
+      // Title chars: blur-in from center like a camera focusing
+      const result = Splitting({ target: titleEl.value, by: 'chars' })
+      const chars = result[0]?.chars || []
+      if (chars.length) {
+        gsap.set(chars, { opacity: 0, filter: 'blur(12px)', scale: 0.7 })
+        gsap.to(chars, {
+          opacity: 1,
+          filter: 'blur(0px)',
+          scale: 1,
+          duration: 0.8,
+          stagger: { each: 0.04, from: 'center' },
+          delay: 0.3,
+          ease: 'power3.out',
+          onComplete() {
+            this.targets().forEach((el: HTMLElement) =>
+              gsap.set(el, { clearProps: 'transform,willChange,filter' }),
+            )
+          },
+        })
+      }
     }
 
     if (gridEl.value) {
@@ -178,3 +208,9 @@ useHead({
   ],
 })
 </script>
+
+<style scoped>
+:deep(.char) {
+  display: inline-block;
+}
+</style>

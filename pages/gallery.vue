@@ -27,7 +27,7 @@
           Full Portfolio
         </p>
         <div class="w-12 h-px bg-accent-red/40 mx-auto mb-6" />
-        <h1 class="font-display text-hero font-bold text-lavender-100 leading-none mb-6">
+        <h1 ref="titleEl" class="font-display text-hero font-bold text-lavender-100 leading-none mb-6" style="perspective: 600px">
           Gallery
         </h1>
         <p class="font-body text-lg text-lavender-300 max-w-xl mx-auto">
@@ -115,6 +115,7 @@
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { categories } from '~/data/artworks'
+import { useReducedMotion } from '~/composables/useMediaQuery'
 import type { Artwork } from '~/types/artwork'
 import type { SourceRect } from '~/composables/useLightbox'
 
@@ -122,8 +123,10 @@ definePageMeta({ layout: false })
 
 const { artworks } = useArtworks()
 const lightbox = useLightbox()
+const reducedMotion = useReducedMotion()
 
 const heroEl = ref<HTMLElement | null>(null)
+const titleEl = ref<HTMLElement | null>(null)
 const filtersEl = ref<HTMLElement | null>(null)
 const gridEl = ref<HTMLElement | null>(null)
 const gridSection = ref<HTMLElement | null>(null)
@@ -224,14 +227,19 @@ function openLightbox(artwork: Artwork, event: Event) {
 }
 
 // GSAP entrance animations
-onMounted(() => {
+onMounted(async () => {
   if (typeof window === 'undefined') return
   gsap.registerPlugin(ScrollTrigger)
 
+  if (reducedMotion.value) return
+
+  const { default: Splitting } = await import('splitting')
+
   ctx = gsap.context(() => {
-    // Hero stagger
-    if (heroEl.value) {
-      gsap.from(heroEl.value.children, {
+    // Hero supporting elements stagger (label, divider, subtitle — excluding title)
+    if (heroEl.value && titleEl.value) {
+      const others = Array.from(heroEl.value.children).filter(el => el !== titleEl.value)
+      gsap.from(others, {
         y: 40,
         opacity: 0,
         duration: 0.8,
@@ -239,6 +247,28 @@ onMounted(() => {
         ease: 'power3.out',
         delay: 0.2,
       })
+
+      // Title chars: rotateY flip-in like book pages turning open
+      const result = Splitting({ target: titleEl.value, by: 'chars' })
+      const chars = result[0]?.chars || []
+      if (chars.length) {
+        gsap.set(chars, { opacity: 0, x: 40, rotateY: 90 })
+        gsap.to(chars, {
+          opacity: 1,
+          x: 0,
+          rotateY: 0,
+          duration: 0.9,
+          stagger: { each: 0.06, from: 'start' },
+          delay: 0.35,
+          ease: 'power4.out',
+          force3D: true,
+          onComplete() {
+            this.targets().forEach((el: HTMLElement) =>
+              gsap.set(el, { clearProps: 'transform,willChange,force3D' }),
+            )
+          },
+        })
+      }
     }
 
     // Filter pills
@@ -249,7 +279,7 @@ onMounted(() => {
         y: 15,
         duration: 0.5,
         stagger: 0.05,
-        delay: 0.5,
+        delay: 0.6,
         ease: 'power2.out',
       })
     }
@@ -319,6 +349,10 @@ useHead({
   .gallery-masonry {
     column-count: 1;
   }
+}
+
+:deep(.char) {
+  display: inline-block;
 }
 
 /* Hide scrollbar on filter row */

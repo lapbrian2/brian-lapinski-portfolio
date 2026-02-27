@@ -6,6 +6,8 @@ import { categories as allCategories } from '~/data/artworks'
 
 const sectionEl = ref<HTMLElement | null>(null)
 const headingEl = ref<HTMLElement | null>(null)
+const headingLabelEl = ref<HTMLElement | null>(null)
+const headingTextEl = ref<HTMLElement | null>(null)
 const previewEl = ref<HTMLElement | null>(null)
 const isMobile = useIsMobile()
 const reducedMotion = useReducedMotion()
@@ -68,7 +70,7 @@ function onNavMouseMove(e: MouseEvent) {
   previewYTo(e.clientY - rect.top - 80)
 }
 
-onMounted(() => {
+onMounted(async () => {
   if (!sectionEl.value || !headingEl.value) return
 
   // Hover preview follow — desktop only
@@ -79,23 +81,42 @@ onMounted(() => {
 
   if (reducedMotion.value) return
 
+  const { default: Splitting } = await import('splitting')
+
   // Query link elements directly from DOM — avoids function-ref timing issues
   const linkElements = Array.from(
     sectionEl.value.querySelectorAll('.collection-cta__link'),
   ) as HTMLElement[]
 
+  // Split heading into words
+  const headingWords = headingTextEl.value
+    ? (Splitting({ target: headingTextEl.value, by: 'words' })[0]?.words || [])
+    : []
+
+  // Split each link's text into chars
+  const linkTextEls = Array.from(
+    sectionEl.value.querySelectorAll('.collection-cta__link-text'),
+  ) as HTMLElement[]
+  const linkCharSets = linkTextEls.map(el => {
+    const result = Splitting({ target: el, by: 'chars' })
+    return result[0]?.chars || []
+  })
+
   ctx = gsap.context(() => {
-    // Heading fade-in
+    // Heading: label + word stagger
     gsap.set(headingEl.value!, { opacity: 0, y: 40 })
+    if (headingWords.length) gsap.set(headingWords, { opacity: 0, y: 20 })
+
     ScrollTrigger.create({
       trigger: sectionEl.value!,
       start: 'top 75%',
       once: true,
       onEnter: () => {
+        // Container slides into view
         gsap.to(headingEl.value!, {
           opacity: 1,
           y: 0,
-          duration: 0.8,
+          duration: 0.6,
           ease: 'power3.out',
           force3D: true,
           onComplete() {
@@ -103,7 +124,24 @@ onMounted(() => {
           },
         })
 
-        // Stagger the category links with their border lines drawing in
+        // Words stagger in with slight delay
+        if (headingWords.length) {
+          gsap.to(headingWords, {
+            opacity: 1,
+            y: 0,
+            duration: 0.7,
+            stagger: { each: 0.08, from: 'start' },
+            delay: 0.2,
+            ease: 'power3.out',
+            onComplete() {
+              this.targets().forEach((el: HTMLElement) =>
+                gsap.set(el, { clearProps: 'transform,willChange' }),
+              )
+            },
+          })
+        }
+
+        // Stagger link containers + their chars cascade
         if (linkElements.length) {
           gsap.fromTo(
             linkElements,
@@ -121,6 +159,25 @@ onMounted(() => {
               },
             },
           )
+
+          // Within each link, stagger chars with cascaded per-link delay
+          linkCharSets.forEach((chars, linkIdx) => {
+            if (!chars.length) return
+            gsap.set(chars, { opacity: 0, y: 15 })
+            gsap.to(chars, {
+              opacity: 1,
+              y: 0,
+              duration: 0.5,
+              stagger: 0.02,
+              delay: 0.5 + linkIdx * 0.12,
+              ease: 'power3.out',
+              onComplete() {
+                this.targets().forEach((el: HTMLElement) =>
+                  gsap.set(el, { clearProps: 'transform,willChange' }),
+                )
+              },
+            })
+          })
 
           // Animate border lines drawing from left to right
           const borderLines = Array.from(
@@ -159,10 +216,10 @@ onUnmounted(() => {
       <div class="w-16 h-px bg-accent-red/40 mx-auto mb-8" />
 
       <div ref="headingEl" class="text-center mb-10 md:mb-14">
-        <p class="font-body text-xs uppercase tracking-[0.25em] text-lavender-400 mb-6">
+        <p ref="headingLabelEl" class="font-body text-xs uppercase tracking-[0.25em] text-lavender-400 mb-6">
           Full Collection
         </p>
-        <h2 class="font-display font-bold text-lavender-100 leading-none collection-cta__heading">
+        <h2 ref="headingTextEl" class="font-display font-bold text-lavender-100 leading-none collection-cta__heading">
           Explore by Category
         </h2>
       </div>
@@ -333,6 +390,19 @@ onUnmounted(() => {
 .collection-cta__link:hover .collection-cta__arrow {
   color: #ed544d;
   transform: translate(4px, -4px);
+}
+
+:deep(.word) {
+  display: inline-block;
+}
+
+:deep(.word + .whitespace) {
+  width: 0.3em;
+  display: inline-block;
+}
+
+:deep(.char) {
+  display: inline-block;
 }
 
 /* Mobile */

@@ -13,6 +13,7 @@ const frameEls = ref<HTMLElement[]>([])
 const curtainEls = ref<HTMLElement[]>([])
 const imgEls = ref<HTMLElement[]>([])
 const textEls = ref<HTMLElement[]>([])
+const titleEls = ref<HTMLElement[]>([])
 
 let ctx: gsap.Context | null = null
 
@@ -26,7 +27,7 @@ const revealArtworks = computed(() => {
   return artworks.value.slice(0, 3)
 })
 
-onMounted(() => {
+onMounted(async () => {
   if (!sectionEl.value) return
 
   // Reduced motion: show everything immediately
@@ -40,11 +41,21 @@ onMounted(() => {
     return
   }
 
+  const { default: Splitting } = await import('splitting')
+
+  // Pre-split all title elements into chars
+  const titleCharSets = titleEls.value.map(el => {
+    if (!el) return []
+    const result = Splitting({ target: el, by: 'chars' })
+    return result[0]?.chars || []
+  })
+
   ctx = gsap.context(() => {
     curtainEls.value.forEach((curtain, i) => {
       const img = imgEls.value[i]
       const text = textEls.value[i]
       const frame = frameEls.value[i]
+      const titleChars = titleCharSets[i] || []
       if (!curtain || !frame) return
 
       if (isMobile.value) {
@@ -81,6 +92,7 @@ onMounted(() => {
       // Initial state: fully clipped from bottom
       gsap.set(curtain, { clipPath: 'inset(100% 0 0 0)' })
       if (text) gsap.set(text, { opacity: 0, y: 30 })
+      if (titleChars.length) gsap.set(titleChars, { opacity: 0, y: 20, rotateX: -40 })
 
       // Clip-path reveal — scrubbed as frame scrolls into view
       gsap.to(curtain, {
@@ -115,17 +127,38 @@ onMounted(() => {
         )
       }
 
-      // Text fade-in after clip-path is ~70% revealed
+      // Text container slides into view
       if (text) {
-        gsap.to(text, {
-          opacity: 1,
-          y: 0,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: frame,
-            start: 'top 40%',
-            end: 'top 10%',
-            scrub: 1,
+        ScrollTrigger.create({
+          trigger: frame,
+          start: 'top 35%',
+          once: true,
+          onEnter: () => {
+            gsap.to(text, {
+              opacity: 1,
+              y: 0,
+              duration: 0.6,
+              ease: 'power3.out',
+            })
+
+            // Title chars cascade in with 3D rotation
+            if (titleChars.length) {
+              gsap.to(titleChars, {
+                opacity: 1,
+                y: 0,
+                rotateX: 0,
+                duration: 0.7,
+                stagger: { each: 0.025, from: 'start' },
+                delay: 0.15,
+                ease: 'power4.out',
+                force3D: true,
+                onComplete() {
+                  this.targets().forEach((el: HTMLElement) =>
+                    gsap.set(el, { clearProps: 'transform,willChange,force3D' }),
+                  )
+                },
+              })
+            }
           },
         })
       }
@@ -174,7 +207,11 @@ onUnmounted(() => {
         <p class="font-body text-xs uppercase tracking-[0.2em] text-lavender-300 mb-3">
           {{ artwork!.medium }} &middot; {{ artwork!.year }}
         </p>
-        <h3 class="font-display text-3xl md:text-5xl lg:text-6xl font-bold text-lavender-100 leading-none">
+        <h3
+          :ref="(el: any) => { if (el) titleEls[index] = el as HTMLElement }"
+          class="font-display text-3xl md:text-5xl lg:text-6xl font-bold text-lavender-100 leading-none"
+          style="perspective: 300px"
+        >
           {{ artwork!.title }}
         </h3>
       </div>
@@ -196,6 +233,10 @@ onUnmounted(() => {
   height: 120%;
   max-width: none;
   will-change: transform;
+}
+
+:deep(.char) {
+  display: inline-block;
 }
 
 /* Mobile: reduce frame heights */
