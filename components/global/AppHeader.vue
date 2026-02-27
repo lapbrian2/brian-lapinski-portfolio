@@ -336,6 +336,25 @@ onMounted(() => {
   handleScroll()
   nextTick(() => {
     if (activeSection.value) moveNavPill(activeSection.value)
+
+    // Staggered entrance animation for desktop nav links
+    if (desktopNavEl.value) {
+      const links = desktopNavEl.value.querySelectorAll('a')
+      if (links.length) {
+        gsap.set(links, { opacity: 0, y: -8 })
+        gsap.to(links, {
+          opacity: 1,
+          y: 0,
+          duration: 0.5,
+          stagger: 0.06,
+          delay: 0.3,
+          ease: 'power2.out',
+          onComplete() {
+            this.targets().forEach((el: HTMLElement) => gsap.set(el, { clearProps: 'transform,opacity' }))
+          },
+        })
+      }
+    }
   })
 })
 

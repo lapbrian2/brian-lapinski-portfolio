@@ -46,9 +46,10 @@
                 :href="social.href"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="font-body text-sm text-lavender-300 hover:text-accent-red transition-colors duration-200 hover-reveal w-fit"
+                class="footer-link group/link relative font-body text-sm text-lavender-300 hover:text-accent-red transition-colors duration-200 w-fit"
               >
                 {{ social.label }}
+                <span class="absolute bottom-0 left-0 w-full h-px bg-accent-red/50 origin-left scale-x-0 group-hover/link:scale-x-100 transition-transform duration-300 ease-out" />
               </a>
             </nav>
           </div>
@@ -63,10 +64,11 @@
                 v-for="link in navLinks"
                 :key="link.id"
                 :href="`#${link.id}`"
-                class="font-body text-sm text-lavender-300 hover:text-accent-red transition-colors duration-200 hover-reveal w-fit"
+                class="footer-link group/link relative font-body text-sm text-lavender-300 hover:text-accent-red transition-colors duration-200 w-fit"
                 @click.prevent="scrollToSection(link.id)"
               >
                 {{ link.label }}
+                <span class="absolute bottom-0 left-0 w-full h-px bg-accent-red/50 origin-left scale-x-0 group-hover/link:scale-x-100 transition-transform duration-300 ease-out" />
               </a>
             </nav>
           </div>
@@ -87,7 +89,9 @@
           @click="scrollToTop"
         >
           Back to top
-          <span class="w-9 h-9 rounded-full border border-dark-600 flex items-center justify-center group-hover:border-accent-red group-hover:bg-accent-red/10 transition-all duration-300">
+          <span class="top-btn-ring relative w-9 h-9 rounded-full border border-dark-600 flex items-center justify-center group-hover:border-accent-red group-hover:bg-accent-red/10 transition-all duration-300">
+            <!-- Pulse ring on hover -->
+            <span class="absolute inset-0 rounded-full border border-accent-red/0 group-hover:border-accent-red/30 group-hover:scale-[1.4] group-hover:opacity-0 transition-all duration-700 ease-out" />
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="group-hover:-translate-y-0.5 transition-transform duration-300">
               <line x1="7" y1="12" x2="7" y2="2" />
               <polyline points="3 6 7 2 11 6" />

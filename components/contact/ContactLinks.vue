@@ -19,6 +19,9 @@
         @mouseenter="onEnter($event.currentTarget as HTMLElement)"
         @mouseleave="onLeave($event.currentTarget as HTMLElement)"
       >
+        <!-- Accent top border — draws in on entrance -->
+        <div class="link-card__accent absolute top-0 left-0 right-0 h-[2px] origin-left" :style="`background: ${link.color}50`" />
+
         <!-- Hover glow -->
         <div
           class="glow-orb absolute pointer-events-none rounded-full opacity-0 transition-opacity duration-500 group-hover:opacity-100"
@@ -126,8 +129,10 @@ onMounted(() => {
     }
 
     // Staggered card entrance with scale + fade
+    const accents = linksRef.value!.querySelectorAll('.link-card__accent')
     if (cards.length) {
       gsap.set(cards, { opacity: 0, y: 40, scale: 0.95 })
+      if (accents.length) gsap.set(accents, { scaleX: 0 })
       ScrollTrigger.create({
         trigger: linksRef.value!,
         start: 'top 80%',
@@ -141,6 +146,16 @@ onMounted(() => {
             stagger: 0.12,
             ease: 'power3.out',
           })
+          // Accent borders draw after cards land
+          if (accents.length) {
+            gsap.to(accents, {
+              scaleX: 1,
+              duration: 0.5,
+              stagger: 0.12,
+              delay: 0.5,
+              ease: 'power2.out',
+            })
+          }
         },
       })
     }

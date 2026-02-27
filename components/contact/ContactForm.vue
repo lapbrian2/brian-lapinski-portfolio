@@ -77,17 +77,20 @@ onUnmounted(() => {
         <label for="contact-name" class="block font-body text-xs uppercase tracking-[0.15em] text-lavender-300 mb-2">
           Name
         </label>
-        <input
-          id="contact-name"
-          v-model="form.name"
-          type="text"
-          required
-          placeholder="Your name"
-          :aria-invalid="!!errors.name"
-          :aria-describedby="errors.name ? 'contact-name-error' : undefined"
-          class="w-full bg-dark-800/60 border border-dark-600 rounded-lg px-4 py-3 font-body text-sm text-lavender-100 placeholder-lavender-500/40 focus:outline-none focus:border-accent-red/50 focus:ring-1 focus:ring-accent-red/20 transition-all duration-300"
-          :class="{ 'border-red-500/50': errors.name }"
-        >
+        <div class="relative">
+          <input
+            id="contact-name"
+            v-model="form.name"
+            type="text"
+            required
+            placeholder="Your name"
+            :aria-invalid="!!errors.name"
+            :aria-describedby="errors.name ? 'contact-name-error' : undefined"
+            class="form-input w-full bg-dark-800/60 border border-dark-600 rounded-lg px-4 py-3 font-body text-sm text-lavender-100 placeholder-lavender-500/40 focus:outline-none focus:border-accent-red/50 focus:ring-1 focus:ring-accent-red/20 transition-all duration-300"
+            :class="{ 'border-red-500/50': errors.name }"
+          >
+          <div class="form-focus-line absolute bottom-0 left-0 right-0 h-[2px] bg-accent-red/60 rounded-b-lg origin-left scale-x-0 transition-transform duration-500 ease-out" />
+        </div>
         <p v-if="errors.name" id="contact-name-error" class="font-body text-xs text-red-400 mt-1.5">{{ errors.name }}</p>
       </div>
 
@@ -96,17 +99,20 @@ onUnmounted(() => {
         <label for="contact-email" class="block font-body text-xs uppercase tracking-[0.15em] text-lavender-300 mb-2">
           Email
         </label>
-        <input
-          id="contact-email"
-          v-model="form.email"
-          type="email"
-          required
-          placeholder="you@example.com"
-          :aria-invalid="!!errors.email"
-          :aria-describedby="errors.email ? 'contact-email-error' : undefined"
-          class="w-full bg-dark-800/60 border border-dark-600 rounded-lg px-4 py-3 font-body text-sm text-lavender-100 placeholder-lavender-500/40 focus:outline-none focus:border-accent-red/50 focus:ring-1 focus:ring-accent-red/20 transition-all duration-300"
-          :class="{ 'border-red-500/50': errors.email }"
-        >
+        <div class="relative">
+          <input
+            id="contact-email"
+            v-model="form.email"
+            type="email"
+            required
+            placeholder="you@example.com"
+            :aria-invalid="!!errors.email"
+            :aria-describedby="errors.email ? 'contact-email-error' : undefined"
+            class="form-input w-full bg-dark-800/60 border border-dark-600 rounded-lg px-4 py-3 font-body text-sm text-lavender-100 placeholder-lavender-500/40 focus:outline-none focus:border-accent-red/50 focus:ring-1 focus:ring-accent-red/20 transition-all duration-300"
+            :class="{ 'border-red-500/50': errors.email }"
+          >
+          <div class="form-focus-line absolute bottom-0 left-0 right-0 h-[2px] bg-accent-red/60 rounded-b-lg origin-left scale-x-0 transition-transform duration-500 ease-out" />
+        </div>
         <p v-if="errors.email" id="contact-email-error" class="font-body text-xs text-red-400 mt-1.5">{{ errors.email }}</p>
       </div>
 
@@ -115,18 +121,21 @@ onUnmounted(() => {
         <label for="contact-message" class="block font-body text-xs uppercase tracking-[0.15em] text-lavender-300 mb-2">
           Message
         </label>
-        <textarea
-          id="contact-message"
-          v-model="form.message"
-          required
-          rows="5"
-          maxlength="1000"
-          placeholder="Tell me about your project, collaboration idea, or just say hello..."
-          :aria-invalid="!!errors.message"
-          :aria-describedby="errors.message ? 'contact-message-error' : undefined"
-          class="w-full bg-dark-800/60 border border-dark-600 rounded-lg px-4 py-3 font-body text-sm text-lavender-100 placeholder-lavender-500/40 focus:outline-none focus:border-accent-red/50 focus:ring-1 focus:ring-accent-red/20 transition-all duration-300 resize-none"
-          :class="{ 'border-red-500/50': errors.message }"
-        />
+        <div class="relative">
+          <textarea
+            id="contact-message"
+            v-model="form.message"
+            required
+            rows="5"
+            maxlength="1000"
+            placeholder="Tell me about your project, collaboration idea, or just say hello..."
+            :aria-invalid="!!errors.message"
+            :aria-describedby="errors.message ? 'contact-message-error' : undefined"
+            class="form-input w-full bg-dark-800/60 border border-dark-600 rounded-lg px-4 py-3 font-body text-sm text-lavender-100 placeholder-lavender-500/40 focus:outline-none focus:border-accent-red/50 focus:ring-1 focus:ring-accent-red/20 transition-all duration-300 resize-none"
+            :class="{ 'border-red-500/50': errors.message }"
+          />
+          <div class="form-focus-line absolute bottom-0 left-0 right-0 h-[2px] bg-accent-red/60 rounded-b-lg origin-left scale-x-0 transition-transform duration-500 ease-out" />
+        </div>
         <div class="h-px mt-0.5 rounded-full overflow-hidden bg-dark-700">
           <div
             class="h-full transition-all duration-300 ease-out rounded-full"
@@ -183,3 +192,10 @@ onUnmounted(() => {
     </form>
   </div>
 </template>
+
+<style scoped>
+/* Focus underline draws left-to-right when input is focused */
+.form-input:focus + .form-focus-line {
+  transform: scaleX(1);
+}
+</style>
