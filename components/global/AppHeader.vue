@@ -141,6 +141,7 @@ import { useActiveSection } from '~/composables/useActiveSection'
 const { activeSection, sections } = useActiveSection()
 
 const pageLinks = [
+  { to: '/gallery', label: 'Gallery' },
   { to: '/shop', label: 'Shop' },
   { to: '/collections', label: 'Collections' },
 ]

@@ -137,6 +137,7 @@ const navLinks = [
 ]
 
 const pageLinks = [
+  { to: '/gallery', label: 'Gallery' },
   { to: '/shop', label: 'Shop' },
   { to: '/collections', label: 'Collections' },
 ]

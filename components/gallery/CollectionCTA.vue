@@ -217,6 +217,20 @@ onUnmounted(() => {
           <div class="collection-cta__border origin-left" />
         </NuxtLink>
       </nav>
+
+      <!-- View All link -->
+      <div class="text-center mt-10">
+        <NuxtLink
+          to="/gallery"
+          class="inline-flex items-center gap-2 px-6 py-3 border border-white/[0.08] rounded-full font-body text-sm text-lavender-300 hover:border-accent-red/30 hover:text-accent-red transition-all duration-300 group"
+        >
+          View All Works
+          <svg class="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14" />
+            <path d="m12 5 7 7-7 7" />
+          </svg>
+        </NuxtLink>
+      </div>
     </div>
   </section>
 </template>
