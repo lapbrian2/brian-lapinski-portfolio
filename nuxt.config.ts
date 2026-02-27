@@ -4,6 +4,7 @@ export default defineNuxtConfig({
   modules: [
     '@nuxtjs/tailwindcss',
     '@nuxt/image',
+    'nuxt-auth-utils',
   ],
 
   app: {
@@ -100,6 +101,7 @@ export default defineNuxtConfig({
       headers: { 'Cache-Control': 'public, max-age=31536000, immutable' },
     },
     '/admin/**': { ssr: false },
+    '/auth/**': { ssr: false },
     // ISR: cache public pages at the edge, revalidate in the background
     '/': { isr: 600 },                  // homepage — 10 min
     '/gallery': { isr: 600 },           // gallery listing — 10 min

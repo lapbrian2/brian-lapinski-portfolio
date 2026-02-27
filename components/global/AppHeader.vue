@@ -56,6 +56,45 @@
         >
           {{ page.label }}
         </NuxtLink>
+
+        <!-- Auth -->
+        <span class="w-px h-4 bg-lavender-400/20" aria-hidden="true" />
+        <div v-if="loggedIn" class="relative">
+          <button
+            class="flex items-center gap-2 group"
+            aria-label="User menu"
+            @click="userMenuOpen = !userMenuOpen"
+          >
+            <img
+              :src="user?.avatar"
+              :alt="user?.name || 'User'"
+              class="w-7 h-7 rounded-full ring-2 ring-transparent group-hover:ring-accent-red/50 transition-all"
+            />
+          </button>
+          <div
+            v-if="userMenuOpen"
+            class="absolute right-0 top-full mt-2 w-48 bg-dark-800 border border-lavender-400/10 rounded-lg shadow-2xl py-1 z-50"
+          >
+            <p class="px-3 py-2 text-xs text-lavender-400 truncate border-b border-lavender-400/10">
+              {{ user?.name }}
+            </p>
+            <form method="POST" action="/auth/logout">
+              <button
+                type="submit"
+                class="w-full text-left px-3 py-2 text-sm text-lavender-300 hover:text-accent-red hover:bg-lavender-400/5 transition-colors"
+              >
+                Sign out
+              </button>
+            </form>
+          </div>
+        </div>
+        <a
+          v-else
+          href="/auth/github"
+          class="font-body text-sm uppercase tracking-wider text-lavender-400 hover:text-lavender-200 transition-colors duration-200"
+        >
+          Sign in
+        </a>
       </nav>
 
       <!-- Mobile Hamburger Button -->
@@ -129,6 +168,35 @@
             <span class="mobile-link-inner inline-block">{{ page.label }}</span>
           </span>
         </NuxtLink>
+
+        <!-- Auth (mobile) -->
+        <span class="w-8 h-px bg-lavender-400/20" aria-hidden="true" />
+        <div v-if="loggedIn" class="flex flex-col items-center gap-3">
+          <img
+            :src="user?.avatar"
+            :alt="user?.name || 'User'"
+            class="w-10 h-10 rounded-full"
+          />
+          <form method="POST" action="/auth/logout">
+            <button
+              type="submit"
+              class="font-display text-2xl font-semibold text-lavender-400 hover:text-accent-red transition-colors"
+              @click="closeMobileMenu"
+            >
+              Sign out
+            </button>
+          </form>
+        </div>
+        <a
+          v-else
+          href="/auth/github"
+          class="mobile-link font-display text-4xl font-semibold text-lavender-200 hover:text-accent-red transition-colors duration-200"
+          @click="closeMobileMenu"
+        >
+          <span class="inline-block overflow-hidden">
+            <span class="mobile-link-inner inline-block">Sign in</span>
+          </span>
+        </a>
       </nav>
     </div>
   </header>
@@ -139,6 +207,8 @@ import gsap from 'gsap'
 import { useActiveSection } from '~/composables/useActiveSection'
 
 const { activeSection, sections } = useActiveSection()
+const { loggedIn, user } = useUserSession()
+const userMenuOpen = ref(false)
 
 const pageLinks = [
   { to: '/gallery', label: 'Gallery' },
@@ -363,9 +433,16 @@ watch(activeSection, (newSection) => {
   }
 })
 
+function closeUserMenu(e: MouseEvent) {
+  if (userMenuOpen.value && !(e.target as HTMLElement).closest('[aria-label="User menu"]')) {
+    userMenuOpen.value = false
+  }
+}
+
 onMounted(() => {
   window.addEventListener('scroll', handleScroll, { passive: true })
   window.addEventListener('keydown', handleKeydown)
+  document.addEventListener('click', closeUserMenu)
   handleScroll()
   nextTick(() => {
     if (activeSection.value) moveNavPill(activeSection.value)
@@ -394,6 +471,7 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll)
   window.removeEventListener('keydown', handleKeydown)
+  document.removeEventListener('click', closeUserMenu)
   menuTl?.kill()
   // Ensure body scroll is restored if menu was open during unmount
   document.body.style.overflow = ''

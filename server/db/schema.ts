@@ -38,6 +38,19 @@ export const artworkTechniques = sqliteTable('artwork_techniques', {
   techniqueId: text('technique_id').notNull().references(() => techniques.id, { onDelete: 'cascade' }),
 })
 
+// Public Users (OAuth)
+export const users = sqliteTable('users', {
+  id: text('id').primaryKey(),
+  email: text('email'),
+  name: text('name'),
+  avatarUrl: text('avatar_url'),
+  provider: text('provider').notNull(), // 'github' | 'google'
+  providerId: text('provider_id').notNull(),
+  createdAt: text('created_at').default(sql`(datetime('now'))`),
+}, (table) => ({
+  providerIdx: index('users_provider_idx').on(table.provider, table.providerId),
+}))
+
 // Key-value content store for editable text blocks
 export const content = sqliteTable('content', {
   key: text('key').primaryKey(),
