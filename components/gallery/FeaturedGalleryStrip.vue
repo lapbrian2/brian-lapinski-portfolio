@@ -27,46 +27,52 @@ const radius = computed(() => {
   return Math.round(cardWidth / (2 * Math.tan(theta / 2)))
 })
 
-// Current ring rotation (tracks cumulative angle for smooth wrapping)
+// Continuous rotation state
 let currentRotation = 0
+let autoRotating = true
+let navigating = false
+let tickerFn: (() => void) | null = null
+const ROTATION_SPEED = 0.15 // degrees per tick ≈ 9°/s ≈ 40s per full revolution
+
+// Continuous turntable rotation via GSAP ticker
+function tick() {
+  if (!autoRotating || navigating || !ringEl.value) return
+  currentRotation -= ROTATION_SPEED
+  gsap.set(ringEl.value, { rotateY: currentRotation })
+
+  // Track which card faces the viewer
+  const normalized = ((-currentRotation % 360) + 360) % 360
+  const idx = Math.round(normalized / cardAngle.value) % featured.value.length
+  if (idx !== activeIndex.value) activeIndex.value = idx
+}
 
 function goTo(index: number) {
   if (!ringEl.value) return
+  navigating = true
   activeIndex.value = index
-  const targetAngle = -index * cardAngle.value
-
-  // Find shortest rotation path (handle wrapping)
-  const diff = targetAngle - currentRotation
-  const shortDiff = ((diff + 180) % 360) - 180
-  currentRotation += shortDiff
+  const target = -index * cardAngle.value
+  // Shortest-path rotation (maps diff to [-180, 180])
+  const diff = target - currentRotation
+  const shortDiff = ((diff % 360) + 540) % 360 - 180
+  const finalRotation = currentRotation + shortDiff
 
   gsap.to(ringEl.value, {
-    rotateY: currentRotation,
+    rotateY: finalRotation,
     duration: 0.8,
     ease: 'power2.inOut',
+    onComplete: () => {
+      currentRotation = finalRotation
+      navigating = false
+    },
   })
 }
 
 function next() {
-  const nextIdx = (activeIndex.value + 1) % featured.value.length
-  activeIndex.value = nextIdx
-  currentRotation -= cardAngle.value
-  gsap.to(ringEl.value!, {
-    rotateY: currentRotation,
-    duration: 0.8,
-    ease: 'power2.inOut',
-  })
+  goTo((activeIndex.value + 1) % featured.value.length)
 }
 
 function prev() {
-  const prevIdx = (activeIndex.value - 1 + featured.value.length) % featured.value.length
-  activeIndex.value = prevIdx
-  currentRotation += cardAngle.value
-  gsap.to(ringEl.value!, {
-    rotateY: currentRotation,
-    duration: 0.8,
-    ease: 'power2.inOut',
-  })
+  goTo((activeIndex.value - 1 + featured.value.length) % featured.value.length)
 }
 
 function onCardClick(index: number) {
@@ -112,26 +118,22 @@ function onKeydown(e: KeyboardEvent) {
   if (e.key === 'ArrowRight') { e.preventDefault(); next() }
 }
 
-// Auto-advance
-let autoTimer: ReturnType<typeof setInterval> | null = null
-
-function startAuto() {
-  stopAuto()
-  autoTimer = setInterval(next, 5000)
+function pauseRotation() {
+  autoRotating = false
 }
 
-function stopAuto() {
-  if (autoTimer) { clearInterval(autoTimer); autoTimer = null }
+function resumeRotation() {
+  autoRotating = true
 }
 
 onMounted(() => {
-  nextTick(() => {
-    startAuto()
-  })
+  if (reducedMotion.value) return
+  tickerFn = tick
+  gsap.ticker.add(tickerFn)
 })
 
 onUnmounted(() => {
-  stopAuto()
+  if (tickerFn) gsap.ticker.remove(tickerFn)
 })
 </script>
 
@@ -141,8 +143,8 @@ onUnmounted(() => {
     class="carousel-section overflow-hidden"
     @keydown="onKeydown"
     tabindex="0"
-    @mouseenter="stopAuto"
-    @mouseleave="startAuto"
+    @mouseenter="pauseRotation"
+    @mouseleave="resumeRotation"
   >
     <!-- Heading -->
     <div class="max-w-7xl mx-auto px-6 md:px-12 pt-12 pb-4 text-center">

@@ -13,20 +13,16 @@ onMounted(() => {
   if (!dividerEl.value) return
 
   ctx = gsap.context(() => {
-    gsap.fromTo(
-      dividerEl.value!.querySelector('.divider-line'),
-      { scaleX: 0 },
-      {
-        scaleX: 1,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: dividerEl.value!,
-          start: 'top 90%',
-          end: 'top 50%',
-          scrub: 1,
-        },
+    const line = dividerEl.value!.querySelector('.divider-line')
+    gsap.set(line, { scaleX: 0 })
+    ScrollTrigger.create({
+      trigger: dividerEl.value!,
+      start: 'top 85%',
+      once: true,
+      onEnter: () => {
+        gsap.to(line, { scaleX: 1, duration: 0.8, ease: 'power2.out' })
       },
-    )
+    })
   }, dividerEl.value)
 })
 

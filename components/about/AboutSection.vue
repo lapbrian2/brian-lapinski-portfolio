@@ -44,20 +44,22 @@ onMounted(async () => {
   const { default: Splitting } = await import('splitting')
 
   ctx = gsap.context(() => {
-    // Pullquote: scroll-scrubbed word opacity (Noomo-style progressive reveal)
+    // Pullquote: staggered word reveal (one-shot, no scrub)
     const result = Splitting({ target: pullquoteEl.value!, by: 'words' })
     const words = result[0]?.words || []
     if (words.length) {
       gsap.set(words, { opacity: 0.12 })
-      gsap.to(words, {
-        opacity: 1,
-        stagger: { each: 0.06 },
-        ease: 'none',
-        scrollTrigger: {
-          trigger: pullquoteEl.value!,
-          start: 'top 80%',
-          end: 'bottom 50%',
-          scrub: true,
+      ScrollTrigger.create({
+        trigger: pullquoteEl.value!,
+        start: 'top 80%',
+        once: true,
+        onEnter: () => {
+          gsap.to(words, {
+            opacity: 1,
+            stagger: { each: 0.04 },
+            duration: 0.8,
+            ease: 'power2.out',
+          })
         },
       })
     }
@@ -140,22 +142,22 @@ onMounted(async () => {
       })
     }
 
-    // Artwork anchor — subtle parallax + scale on scroll
+    // Artwork anchor — simple entrance reveal (no continuous scrub)
     if (artworkAnchorEl.value) {
-      const img = artworkAnchorEl.value.querySelector('img')
-      if (img) {
-        gsap.to(img, {
-          y: -30,
-          scale: 1.04,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: artworkAnchorEl.value,
-            start: 'top bottom',
-            end: 'bottom top',
-            scrub: true,
-          },
-        })
-      }
+      gsap.set(artworkAnchorEl.value, { opacity: 0, y: 20 })
+      ScrollTrigger.create({
+        trigger: artworkAnchorEl.value,
+        start: 'top 85%',
+        once: true,
+        onEnter: () => {
+          gsap.to(artworkAnchorEl.value!, {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            ease: 'power2.out',
+          })
+        },
+      })
     }
   }, sectionEl.value!)
 })

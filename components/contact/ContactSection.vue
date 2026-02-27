@@ -80,17 +80,19 @@ onMounted(async () => {
   const { default: Splitting } = await import('splitting')
 
   ctx = gsap.context(() => {
-    // Warm glow reveal — scrub-driven radial pulse
+    // Warm glow reveal — one-shot, no scrub
     if (glowEl.value) {
-      gsap.to(glowEl.value, {
-        opacity: 1,
-        scale: 1.1,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: sectionEl.value!,
-          start: 'top 80%',
-          end: 'top 20%',
-          scrub: true,
+      ScrollTrigger.create({
+        trigger: sectionEl.value!,
+        start: 'top 80%',
+        once: true,
+        onEnter: () => {
+          gsap.to(glowEl.value!, {
+            opacity: 1,
+            scale: 1.1,
+            duration: 1.2,
+            ease: 'power2.out',
+          })
         },
       })
     }
