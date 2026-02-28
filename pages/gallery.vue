@@ -88,14 +88,64 @@
               draggable="false"
             />
 
+            <!-- Prompt badge (always visible) -->
+            <div
+              v-if="artwork.hasPrompt"
+              class="absolute top-3 right-3 z-10 pointer-events-none"
+            >
+              <span
+                v-if="isPurchased(artwork.id)"
+                class="prompt-badge prompt-badge--unlocked"
+                title="Prompt unlocked"
+              >
+                <svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                  <path d="M4 9V6a4 4 0 1 1 8 0" />
+                  <rect x="2" y="9" width="12" height="7" rx="1.5" fill="currentColor" stroke="none" opacity="0.2" />
+                  <rect x="2" y="9" width="12" height="7" rx="1.5" />
+                </svg>
+              </span>
+              <span
+                v-else
+                class="prompt-badge prompt-badge--locked"
+                title="Prompt available"
+              >
+                <svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                  <rect x="2" y="8" width="12" height="8" rx="1.5" />
+                  <path d="M5 8V5a3 3 0 0 1 6 0v3" />
+                </svg>
+              </span>
+            </div>
+
             <!-- Hover overlay -->
             <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400 flex flex-col justify-end p-5">
               <h3 class="font-display text-base md:text-lg font-semibold text-white mb-1 translate-y-3 group-hover:translate-y-0 transition-transform duration-400">
                 {{ artwork.title }}
               </h3>
-              <p class="font-body text-xs uppercase tracking-[0.12em] text-lavender-300/70 translate-y-3 group-hover:translate-y-0 transition-transform duration-400 delay-75">
-                {{ artwork.medium }} &middot; {{ artwork.year }}
-              </p>
+              <div class="flex items-center justify-between translate-y-3 group-hover:translate-y-0 transition-transform duration-400 delay-75">
+                <p class="font-body text-xs uppercase tracking-[0.12em] text-lavender-300/70">
+                  {{ artwork.medium }} &middot; {{ artwork.year }}
+                </p>
+                <!-- Prompt unlock hint on hover -->
+                <span
+                  v-if="artwork.hasPrompt && !isPurchased(artwork.id)"
+                  class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-accent-red/20 border border-accent-red/30 text-accent-red font-body text-[10px] font-medium tracking-wide"
+                >
+                  <svg width="8" height="8" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                    <rect x="2" y="8" width="12" height="8" rx="1.5" />
+                    <path d="M5 8V5a3 3 0 0 1 6 0v3" />
+                  </svg>
+                  ${{ ((artwork.promptPrice || 399) / 100).toFixed(2) }}
+                </span>
+                <span
+                  v-else-if="artwork.hasPrompt && isPurchased(artwork.id)"
+                  class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 font-body text-[10px] font-medium tracking-wide"
+                >
+                  <svg width="8" height="8" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="2 6 5 9 10 3" />
+                  </svg>
+                  Unlocked
+                </span>
+              </div>
             </div>
 
             <!-- Dominant color glow on hover -->
@@ -127,6 +177,7 @@ const { artworks } = useArtworks()
 const lightbox = useLightbox()
 const reducedMotion = useReducedMotion()
 const toast = useToast()
+const { isPurchased, loggedIn } = usePromptPurchases()
 
 const heroEl = ref<HTMLElement | null>(null)
 const titleEl = ref<HTMLElement | null>(null)
@@ -433,5 +484,33 @@ useHead({
 }
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+/* Prompt availability badges on gallery cards */
+.prompt-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  backdrop-filter: blur(8px);
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.prompt-badge--locked {
+  background: rgba(237, 84, 77, 0.15);
+  border: 1px solid rgba(237, 84, 77, 0.3);
+  color: #ed544d;
+}
+
+.prompt-badge--unlocked {
+  background: rgba(74, 222, 128, 0.15);
+  border: 1px solid rgba(74, 222, 128, 0.3);
+  color: #4ade80;
+}
+
+.gallery-card:hover .prompt-badge {
+  transform: scale(1.1);
 }
 </style>
