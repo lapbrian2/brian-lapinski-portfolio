@@ -1,5 +1,5 @@
 import { eq } from 'drizzle-orm'
-import { orders, orderItems, printVariants, printProducts, artworks } from '~/server/db/schema'
+import { orders, orderItems, printVariants, printProducts, artworks, promptPurchases } from '~/server/db/schema'
 import { useDb } from '~/server/db'
 import { orderConfirmationEmail, adminOrderNotificationEmail } from '~/server/utils/email-templates'
 
@@ -34,6 +34,32 @@ export default defineEventHandler(async (event) => {
 
   if (stripeEvent.type === 'checkout.session.completed') {
     const session = stripeEvent.data.object as any
+
+    // ── Prompt purchase handling ──
+    if (session.metadata?.type === 'prompt_purchase') {
+      const { userId, artworkId, pricePaid } = session.metadata
+
+      // Idempotency: check if already recorded
+      const [existing] = await db
+        .select({ id: promptPurchases.id })
+        .from(promptPurchases)
+        .where(eq(promptPurchases.stripeSessionId, session.id))
+        .limit(1)
+      if (existing) return { received: true }
+
+      await db.insert(promptPurchases).values({
+        userId,
+        artworkId,
+        stripeSessionId: session.id,
+        stripePaymentIntentId: session.payment_intent || null,
+        pricePaid: Number(pricePaid),
+        status: 'completed',
+      })
+
+      return { received: true }
+    }
+
+    // ── Print order handling ──
     const orderId = session.metadata?.orderId
     const customerEmail = session.customer_details?.email || ''
 

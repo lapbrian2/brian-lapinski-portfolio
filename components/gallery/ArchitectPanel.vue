@@ -101,7 +101,7 @@ const visibleNodes = computed(() => {
 })
 
 const hasOssuaryData = computed(() => {
-  return !!(props.item.rawPrompt || props.item.promptNodes?.length)
+  return !!(props.item.hasPrompt || props.item.rawPrompt || props.item.promptNodes?.length)
 })
 
 // GSAP slide-in/out animation with overwrite protection
@@ -200,6 +200,13 @@ onUnmounted(() => {
 const playground = usePlayground()
 const quickForkBtnEl = ref<HTMLElement | null>(null)
 
+// ── Feature: Purchase Gating ──
+const { isPurchased, purchasePrompt, pendingPurchase, loggedIn } = usePromptPurchases()
+
+const isUnlocked = computed(() => {
+  return props.item.promptUnlocked || (props.item.id ? isPurchased(props.item.id) : false)
+})
+
 function handleOpenPlayground() {
   playground.open({
     title: props.item.title,
@@ -232,8 +239,9 @@ async function handleQuickFork() {
   }
 }
 
-// Helper: get hovered node's description within a category group
+// Helper: get hovered node's description within a category group (gated when locked)
 function getHoveredDescription(nodes: PromptNode[]): string | null {
+  if (!isUnlocked.value) return null
   if (!hoveredNodeId.value) return null
   const node = nodes.find(n => n.id === hoveredNodeId.value)
   return node?.description || null
@@ -394,77 +402,127 @@ function getHoveredDescription(nodes: PromptNode[]): string | null {
               </button>
             </div>
 
-            <!-- Raw Prompt (advanced only) -->
-            <div v-if="item.rawPrompt && mode === 'advanced'" class="animate-in">
-              <div class="flex items-center gap-2 mb-2">
-                <span class="text-[10px] uppercase tracking-[0.2em] font-body text-lavender-400/50">
-                  Raw Prompt
-                </span>
-              </div>
-              <div class="prompt-block">
-                <code class="text-[11px] leading-relaxed font-mono text-lavender-200/80 break-words whitespace-pre-wrap">{{ item.rawPrompt }}</code>
-              </div>
-            </div>
-
-            <!-- Refinement Notes (advanced only) -->
-            <div v-if="item.refinementNotes && mode === 'advanced'" class="animate-in">
-              <div class="flex items-center gap-2 mb-2">
-                <span class="text-[10px] uppercase tracking-[0.2em] font-body text-lavender-400/50">
-                  Artist Notes
-                </span>
-              </div>
-              <p class="text-[12px] leading-relaxed font-body text-lavender-300/60 italic">
-                {{ item.refinementNotes }}
-              </p>
-            </div>
-
-            <!-- Actions -->
-            <div class="animate-in pt-2 space-y-2">
-              <!-- Open Playground — primary -->
-              <button
-                class="btn-press fork-button group w-full"
-                @click="handleOpenPlayground"
-              >
-                <span class="flex items-center justify-center gap-2">
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" class="transition-transform duration-200 group-hover:rotate-12">
-                    <rect x="1" y="3" width="12" height="9" rx="1.5" />
-                    <path d="M4 3V1.5A.5.5 0 0 1 4.5 1h5a.5.5 0 0 1 .5.5V3" />
-                    <line x1="4" y1="6.5" x2="10" y2="6.5" />
-                    <line x1="4" y1="9" x2="7" y2="9" />
-                  </svg>
-                  <span>Open Playground</span>
-                </span>
-              </button>
-
-              <!-- Copy Raw Prompt — secondary quick action -->
-              <button
-                v-if="item.rawPrompt"
-                ref="quickForkBtnEl"
-                class="btn-press quick-fork-button group w-full"
-                @click="handleQuickFork"
-              >
-                <span v-if="!copied || copiedType !== 'quick'" class="flex items-center justify-center gap-2">
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
-                    <rect x="2" y="2" width="7" height="9" rx="1" />
-                    <path d="M5 2V1a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1h-1" />
-                  </svg>
-                  <span>Copy Raw Prompt</span>
-                </span>
-                <Transition name="feedback-slide" mode="out-in">
-                  <div v-if="copied && copiedType === 'quick'" class="flex flex-col items-center gap-0.5">
-                    <span class="text-accent-red font-medium flex items-center gap-1.5">
-                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="2 6 5 9 10 3" />
-                      </svg>
-                      Prompt copied
-                    </span>
-                    <span class="text-dark-400 text-[10px] italic">
-                      Paste directly into Midjourney — ready to generate
-                    </span>
+            <!-- ══ LOCKED STATE: Purchase CTA ══ -->
+            <div v-if="item.hasPrompt && !isUnlocked" class="animate-in">
+              <div class="locked-prompt-block">
+                <div class="relative overflow-hidden rounded-lg">
+                  <!-- Lock overlay -->
+                  <div class="absolute inset-0 backdrop-blur-sm bg-black/50 flex flex-col items-center justify-center z-10 gap-3 p-5 text-center">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3" class="text-lavender-400/60">
+                      <rect x="3" y="9" width="14" height="9" rx="2" />
+                      <path d="M6 9V6a4 4 0 1 1 8 0v3" stroke-linecap="round" />
+                    </svg>
+                    <p class="text-[11px] font-body text-lavender-300/70 leading-relaxed max-w-[220px]">
+                      Full prompt, technique details &amp; Playground access
+                    </p>
+                    <button
+                      v-if="loggedIn"
+                      class="unlock-button"
+                      :disabled="pendingPurchase === item.id"
+                      @click="purchasePrompt(item.id!)"
+                    >
+                      <span v-if="pendingPurchase === item.id" class="flex items-center gap-2">
+                        <span class="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin" />
+                        Processing...
+                      </span>
+                      <span v-else>
+                        Unlock Prompt &mdash; ${{ ((item.promptPrice || 399) / 100).toFixed(2) }}
+                      </span>
+                    </button>
+                    <button
+                      v-else
+                      class="unlock-button"
+                      @click="navigateTo('/auth/github')"
+                    >
+                      Sign in to Unlock
+                    </button>
                   </div>
-                </Transition>
-              </button>
+                  <!-- Blurred placeholder content -->
+                  <div class="blur-sm opacity-20 pointer-events-none select-none p-4 space-y-2">
+                    <div class="h-2 w-3/4 bg-white/10 rounded" />
+                    <div class="h-2 w-full bg-white/10 rounded" />
+                    <div class="h-2 w-2/3 bg-white/10 rounded" />
+                    <div class="h-2 w-5/6 bg-white/10 rounded" />
+                    <div class="h-2 w-1/2 bg-white/10 rounded" />
+                  </div>
+                </div>
+              </div>
             </div>
+
+            <!-- ══ UNLOCKED STATE: Full prompt data + actions ══ -->
+            <template v-if="isUnlocked">
+              <!-- Raw Prompt (advanced only) -->
+              <div v-if="item.rawPrompt && mode === 'advanced'" class="animate-in">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="text-[10px] uppercase tracking-[0.2em] font-body text-lavender-400/50">
+                    Raw Prompt
+                  </span>
+                </div>
+                <div class="prompt-block">
+                  <code class="text-[11px] leading-relaxed font-mono text-lavender-200/80 break-words whitespace-pre-wrap">{{ item.rawPrompt }}</code>
+                </div>
+              </div>
+
+              <!-- Refinement Notes (advanced only) -->
+              <div v-if="item.refinementNotes && mode === 'advanced'" class="animate-in">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="text-[10px] uppercase tracking-[0.2em] font-body text-lavender-400/50">
+                    Artist Notes
+                  </span>
+                </div>
+                <p class="text-[12px] leading-relaxed font-body text-lavender-300/60 italic">
+                  {{ item.refinementNotes }}
+                </p>
+              </div>
+
+              <!-- Actions -->
+              <div class="animate-in pt-2 space-y-2">
+                <!-- Open Playground — primary -->
+                <button
+                  class="btn-press fork-button group w-full"
+                  @click="handleOpenPlayground"
+                >
+                  <span class="flex items-center justify-center gap-2">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" class="transition-transform duration-200 group-hover:rotate-12">
+                      <rect x="1" y="3" width="12" height="9" rx="1.5" />
+                      <path d="M4 3V1.5A.5.5 0 0 1 4.5 1h5a.5.5 0 0 1 .5.5V3" />
+                      <line x1="4" y1="6.5" x2="10" y2="6.5" />
+                      <line x1="4" y1="9" x2="7" y2="9" />
+                    </svg>
+                    <span>Open Playground</span>
+                  </span>
+                </button>
+
+                <!-- Copy Raw Prompt — secondary quick action -->
+                <button
+                  v-if="item.rawPrompt"
+                  ref="quickForkBtnEl"
+                  class="btn-press quick-fork-button group w-full"
+                  @click="handleQuickFork"
+                >
+                  <span v-if="!copied || copiedType !== 'quick'" class="flex items-center justify-center gap-2">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
+                      <rect x="2" y="2" width="7" height="9" rx="1" />
+                      <path d="M5 2V1a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1h-1" />
+                    </svg>
+                    <span>Copy Raw Prompt</span>
+                  </span>
+                  <Transition name="feedback-slide" mode="out-in">
+                    <div v-if="copied && copiedType === 'quick'" class="flex flex-col items-center gap-0.5">
+                      <span class="text-accent-red font-medium flex items-center gap-1.5">
+                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="2 6 5 9 10 3" />
+                        </svg>
+                        Prompt copied
+                      </span>
+                      <span class="text-dark-400 text-[10px] italic">
+                        Paste directly into Midjourney — ready to generate
+                      </span>
+                    </div>
+                  </Transition>
+                </button>
+              </div>
+            </template>
           </template>
         </div>
 
@@ -595,6 +653,44 @@ function getHoveredDescription(nodes: PromptNode[]): string | null {
 .mode-toggle.is-advanced .mode-toggle-thumb {
   transform: translateX(10px);
   background: #ed544d;
+}
+
+/* ── Unlock button ── */
+.unlock-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 20px;
+  border-radius: 8px;
+  background: rgba(237, 84, 77, 0.15);
+  border: 1px solid rgba(237, 84, 77, 0.3);
+  color: #ed544d;
+  font-family: var(--font-body, 'PP Neue Montreal', sans-serif);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+
+.unlock-button:hover:not(:disabled) {
+  background: rgba(237, 84, 77, 0.25);
+  border-color: rgba(237, 84, 77, 0.45);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(237, 84, 77, 0.2);
+}
+
+.unlock-button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.locked-prompt-block {
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  min-height: 140px;
+  position: relative;
 }
 
 .prompt-block {

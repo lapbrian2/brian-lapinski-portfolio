@@ -1,12 +1,35 @@
-import { eq, asc, inArray, count } from 'drizzle-orm'
-import { artworks, techniques, artworkTechniques, artworkLikes } from '~/server/db/schema'
+import { eq, asc, and, inArray, count } from 'drizzle-orm'
+import { artworks, techniques, artworkTechniques, artworkLikes, promptPurchases } from '~/server/db/schema'
 import { useDb } from '~/server/db'
+import { getPromptPrice } from '~/server/utils/prompt-pricing'
 
 export default defineEventHandler(async (event) => {
   const db = useDb()
   const query = getQuery(event)
   const category = query.category as string | undefined
   const withNodes = query.nodes === 'true' // ?nodes=true to include prompt nodes
+
+  // Check if user is authenticated
+  let userId: string | undefined
+  try {
+    const session = await getUserSession(event)
+    userId = session?.user?.id as string | undefined
+  } catch {
+    // nuxt-auth-utils not configured
+  }
+
+  // Fetch user's purchased prompt IDs
+  let purchasedIds = new Set<string>()
+  if (userId) {
+    const purchases = await db
+      .select({ artworkId: promptPurchases.artworkId })
+      .from(promptPurchases)
+      .where(and(
+        eq(promptPurchases.userId, userId),
+        eq(promptPurchases.status, 'completed'),
+      ))
+    purchasedIds = new Set(purchases.map(p => p.artworkId))
+  }
 
   // Return all artworks (filtered by category if specified)
   let results
@@ -66,30 +89,54 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // Flatten into response
-    const enriched = results.map((artwork) => ({
-      ...artwork,
-      promptNodes: nodeMap.get(artwork.id) || [],
-      likeCount: likeMap.get(artwork.id) || 0,
-    }))
+    // Gate premium fields based on purchase status
+    const enriched = results.map((artwork) => {
+      const unlocked = purchasedIds.has(artwork.id)
+      const nodes = nodeMap.get(artwork.id) || []
+      return {
+        ...artwork,
+        rawPrompt: unlocked ? artwork.rawPrompt : null,
+        refinementNotes: unlocked ? artwork.refinementNotes : null,
+        promptNodes: nodes.map(node => ({
+          ...node,
+          description: unlocked ? node.description : null,
+        })),
+        likeCount: likeMap.get(artwork.id) || 0,
+        promptUnlocked: unlocked,
+        promptPrice: getPromptPrice(artwork.promptPrice),
+        hasPrompt: !!artwork.rawPrompt,
+      }
+    })
 
+    // Per-user responses must not be cached publicly
     setResponseHeaders(event, {
-      'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120',
+      'Cache-Control': userId
+        ? 'private, no-store'
+        : 'public, s-maxage=60, stale-while-revalidate=120',
     })
 
     return { success: true, data: enriched }
   }
 
-  // Cache for 60s, stale-while-revalidate for 2 min
-  setResponseHeaders(event, {
-    'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120',
+  // Plain results (no nodes) — still gate premium fields
+  const withLikes = results.map((artwork) => {
+    const unlocked = purchasedIds.has(artwork.id)
+    return {
+      ...artwork,
+      rawPrompt: unlocked ? artwork.rawPrompt : null,
+      refinementNotes: unlocked ? artwork.refinementNotes : null,
+      likeCount: likeMap.get(artwork.id) || 0,
+      promptUnlocked: unlocked,
+      promptPrice: getPromptPrice(artwork.promptPrice),
+      hasPrompt: !!artwork.rawPrompt,
+    }
   })
 
-  // Add like counts to plain results
-  const withLikes = results.map((artwork) => ({
-    ...artwork,
-    likeCount: likeMap.get(artwork.id) || 0,
-  }))
+  setResponseHeaders(event, {
+    'Cache-Control': userId
+      ? 'private, no-store'
+      : 'public, s-maxage=60, stale-while-revalidate=120',
+  })
 
   return { success: true, data: withLikes }
 })

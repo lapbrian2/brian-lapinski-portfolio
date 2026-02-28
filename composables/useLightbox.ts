@@ -14,6 +14,10 @@ export interface LightboxItem {
   refinementNotes?: string | null
   promptNodes?: PromptNode[]
   likeCount?: number
+  // Purchase gating
+  promptUnlocked?: boolean
+  promptPrice?: number
+  hasPrompt?: boolean
 }
 
 export interface SourceRect {

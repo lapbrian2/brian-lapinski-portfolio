@@ -97,6 +97,29 @@ export default defineNitroPlugin(async () => {
       )
     `)
 
+    // Prompt purchases table
+    await client.execute(`
+      CREATE TABLE IF NOT EXISTS prompt_purchases (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        artwork_id TEXT NOT NULL REFERENCES artworks(id) ON DELETE CASCADE,
+        stripe_session_id TEXT UNIQUE,
+        stripe_payment_intent_id TEXT,
+        price_paid INTEGER NOT NULL,
+        status TEXT NOT NULL DEFAULT 'completed',
+        created_at TEXT DEFAULT (datetime('now'))
+      )
+    `)
+    await client.execute(`CREATE INDEX IF NOT EXISTS prompt_purchases_user_artwork_idx ON prompt_purchases(user_id, artwork_id)`)
+    await client.execute(`CREATE INDEX IF NOT EXISTS prompt_purchases_user_idx ON prompt_purchases(user_id)`)
+
+    // Add prompt_price column to artworks (may already exist)
+    try {
+      await client.execute(`ALTER TABLE artworks ADD COLUMN prompt_price INTEGER`)
+    } catch {
+      // Column already exists
+    }
+
     console.log('[db-migrate] All tables ready')
   } catch (err) {
     console.warn('[db-migrate] Migration check failed:', err)

@@ -19,6 +19,7 @@ export const artworks = sqliteTable('artworks', {
   mjVersion: text('mj_version'),
   refinementNotes: text('refinement_notes'),
   dominantColor: text('dominant_color'),
+  promptPrice: integer('prompt_price'), // cents, null = use global default ($3.99)
   createdAt: text('created_at').default(sql`(datetime('now'))`),
   updatedAt: text('updated_at').default(sql`(datetime('now'))`),
 })
@@ -169,6 +170,23 @@ export const orderItems = sqliteTable('order_items', {
   quantity: integer('quantity').notNull().default(1),
   unitPrice: integer('unit_price').notNull(), // cents at time of purchase
 })
+
+// ─── Prompt Purchases ───
+
+// Tracks per-artwork prompt unlocks
+export const promptPurchases = sqliteTable('prompt_purchases', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  artworkId: text('artwork_id').notNull().references(() => artworks.id, { onDelete: 'cascade' }),
+  stripeSessionId: text('stripe_session_id').unique(),
+  stripePaymentIntentId: text('stripe_payment_intent_id'),
+  pricePaid: integer('price_paid').notNull(), // cents at time of purchase
+  status: text('status').notNull().default('completed'), // 'completed' | 'refunded'
+  createdAt: text('created_at').default(sql`(datetime('now'))`),
+}, (table) => ({
+  userArtworkIdx: index('prompt_purchases_user_artwork_idx').on(table.userId, table.artworkId),
+  userIdx: index('prompt_purchases_user_idx').on(table.userId),
+}))
 
 // ─── Collections & Curation ───
 

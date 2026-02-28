@@ -65,6 +65,7 @@ export function usePlayground() {
   const charCount = computed(() => promptText.value.length)
 
   function open(opts: PlaygroundOpenOptions) {
+    if (!opts.rawPrompt) return // Don't open playground without prompt data
     sourceTitle.value = opts.title
     promptText.value = opts.rawPrompt || ''
     mjVersion.value = opts.mjVersion || '--v 7'

@@ -54,7 +54,7 @@ const VELOCITY_THRESHOLD = 0.3 // px/ms — a quick flick
 // Check if current item has Ossuary data
 const hasOssuaryData = computed(() => {
   const item = lightbox.currentItem.value
-  return !!(item?.rawPrompt || item?.promptNodes?.length)
+  return !!(item?.hasPrompt || item?.rawPrompt || item?.promptNodes?.length)
 })
 
 function onBackdropClick(e: MouseEvent) {
