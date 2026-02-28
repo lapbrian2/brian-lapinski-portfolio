@@ -8,6 +8,7 @@ const props = withDefaults(defineProps<{
 const visible = ref(false)
 
 function onScroll() {
+  if (typeof window === 'undefined') return
   visible.value = props.ready && window.scrollY < 100
 }
 

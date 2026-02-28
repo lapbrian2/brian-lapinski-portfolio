@@ -100,7 +100,9 @@ export function useLightbox() {
 
   function trackView(artworkId: string) {
     if (typeof window === 'undefined') return
-    $fetch(`/api/artworks/${artworkId}/view`, { method: 'POST' }).catch(() => {})
+    $fetch(`/api/artworks/${artworkId}/view`, { method: 'POST' }).catch((err) => {
+      console.warn('View tracking failed:', err)
+    })
   }
 
   function getSourceRect(): SourceRect | null {

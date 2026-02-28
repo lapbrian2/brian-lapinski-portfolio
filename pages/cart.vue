@@ -55,6 +55,8 @@
                   v-if="item.artworkSrc"
                   :src="item.artworkSrc"
                   :alt="item.artworkTitle"
+                  width="80"
+                  height="80"
                   class="w-20 h-20 md:w-24 md:h-24 object-cover rounded-sm"
                   loading="lazy"
                 />

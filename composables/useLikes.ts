@@ -21,7 +21,8 @@ export function useLikes() {
     const session = useUserSession()
     loggedIn = session.loggedIn
     user = session.user
-  } catch {
+  } catch (err) {
+    console.warn('Auth session unavailable:', err)
     // nuxt-auth-utils not configured — treat as anonymous
   }
 
@@ -43,7 +44,8 @@ export function useLikes() {
             likedIds.value = new Set(response.data)
             persistToStorage()
           }
-        } catch {
+        } catch (err) {
+          console.warn('Failed to hydrate likes from server:', err)
           // Fall back to localStorage
           hydrateFromStorage()
         }
@@ -62,8 +64,8 @@ export function useLikes() {
           likedIds.value = new Set(ids)
         }
       }
-    } catch {
-      // Silently fail — corrupt localStorage
+    } catch (err) {
+      console.warn('Failed to parse likes from localStorage:', err)
     }
   }
 
@@ -71,8 +73,8 @@ export function useLikes() {
     if (!import.meta.client) return
     try {
       localStorage.setItem(getStorageKey(), JSON.stringify([...likedIds.value]))
-    } catch {
-      // Storage full or unavailable
+    } catch (err) {
+      console.warn('Failed to persist likes to localStorage:', err)
     }
   }
 
@@ -158,7 +160,8 @@ export function useLikes() {
       likeCounts.value = reconcileCounts
 
       return response.liked
-    } catch {
+    } catch (err) {
+      console.error('Failed to toggle like:', err)
       // Revert on failure
       const revertIds = new Set(likedIds.value)
       if (wasLiked) {

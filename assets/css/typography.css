@@ -26,3 +26,10 @@
   --tracking-wide: 0.05em;
   --tracking-wider: 0.1em;
 }
+
+/* Ensure text remains visible during font loading (prevent FOIT) */
+@font-face {
+  font-family: 'PP Neue Montreal';
+  font-display: swap;
+  src: local('PP Neue Montreal');
+}

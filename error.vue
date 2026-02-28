@@ -88,6 +88,9 @@ onMounted(async () => {
 
   const { default: Splitting } = await import('splitting')
 
+  // Re-check after async gap — component may have unmounted during import
+  if (!containerEl.value) return
+
   // Scramble/decode the title
   if (titleEl.value) {
     const result = Splitting({ target: titleEl.value, by: 'chars' })

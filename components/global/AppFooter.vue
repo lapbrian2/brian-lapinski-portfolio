@@ -87,7 +87,7 @@
       <!-- Bottom Row -->
       <div class="flex items-center justify-between pt-6 border-t border-dark-700/50">
         <p class="text-xs text-lavender-500 font-body">
-          &copy; {{ new Date().getFullYear() }} Brian Lapinski
+          &copy; {{ currentYear }} Brian Lapinski
         </p>
 
         <!-- Back to top -->
@@ -142,6 +142,8 @@ const pageLinks = [
   { to: '/collections', label: 'Collections' },
   { to: '/account/purchases', label: 'My Prompts' },
 ]
+
+const currentYear = new Date().getFullYear()
 
 const footerEl = ref<HTMLElement | null>(null)
 const borderEl = ref<HTMLElement | null>(null)
