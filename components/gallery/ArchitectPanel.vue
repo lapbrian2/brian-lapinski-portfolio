@@ -210,12 +210,26 @@ function handleOpenPlayground() {
 }
 
 async function handleQuickFork() {
-  await quickFork({
+  const success = await quickFork({
     title: props.item.title,
     rawPrompt: props.item.rawPrompt,
     mjVersion: props.item.mjVersion,
     promptNodes: props.item.promptNodes,
   })
+  // Elastic scale feedback on copy success
+  if (success && quickForkBtnEl.value) {
+    gsap.fromTo(quickForkBtnEl.value, {
+      scale: 1,
+    }, {
+      scale: 1.08,
+      duration: 0.5,
+      ease: 'elastic.out(1.2, 0.4)',
+      yoyo: true,
+      repeat: 1,
+      force3D: true,
+      clearProps: 'scale',
+    })
+  }
 }
 
 // Helper: get hovered node's description within a category group

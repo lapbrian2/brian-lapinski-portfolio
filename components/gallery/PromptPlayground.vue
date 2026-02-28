@@ -7,6 +7,7 @@ import { useIsMobile, useReducedMotion } from '~/composables/useMediaQuery'
 
 const playground = usePlayground()
 const { copyToClipboard } = usePromptFork()
+const { burst } = useParticleBurst()
 const isMobile = useIsMobile()
 const reducedMotion = useReducedMotion()
 
@@ -84,6 +85,7 @@ async function handleCopy() {
   const success = await copyToClipboard(text)
   if (success) {
     justCopied.value = true
+    burst(copyBtnEl.value)
     if (copyTimeout) clearTimeout(copyTimeout)
     copyTimeout = setTimeout(() => { justCopied.value = false }, 2000)
   }
