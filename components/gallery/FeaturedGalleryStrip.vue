@@ -10,8 +10,36 @@ const reducedMotion = useReducedMotion()
 
 const featured = computed(() => {
   const feat = artworks.value.filter((a) => a.featured)
-  if (feat.length >= 4) return feat.slice(0, 12)
-  return artworks.value.slice(0, 8)
+  const pool = feat.length >= 4 ? feat : artworks.value
+  const limit = 12
+
+  // Group by category for round-robin diversity
+  const byCategory = new Map<string, typeof pool>()
+  for (const a of pool) {
+    const list = byCategory.get(a.category) || []
+    list.push(a)
+    byCategory.set(a.category, list)
+  }
+
+  // Round-robin pick from each category so the carousel shows mixed styles
+  const result: typeof pool = []
+  const categories = [...byCategory.keys()]
+  let round = 0
+  while (result.length < limit) {
+    let added = false
+    for (const cat of categories) {
+      const list = byCategory.get(cat)!
+      if (round < list.length) {
+        result.push(list[round])
+        added = true
+        if (result.length >= limit) break
+      }
+    }
+    if (!added) break
+    round++
+  }
+
+  return result
 })
 
 const sceneEl = ref<HTMLElement | null>(null)
