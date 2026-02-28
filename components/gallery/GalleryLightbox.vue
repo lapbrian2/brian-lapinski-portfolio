@@ -692,17 +692,16 @@ onUnmounted(() => {
             <span class="font-body text-[10px] uppercase tracking-[0.2em] text-lavender-400/40">Loading</span>
           </div>
 
-          <NuxtImg
+          <img
             v-if="lightbox.currentItem.value.src"
             :key="lightbox.currentIndex.value"
             :src="lightbox.currentItem.value.src"
             :alt="lightbox.currentItem.value.title"
             class="lightbox-image select-none"
             :class="imageLoaded ? 'opacity-100' : 'opacity-0'"
-            sizes="100vw"
             draggable="false"
             @load="onImageLoad"
-          />
+          >
 
           <!-- Fallback if no image -->
           <div
