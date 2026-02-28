@@ -494,6 +494,11 @@ useHead({
     { name: 'twitter:image', content: 'https://lapinski.art/images/artworks/the-threshold.webp' },
   ],
 })
+
+// JSON-LD structured data for gallery
+watch(artworks, (arts) => {
+  if (arts.length) useGallerySchema(arts)
+}, { immediate: true })
 </script>
 
 <style scoped>

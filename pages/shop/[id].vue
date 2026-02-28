@@ -336,4 +336,11 @@ useHead({
     ]
   }),
 })
+
+// JSON-LD Product structured data
+watch(product, (p) => {
+  if (p?.variants) {
+    useProductSchema(p, p.variants)
+  }
+}, { immediate: true })
 </script>

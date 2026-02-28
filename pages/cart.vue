@@ -200,6 +200,7 @@ useHead({
   title: 'Cart | Brian Lapinski',
   meta: [
     { name: 'description', content: 'Your shopping cart — Brian Lapinski Print Shop.' },
+    { name: 'robots', content: 'noindex' },
   ],
 })
 </script>

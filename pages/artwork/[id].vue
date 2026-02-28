@@ -90,6 +90,15 @@
               <ArtworkStats :artwork-id="artwork.id" />
               <ResonanceButton :artwork-id="artwork.id" size="md" />
             </div>
+
+            <!-- Share -->
+            <div class="mt-4">
+              <ShareButtons
+                :title="artwork.title"
+                :url="artworkUrl"
+                :image-url="artworkImageUrl"
+              />
+            </div>
           </div>
 
           <!-- Description -->
@@ -328,9 +337,22 @@ onUnmounted(() => {
   ctx?.revert()
 })
 
-// SEO: Dynamic head
+// Computed URLs for share buttons
 const config = useRuntimeConfig()
 const baseUrl = (config.public.siteUrl as string) || 'https://lapinski.art'
+
+const artworkUrl = computed(() =>
+  artwork.value ? `${baseUrl}/artwork/${artwork.value.id}` : baseUrl,
+)
+
+const artworkImageUrl = computed(() => {
+  if (!artwork.value) return ''
+  return artwork.value.src.startsWith('http')
+    ? artwork.value.src
+    : `${baseUrl}${artwork.value.src}`
+})
+
+// SEO: Dynamic head
 
 useHead({
   title: computed(() => artwork.value

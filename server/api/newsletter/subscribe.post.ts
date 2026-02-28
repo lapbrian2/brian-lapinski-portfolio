@@ -1,6 +1,7 @@
 import { eq } from 'drizzle-orm'
 import { subscribers } from '~/server/db/schema'
 import { useDb } from '~/server/db'
+import { welcomeEmail } from '~/server/utils/email-templates'
 
 // Simple in-memory rate limiter (per IP, resets on cold start)
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>()
@@ -82,6 +83,27 @@ export default defineEventHandler(async (event) => {
     email: trimmedEmail,
     name: trimmedName,
   })
+
+  // Send welcome email (non-blocking, never fail subscription for email)
+  const config = useRuntimeConfig()
+  if (config.resendApiKey) {
+    try {
+      const baseUrl = (config.public.siteUrl as string) || 'https://lapinski.art'
+      const unsubscribeUrl = `${baseUrl}/unsubscribe?email=${encodeURIComponent(trimmedEmail)}`
+      const emailContent = welcomeEmail({ name: trimmedName || null, unsubscribeUrl })
+
+      const { Resend } = await import('resend')
+      const resend = new Resend(config.resendApiKey as string)
+      await resend.emails.send({
+        from: config.resendFromEmail as string,
+        to: trimmedEmail,
+        subject: emailContent.subject,
+        html: emailContent.html,
+      })
+    } catch {
+      // Never fail subscription for email error
+    }
+  }
 
   return { success: true }
 })

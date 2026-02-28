@@ -42,4 +42,18 @@ describe('formatPrice', () => {
   it('formats 0 cents as "$0.00"', () => {
     expect(formatPrice(0)).toBe('$0.00')
   })
+
+  it('formats 1 cent as "$0.01"', () => {
+    expect(formatPrice(1)).toBe('$0.01')
+  })
+
+  it('formats negative cents as a dollar string', () => {
+    const result = formatPrice(-100)
+    expect(typeof result).toBe('string')
+    expect(result).toBe('$-1.00')
+  })
+
+  it('formats large values like 100000 cents as "$1000.00"', () => {
+    expect(formatPrice(100000)).toBe('$1000.00')
+  })
 })
