@@ -71,6 +71,7 @@
             <button
               v-for="opt in sortOptions"
               :key="opt.value"
+              :aria-pressed="sortBy === opt.value"
               class="sort-pill px-3 py-1.5 rounded-full font-body text-xs transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-red"
               :class="sortBy === opt.value
                 ? 'bg-white/10 text-lavender-100'
@@ -538,11 +539,14 @@ useHead({
     { property: 'og:description', content: 'Browse the full portfolio of AI artworks by Brian Lapinski.' },
     { property: 'og:image', content: 'https://lapinski.art/images/artworks/the-threshold.webp' },
     { property: 'og:type', content: 'website' },
+    { property: 'og:url', content: 'https://lapinski.art/gallery' },
+    { property: 'og:image:alt', content: 'AI art gallery by Brian Lapinski' },
     { name: 'twitter:card', content: 'summary_large_image' },
     { name: 'twitter:title', content: 'Gallery | Brian Lapinski' },
     { name: 'twitter:description', content: 'Browse the full portfolio of AI artworks by Brian Lapinski.' },
     { name: 'twitter:image', content: 'https://lapinski.art/images/artworks/the-threshold.webp' },
   ],
+  link: [{ rel: 'canonical', href: 'https://lapinski.art/gallery' }],
 })
 
 // JSON-LD structured data for gallery

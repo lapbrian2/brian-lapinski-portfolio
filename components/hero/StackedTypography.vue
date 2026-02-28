@@ -3,6 +3,8 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useIsMobile, useReducedMotion } from '~/composables/useMediaQuery'
 
+const StackedAurora = defineAsyncComponent(() => import('~/components/hero/StackedAurora.client.vue'))
+
 const sectionEl = ref<HTMLElement | null>(null)
 const isMobile = useIsMobile()
 const reducedMotion = useReducedMotion()

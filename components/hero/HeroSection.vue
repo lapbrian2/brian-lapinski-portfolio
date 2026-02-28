@@ -8,10 +8,10 @@ const props = defineProps<{
 
 // Hero artwork cycle — 4 diverse pieces spanning every style
 const heroImages = [
-  '/images/artworks/red-shift.webp',
-  '/images/artworks/silk-valley.webp',
-  '/images/artworks/the-deep.webp',
-  '/images/artworks/the-threshold.webp',
+  { src: '/images/artworks/red-shift.webp', alt: 'Red Shift — cyberpunk motorcycle in neon cityscape' },
+  { src: '/images/artworks/silk-valley.webp', alt: 'Silk Valley — misty mountain landscape draped in golden light' },
+  { src: '/images/artworks/the-deep.webp', alt: 'The Deep — explorer in bioluminescent underwater cavern' },
+  { src: '/images/artworks/the-threshold.webp', alt: 'The Threshold — figure standing before a luminous gateway' },
 ]
 
 // Preload only the first hero image — subsequent images load lazily as needed
@@ -20,7 +20,7 @@ useHead({
     {
       rel: 'preload',
       as: 'image',
-      href: heroImages[0],
+      href: heroImages[0].src,
     },
   ],
 })
@@ -128,11 +128,11 @@ onUnmounted(() => {
     <!-- Artwork background layer — crossfading Ken Burns cycle -->
     <div class="absolute inset-0 z-[1]">
       <img
-        v-for="(src, i) in heroImages"
-        :key="src"
+        v-for="(img, i) in heroImages"
+        :key="img.src"
         :ref="(el) => { if (el) imgEls[i] = el as HTMLElement }"
-        :src="src"
-        alt=""
+        :src="img.src"
+        :alt="img.alt"
         class="absolute inset-0 w-full h-full object-cover hero-img"
         style="opacity: 0"
         :loading="i === 0 ? 'eager' : 'lazy'"

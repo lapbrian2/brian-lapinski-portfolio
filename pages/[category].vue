@@ -218,11 +218,14 @@ useHead({
     { property: 'og:description', content: categoryDescription.value },
     { property: 'og:image', content: ogImage.value },
     { property: 'og:type', content: 'website' },
+    { property: 'og:url', content: `https://lapinski.art/${route.params.category}` },
+    { property: 'og:image:alt', content: `${categoryLabel.value} AI artworks by Brian Lapinski` },
     { name: 'twitter:card', content: 'summary_large_image' },
     { name: 'twitter:title', content: `${categoryLabel.value} | Brian Lapinski` },
     { name: 'twitter:description', content: categoryDescription.value },
     { name: 'twitter:image', content: ogImage.value },
   ]),
+  link: computed(() => [{ rel: 'canonical', href: `https://lapinski.art/${route.params.category}` }]),
 })
 
 // JSON-LD structured data for category page — reactive via watchEffect

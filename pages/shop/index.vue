@@ -413,11 +413,14 @@ useHead({
     { property: 'og:description', content: 'Limited edition museum-quality prints and high-resolution downloads of original AI artworks.' },
     { property: 'og:image', content: 'https://lapinski.art/images/artworks/the-threshold.webp' },
     { property: 'og:type', content: 'website' },
+    { property: 'og:url', content: 'https://lapinski.art/shop' },
+    { property: 'og:image:alt', content: 'AI art prints by Brian Lapinski' },
     { name: 'twitter:card', content: 'summary_large_image' },
     { name: 'twitter:title', content: 'Print Shop | Brian Lapinski' },
     { name: 'twitter:description', content: 'Limited edition prints and high-resolution downloads of original AI artworks.' },
     { name: 'twitter:image', content: 'https://lapinski.art/images/artworks/the-threshold.webp' },
   ],
+  link: [{ rel: 'canonical', href: 'https://lapinski.art/shop' }],
 })
 </script>
 

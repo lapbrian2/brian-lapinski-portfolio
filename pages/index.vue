@@ -45,7 +45,10 @@ useHead({
       name: 'description',
       content: 'Brian Lapinski — exploring what it means to be human through images. AI artist, educator, and Creative Partner.',
     },
+    { property: 'og:url', content: 'https://lapinski.art/' },
+    { property: 'og:image:alt', content: 'Brian Lapinski AI Art Portfolio' },
   ],
+  link: [{ rel: 'canonical', href: 'https://lapinski.art/' }],
 })
 
 // Structured data: WebSite + ArtGallery schema

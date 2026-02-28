@@ -251,11 +251,14 @@ useHead({
     { property: 'og:description', content: 'AI artist exploring what it means to be human through images. Learn about the creative process and prompt architecture.' },
     { property: 'og:image', content: 'https://lapinski.art/images/artworks/the-threshold.webp' },
     { property: 'og:type', content: 'profile' },
+    { property: 'og:url', content: 'https://lapinski.art/about' },
+    { property: 'og:image:alt', content: 'Brian Lapinski — AI artist portrait' },
     { name: 'twitter:card', content: 'summary_large_image' },
     { name: 'twitter:title', content: 'About | Brian Lapinski' },
     { name: 'twitter:description', content: 'AI artist exploring what it means to be human through images.' },
     { name: 'twitter:image', content: 'https://lapinski.art/images/artworks/the-threshold.webp' },
   ],
+  link: [{ rel: 'canonical', href: 'https://lapinski.art/about' }],
 })
 
 // Structured data: Person schema

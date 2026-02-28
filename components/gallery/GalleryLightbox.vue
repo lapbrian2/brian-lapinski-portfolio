@@ -5,6 +5,7 @@ import { useIsMobile, useReducedMotion } from '~/composables/useMediaQuery'
 
 import type { PrintProduct } from '~/types/shop'
 
+const config = useRuntimeConfig()
 const lightbox = useLightbox()
 const playground = usePlayground()
 const { copied, copiedType } = usePromptFork()
@@ -18,6 +19,7 @@ const backdropEl = ref<HTMLElement | null>(null)
 const imageLoaded = ref(false)
 const showCaption = ref(true)
 const showArchitect = ref(false)
+const showShare = ref(false)
 const showToast = ref(false)
 let toastTimeoutId: ReturnType<typeof setTimeout> | null = null
 
@@ -38,6 +40,18 @@ const printProductForCurrent = computed(() => {
   const artworkId = lightbox.currentItem.value?.id
   if (!artworkId || !shopProductsData.value?.data) return null
   return shopProductsData.value.data.find((p) => p.artworkId === artworkId && p.active) ?? null
+})
+
+// Share URL helpers
+const shareBaseUrl = computed(() => (config.public.siteUrl as string) || 'https://lapinski.art')
+const shareArtworkUrl = computed(() => {
+  const id = lightbox.currentItem.value?.id
+  return id ? `${shareBaseUrl.value}/artwork/${id}` : shareBaseUrl.value
+})
+const shareImageUrl = computed(() => {
+  const src = lightbox.currentItem.value?.src
+  if (!src) return ''
+  return src.startsWith('http') ? src : `${shareBaseUrl.value}${src}`
 })
 
 const FOCUSABLE_SELECTOR = 'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'
@@ -103,6 +117,10 @@ function toggleCaption() {
 
 function toggleArchitect() {
   showArchitect.value = !showArchitect.value
+}
+
+function toggleShare() {
+  showShare.value = !showShare.value
 }
 
 function onTouchStart(e: TouchEvent) {
@@ -174,6 +192,7 @@ function onTouchEnd() {
 watch(() => lightbox.currentIndex.value, (_, oldVal) => {
   if (oldVal === undefined) return
   showArchitect.value = false
+  showShare.value = false
   imageLoaded.value = false
   animateImageTransition()
 })
@@ -504,6 +523,7 @@ watch(() => lightbox.isOpen.value, (open) => {
   } else {
     window.removeEventListener('keydown', handleKeydown)
     showArchitect.value = false
+    showShare.value = false
     activeTl?.kill()
     activeTl = null
     ;(previouslyFocused as HTMLElement | null)?.focus()
@@ -541,12 +561,14 @@ function handleKeydown(e: KeyboardEvent) {
     return
   }
 
-  // Escape cascade: playground → architect panel → lightbox
+  // Escape cascade: playground → architect panel → share popover → lightbox
   if (e.key === 'Escape') {
     if (playground.isOpen.value) {
       playground.close()
     } else if (showArchitect.value) {
       showArchitect.value = false
+    } else if (showShare.value) {
+      showShare.value = false
     } else {
       animatedClose()
     }
@@ -617,6 +639,36 @@ onUnmounted(() => {
             :artwork-id="lightbox.currentItem.value.id"
             size="md"
           />
+
+          <!-- Share toggle -->
+          <div v-if="lightbox.currentItem.value?.id" class="relative">
+            <button
+              class="btn-press w-10 h-10 flex items-center justify-center rounded-full text-lavender-400 hover:text-lavender-100 transition-colors duration-200 cursor-hover"
+              :class="showShare ? 'bg-white/10' : 'bg-white/5'"
+              aria-label="Share this artwork"
+              :aria-expanded="showShare"
+              @click.stop="toggleShare"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+                <polyline points="16 6 12 2 8 6" />
+                <line x1="12" y1="2" x2="12" y2="15" />
+              </svg>
+            </button>
+            <Transition name="share-pop">
+              <div
+                v-if="showShare"
+                class="absolute right-0 top-full mt-2 z-20 rounded-xl border border-white/[0.08] bg-dark-900/95 backdrop-blur-md px-4 py-3 shadow-xl"
+                @click.stop
+              >
+                <ShareButtons
+                  :title="lightbox.currentItem.value.title"
+                  :url="shareArtworkUrl"
+                  :image-url="shareImageUrl"
+                />
+              </div>
+            </Transition>
+          </div>
 
           <!-- Architect Panel toggle -->
           <button
@@ -1006,6 +1058,22 @@ onUnmounted(() => {
 .toast-fade-leave-to {
   opacity: 0;
   transform: translateY(-12px);
+}
+
+/* Share popover transition */
+.share-pop-enter-active {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.share-pop-leave-active {
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+.share-pop-enter-from {
+  opacity: 0;
+  transform: translateY(-6px) scale(0.95);
+}
+.share-pop-leave-to {
+  opacity: 0;
+  transform: translateY(-6px) scale(0.95);
 }
 
 /* Mobile scrim fade transition */

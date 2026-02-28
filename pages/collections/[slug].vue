@@ -246,11 +246,16 @@ useHead({
       { property: 'og:image', content: imageUrl },
       { property: 'og:type', content: 'website' },
       { property: 'og:url', content: `${baseUrl}/collections/${c.slug}` },
+      { property: 'og:image:alt', content: `${c.title} collection by Brian Lapinski` },
       { name: 'twitter:card', content: 'summary_large_image' },
       { name: 'twitter:title', content: `${c.title} | Brian Lapinski` },
       { name: 'twitter:description', content: c.description || `${c.title} — a curated collection.` },
       { name: 'twitter:image', content: imageUrl },
     ]
+  }),
+  link: computed(() => {
+    if (!collection.value) return []
+    return [{ rel: 'canonical', href: `${baseUrl}/collections/${collection.value.slug}` }]
   }),
 })
 </script>

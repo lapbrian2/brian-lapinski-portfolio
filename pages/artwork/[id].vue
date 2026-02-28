@@ -369,12 +369,18 @@ useHead({
       { property: 'og:image', content: imageUrl },
       { property: 'og:type', content: 'article' },
       { property: 'og:url', content: `${baseUrl}/artwork/${a.id}` },
+      { property: 'og:image:alt', content: `${a.title} — AI artwork by Brian Lapinski` },
       { name: 'twitter:card', content: 'summary_large_image' },
       { name: 'twitter:title', content: `${a.title} | Brian Lapinski` },
       { name: 'twitter:description', content: a.description },
       { name: 'twitter:image', content: imageUrl },
       { name: 'twitter:creator', content: '@Lapbrian2' },
     ]
+  }),
+  link: computed(() => {
+    const a = artwork.value
+    if (!a) return []
+    return [{ rel: 'canonical', href: `${baseUrl}/artwork/${a.id}` }]
   }),
 })
 

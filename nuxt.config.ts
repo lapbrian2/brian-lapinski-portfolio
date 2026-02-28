@@ -27,6 +27,7 @@ export default defineNuxtConfig({
         { property: 'og:image:width', content: '1200' },
         { property: 'og:image:height', content: '630' },
         { property: 'og:locale', content: 'en_US' },
+        { property: 'og:site_name', content: 'Brian Lapinski' },
         // Twitter Card
         { name: 'twitter:card', content: 'summary_large_image' },
         { name: 'twitter:title', content: 'Brian Lapinski | AI Art Portfolio' },

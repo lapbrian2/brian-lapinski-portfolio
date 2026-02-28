@@ -332,8 +332,14 @@ useHead({
       { property: 'og:description', content: `Limited edition museum-quality print of "${product.value.artworkTitle}".` },
       { property: 'og:image', content: product.value.artworkSrc || '' },
       { property: 'og:type', content: 'product' },
+      { property: 'og:url', content: `https://lapinski.art/shop/${product.value.id}` },
+      { property: 'og:image:alt', content: `${product.value.artworkTitle} print by Brian Lapinski` },
       { name: 'twitter:card', content: 'summary_large_image' },
     ]
+  }),
+  link: computed(() => {
+    if (!product.value) return []
+    return [{ rel: 'canonical', href: `https://lapinski.art/shop/${product.value.id}` }]
   }),
 })
 
