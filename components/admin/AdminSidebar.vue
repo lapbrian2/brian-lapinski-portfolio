@@ -65,6 +65,8 @@ const navItems = [
   { to: '/admin/content', label: 'Content', icon: 'edit' },
   { to: '/admin/credentials', label: 'Credentials', icon: 'award' },
   { to: '/admin/submissions', label: 'Submissions', icon: 'mail' },
+  { to: '/admin/subscribers', label: 'Subscribers', icon: 'mail' },
+  { to: '/admin/newsletter', label: 'Newsletter', icon: 'edit' },
   { to: '/admin/analytics', label: 'Analytics', icon: 'chart' },
 ]
 

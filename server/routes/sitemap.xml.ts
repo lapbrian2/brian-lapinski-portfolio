@@ -40,6 +40,7 @@ export default defineEventHandler(async (event) => {
       priority: '0.8',
       changefreq: 'weekly',
     })),
+    { loc: '/about', priority: '0.8', changefreq: 'monthly' },
     { loc: '/shop', priority: '0.7', changefreq: 'weekly' },
     { loc: '/collections', priority: '0.7', changefreq: 'weekly' },
     ...artworkRows.map((a) => ({

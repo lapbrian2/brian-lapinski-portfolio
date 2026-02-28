@@ -38,9 +38,11 @@ export default defineNuxtConfig({
       link: [
         { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
         { rel: 'alternate', type: 'application/rss+xml', title: 'Brian Lapinski — New Artworks', href: 'https://lapinski.art/feed.xml' },
+        { rel: 'dns-prefetch', href: 'https://fonts.cdnfonts.com' },
         { rel: 'preconnect', href: 'https://fonts.cdnfonts.com', crossorigin: '' },
         { rel: 'preload', as: 'style', href: 'https://fonts.cdnfonts.com/css/pp-neue-montreal' },
         { rel: 'stylesheet', href: 'https://fonts.cdnfonts.com/css/pp-neue-montreal' },
+        { rel: 'dns-prefetch', href: 'https://checkout.stripe.com' },
       ],
     },
   },

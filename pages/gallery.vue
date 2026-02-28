@@ -36,9 +36,37 @@
       </div>
     </section>
 
-    <!-- Category Filter Pills -->
+    <!-- Search + Category Filter -->
     <section class="px-6 md:px-12 pb-10">
-      <div ref="filtersEl" class="max-w-5xl mx-auto flex justify-center">
+      <div ref="filtersEl" class="max-w-5xl mx-auto space-y-4">
+        <!-- Search Bar -->
+        <div class="relative max-w-md mx-auto">
+          <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-lavender-500/50 pointer-events-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.3-4.3" />
+          </svg>
+          <input
+            v-model="searchQuery"
+            type="search"
+            placeholder="Search by title, medium, or description..."
+            aria-label="Search artworks"
+            class="w-full pl-10 pr-4 py-2.5 bg-white/[0.03] border border-white/[0.08] rounded-full font-body text-sm text-lavender-200 placeholder:text-lavender-500/40 focus:border-accent-red/40 focus:outline-none transition-colors duration-300"
+          />
+          <button
+            v-if="searchQuery"
+            class="absolute right-3 top-1/2 -translate-y-1/2 text-lavender-500/60 hover:text-lavender-300 transition-colors"
+            aria-label="Clear search"
+            @click="searchQuery = ''"
+          >
+            <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 6 6 18" />
+              <path d="m6 6 12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Category Pills -->
+        <div class="flex justify-center">
         <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
           <button
             v-for="cat in categories"
@@ -55,6 +83,7 @@
               class="ml-1.5 text-xs opacity-50"
             >{{ getCategoryCount(cat.id) }}</span>
           </button>
+        </div>
         </div>
       </div>
     </section>
@@ -184,6 +213,7 @@ const gridEl = ref<HTMLElement | null>(null)
 const gridSection = ref<HTMLElement | null>(null)
 
 const activeCategory = ref('all')
+const searchQuery = ref('')
 let ctx: gsap.Context | null = null
 let isAnimating = false
 
@@ -195,8 +225,19 @@ const { velocity } = useScrollVelocity()
 let skewTo: gsap.QuickToFunc | null = null
 
 const filteredArtworks = computed(() => {
-  if (activeCategory.value === 'all') return artworks.value
-  return artworks.value.filter(a => a.category === activeCategory.value)
+  let results = artworks.value
+  if (activeCategory.value !== 'all') {
+    results = results.filter(a => a.category === activeCategory.value)
+  }
+  const q = searchQuery.value.trim().toLowerCase()
+  if (q) {
+    results = results.filter(a =>
+      a.title.toLowerCase().includes(q)
+      || a.medium?.toLowerCase().includes(q)
+      || a.description?.toLowerCase().includes(q),
+    )
+  }
+  return results
 })
 
 function getCategoryCount(catId: string): number {
