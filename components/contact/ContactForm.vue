@@ -2,6 +2,7 @@
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useReducedMotion } from '~/composables/useMediaQuery'
+import { applyMagneticHover } from '~/composables/useMagneticHover'
 
 const MESSAGE_MAX = 1000
 
@@ -12,9 +13,18 @@ const reducedMotion = useReducedMotion()
 const messageLength = computed(() => form.message.length)
 const messageLengthPercent = computed(() => Math.min(100, (messageLength.value / MESSAGE_MAX) * 100))
 let ctx: gsap.Context | null = null
+let magneticCleanup: (() => void) | null = null
 
 onMounted(() => {
   if (!formEl.value) return
+
+  // Magnetic hover on submit button
+  if (window.matchMedia('(hover: hover)').matches) {
+    const submitBtn = formEl.value.querySelector('button[type="submit"]') as HTMLElement | null
+    if (submitBtn) {
+      magneticCleanup = applyMagneticHover(submitBtn, { strength: 0.2, scaleTo: 1.06 })
+    }
+  }
 
   // Respect reduced-motion preference
   if (reducedMotion.value) return
@@ -42,6 +52,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   ctx?.revert()
+  magneticCleanup?.()
 })
 </script>
 

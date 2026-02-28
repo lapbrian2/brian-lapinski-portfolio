@@ -205,6 +205,7 @@
 <script setup lang="ts">
 import gsap from 'gsap'
 import { useActiveSection } from '~/composables/useActiveSection'
+import { applyMagneticHover } from '~/composables/useMagneticHover'
 
 const { activeSection, sections } = useActiveSection()
 
@@ -236,6 +237,7 @@ const mobileNavEl = ref<HTMLElement | null>(null)
 const hamburgerEl = ref<HTMLElement | null>(null)
 
 let menuTl: gsap.core.Timeline | null = null
+const magneticCleanups: Array<() => void> = []
 
 function scrollToTop(): void {
   // If not on the homepage, navigate there
@@ -457,6 +459,13 @@ onMounted(() => {
   nextTick(() => {
     if (activeSection.value) moveNavPill(activeSection.value)
 
+    // Magnetic hover on desktop nav links (subtle pull)
+    if (desktopNavEl.value && window.matchMedia('(hover: hover)').matches) {
+      desktopNavEl.value.querySelectorAll<HTMLElement>('a').forEach((link) => {
+        magneticCleanups.push(applyMagneticHover(link, { strength: 0.15, scaleTo: 1.02 }))
+      })
+    }
+
     // Staggered entrance animation for desktop nav links
     if (desktopNavEl.value) {
       const links = desktopNavEl.value.querySelectorAll('a')
@@ -483,6 +492,7 @@ onUnmounted(() => {
   window.removeEventListener('keydown', handleKeydown)
   document.removeEventListener('click', closeUserMenu)
   menuTl?.kill()
+  magneticCleanups.forEach(fn => fn())
   // Ensure body scroll is restored if menu was open during unmount
   document.body.style.overflow = ''
 })

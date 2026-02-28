@@ -137,6 +137,9 @@ const activeCategory = ref('all')
 let ctx: gsap.Context | null = null
 let isAnimating = false
 
+// 3D tilt on gallery cards (desktop only, event-delegated)
+useTiltHover(gridEl, { selector: '.gallery-card' })
+
 const filteredArtworks = computed(() => {
   if (activeCategory.value === 'all') return artworks.value
   return artworks.value.filter(a => a.category === activeCategory.value)

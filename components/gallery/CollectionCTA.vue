@@ -2,6 +2,7 @@
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useIsMobile, useReducedMotion } from '~/composables/useMediaQuery'
+import { applyMagneticHover } from '~/composables/useMagneticHover'
 import { categories as allCategories } from '~/data/artworks'
 
 const sectionEl = ref<HTMLElement | null>(null)
@@ -13,6 +14,7 @@ const isMobile = useIsMobile()
 const reducedMotion = useReducedMotion()
 
 let ctx: gsap.Context | null = null
+let magneticCleanup: (() => void) | null = null
 
 // Representative preview image per category
 const categoryPreviews: Record<string, string> = {
@@ -77,6 +79,14 @@ onMounted(async () => {
   if (!isMobile.value && previewEl.value) {
     previewXTo = gsap.quickTo(previewEl.value, 'left', { duration: 0.4, ease: 'power2.out' })
     previewYTo = gsap.quickTo(previewEl.value, 'top', { duration: 0.4, ease: 'power2.out' })
+  }
+
+  // Magnetic hover on "View All Works" CTA
+  if (!isMobile.value) {
+    const viewAllLink = sectionEl.value.querySelector('a[href="/gallery"]') as HTMLElement | null
+    if (viewAllLink) {
+      magneticCleanup = applyMagneticHover(viewAllLink, { strength: 0.3 })
+    }
   }
 
   if (reducedMotion.value) return
@@ -206,6 +216,7 @@ onUnmounted(() => {
   ctx?.revert()
   previewXTo = null
   previewYTo = null
+  magneticCleanup?.()
 })
 </script>
 
