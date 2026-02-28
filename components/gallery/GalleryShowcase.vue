@@ -31,9 +31,10 @@ const showcase = computed(() => {
       medium: `${found.medium} · ${found.year}`,
       description: found.description,
       src: found.src,
+      dominantColor: found.dominantColor || '#ed544d',
     }
   }
-  return staticFallback
+  return { ...staticFallback, dominantColor: '#ed544d' }
 })
 
 // Mouse-driven depth parallax — image follows cursor subtly
@@ -125,6 +126,12 @@ onUnmounted(() => {
         />
       </div>
     </div>
+
+    <!-- Dominant color ambient glow -->
+    <div
+      class="absolute inset-0 pointer-events-none transition-all duration-1000"
+      :style="`background: radial-gradient(ellipse 80% 60% at 60% 50%, ${showcase.dominantColor}14 0%, transparent 70%)`"
+    />
 
     <!-- Gradient overlays for text legibility -->
     <div class="absolute inset-0 bg-gradient-to-r from-dark-900/80 via-dark-900/30 to-transparent pointer-events-none" />

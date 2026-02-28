@@ -21,7 +21,7 @@
     </header>
 
     <!-- Hero -->
-    <section class="pt-32 pb-8 px-6 md:px-12">
+    <section class="noise-gradient pt-32 pb-8 px-6 md:px-12">
       <div ref="heroEl" class="max-w-5xl mx-auto text-center">
         <p class="font-body text-xs uppercase tracking-[0.3em] text-accent-red mb-4">
           Full Portfolio
