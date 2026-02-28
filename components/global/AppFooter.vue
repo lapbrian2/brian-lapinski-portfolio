@@ -12,7 +12,7 @@
 
     <div class="max-w-[1400px] mx-auto relative">
       <!-- Main footer grid -->
-      <div class="grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-8 mb-16">
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 mb-10 md:mb-16">
         <!-- Left: Large name -->
         <div class="md:col-span-7">
           <span class="font-display font-bold text-lavender-100 leading-none block mb-4 footer-name">
@@ -33,7 +33,7 @@
         </div>
 
         <!-- Right: Links columns -->
-        <div class="md:col-span-5 flex gap-16">
+        <div class="md:col-span-5 flex gap-8 sm:gap-16">
           <!-- Social -->
           <div>
             <p class="font-body text-xs uppercase tracking-[0.2em] text-lavender-300 mb-4">
@@ -131,7 +131,6 @@ const socialLinks: SocialLink[] = [
 
 const navLinks = [
   { id: 'work', label: 'Work' },
-  { id: 'about', label: 'About' },
   { id: 'process', label: 'Process' },
   { id: 'contact', label: 'Contact' },
 ]
