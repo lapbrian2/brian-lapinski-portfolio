@@ -25,9 +25,9 @@ const pending = computed(() => likes.isPending(props.artworkId))
 // Size variants
 const sizeClasses = computed(() => {
   if (props.size === 'sm') {
-    return 'w-8 h-8'
+    return 'w-10 h-10'
   }
-  return 'w-10 h-10'
+  return 'w-11 h-11'
 })
 
 const iconSize = computed(() => props.size === 'sm' ? 14 : 16)

@@ -106,10 +106,45 @@
       </div>
     </section>
 
+    <!-- Screen reader announcement for filter results -->
+    <div class="sr-only" aria-live="polite" aria-atomic="true">
+      {{ filteredArtworks.length }} artwork{{ filteredArtworks.length === 1 ? '' : 's' }} found
+    </div>
+
+    <!-- Error state -->
+    <section v-if="error" class="px-6 md:px-12 pb-24">
+      <div class="max-w-md mx-auto text-center py-16">
+        <div class="w-14 h-14 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center mx-auto mb-5">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+        </div>
+        <h2 class="font-display text-xl text-lavender-100 mb-2">Failed to Load Gallery</h2>
+        <p class="font-body text-sm text-lavender-400 mb-6">Something went wrong loading the artworks. Please try again.</p>
+        <button
+          class="inline-flex items-center gap-2 px-6 py-3 bg-accent-red hover:bg-accent-red-hover text-white text-sm font-medium rounded-sm transition-colors"
+          @click="refresh()"
+        >
+          Retry
+        </button>
+      </div>
+    </section>
+
     <!-- Masonry Grid -->
-    <section ref="gridSection" class="px-6 md:px-12 pb-24">
+    <section v-else ref="gridSection" class="px-6 md:px-12 pb-24">
       <div class="max-w-[1400px] mx-auto">
-        <div ref="gridEl" class="gallery-masonry">
+        <!-- Empty state -->
+        <div v-if="filteredArtworks.length === 0 && artworks.length > 0" class="text-center py-16">
+          <p class="font-body text-lg text-lavender-400 mb-4">No artworks match your filters.</p>
+          <button
+            class="font-body text-sm text-accent-red hover:text-accent-red-hover transition-colors underline underline-offset-4"
+            @click="activeCategory = 'all'; searchQuery = ''"
+          >
+            Clear all filters
+          </button>
+        </div>
+
+        <div v-else ref="gridEl" class="gallery-masonry">
           <div
             v-for="artwork in filteredArtworks"
             :key="artwork.id"
@@ -233,7 +268,7 @@ import type { SourceRect } from '~/composables/useLightbox'
 
 definePageMeta({ layout: false })
 
-const { artworks } = useArtworks()
+const { artworks, error, refresh } = useArtworks()
 const lightbox = useLightbox()
 const likes = useLikes()
 const reducedMotion = useReducedMotion()

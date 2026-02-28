@@ -94,6 +94,7 @@ onUnmounted(() => {
             v-model="form.name"
             type="text"
             required
+            autocomplete="name"
             placeholder="Your name"
             :aria-invalid="!!errors.name"
             :aria-describedby="errors.name ? 'contact-name-error' : undefined"
@@ -116,6 +117,7 @@ onUnmounted(() => {
             v-model="form.email"
             type="email"
             required
+            autocomplete="email"
             placeholder="you@example.com"
             :aria-invalid="!!errors.email"
             :aria-describedby="errors.email ? 'contact-email-error' : undefined"

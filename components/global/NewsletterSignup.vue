@@ -93,6 +93,7 @@ function reset() {
           id="nl-name"
           v-model="form.name"
           type="text"
+          autocomplete="name"
           maxlength="100"
           placeholder="Your name"
           class="w-full bg-dark-800/60 border border-dark-600 rounded-lg px-4 py-2.5 font-body text-sm text-lavender-100 placeholder-lavender-500/40 focus:outline-none focus:border-accent-red/50 focus:ring-1 focus:ring-accent-red/20 transition-all duration-300"
@@ -109,6 +110,7 @@ function reset() {
           v-model="form.email"
           type="email"
           required
+          autocomplete="email"
           maxlength="200"
           placeholder="you@example.com"
           :aria-invalid="status === 'error' && !!errorMessage"
