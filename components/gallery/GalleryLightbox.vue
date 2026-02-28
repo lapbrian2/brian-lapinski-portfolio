@@ -6,6 +6,7 @@ import { useIsMobile, useReducedMotion } from '~/composables/useMediaQuery'
 import type { PrintProduct } from '~/types/shop'
 
 const lightbox = useLightbox()
+const playground = usePlayground()
 const { copied, copiedType } = usePromptFork()
 const reducedMotion = useReducedMotion()
 const isMobile = useIsMobile()
@@ -508,9 +509,11 @@ function handleKeydown(e: KeyboardEvent) {
     return
   }
 
-  // Close architect panel on Escape if open, otherwise close lightbox
+  // Escape cascade: playground → architect panel → lightbox
   if (e.key === 'Escape') {
-    if (showArchitect.value) {
+    if (playground.isOpen.value) {
+      playground.close()
+    } else if (showArchitect.value) {
       showArchitect.value = false
     } else {
       animatedClose()
@@ -762,6 +765,9 @@ onUnmounted(() => {
         :visible="showArchitect"
         @close="showArchitect = false"
       />
+
+      <!-- Prompt Playground drawer (Teleports to body) -->
+      <PromptPlayground />
 
       <!-- Keyboard hints (desktop only) -->
       <Transition name="caption-fade">

@@ -3,6 +3,7 @@ import gsap from 'gsap'
 import type { LightboxItem } from '~/composables/useLightbox'
 import { useIsMobile } from '~/composables/useMediaQuery'
 import type { PromptNode, TechniqueCategory } from '~/types/artwork'
+import { categoryColors, categoryLabels } from '~/data/techniqueCategories'
 
 const isMobile = useIsMobile()
 
@@ -17,7 +18,7 @@ const emit = defineEmits<{
 
 const panelEl = ref<HTMLElement | null>(null)
 const contentEl = ref<HTMLElement | null>(null)
-const { fork, quickFork, copied, copiedType } = usePromptFork()
+const { quickFork, copied, copiedType } = usePromptFork()
 
 // Scroll fade indicator state
 const scrollTop = ref(0)
@@ -74,28 +75,7 @@ function toggleMode() {
 
 const beginnerCategories: TechniqueCategory[] = ['style', 'mood', 'lighting']
 
-// Technique category color mapping — matches the Ossuary design system
-const categoryColors: Record<TechniqueCategory, { bg: string; text: string; border: string; dot: string }> = {
-  lighting: { bg: 'bg-amber-500/10', text: 'text-amber-300', border: 'border-amber-500/20', dot: 'bg-amber-400' },
-  camera: { bg: 'bg-rose-500/10', text: 'text-rose-300', border: 'border-rose-500/20', dot: 'bg-rose-400' },
-  style: { bg: 'bg-violet-500/10', text: 'text-violet-300', border: 'border-violet-500/20', dot: 'bg-violet-400' },
-  mood: { bg: 'bg-indigo-500/10', text: 'text-indigo-300', border: 'border-indigo-500/20', dot: 'bg-indigo-400' },
-  composition: { bg: 'bg-emerald-500/10', text: 'text-emerald-300', border: 'border-emerald-500/20', dot: 'bg-emerald-400' },
-  material: { bg: 'bg-orange-500/10', text: 'text-orange-300', border: 'border-orange-500/20', dot: 'bg-orange-400' },
-  color: { bg: 'bg-cyan-500/10', text: 'text-cyan-300', border: 'border-cyan-500/20', dot: 'bg-cyan-400' },
-  post: { bg: 'bg-pink-500/10', text: 'text-pink-300', border: 'border-pink-500/20', dot: 'bg-pink-400' },
-}
-
-const categoryLabels: Record<TechniqueCategory, string> = {
-  lighting: 'Lighting',
-  camera: 'Camera',
-  style: 'Style',
-  mood: 'Mood',
-  composition: 'Composition',
-  material: 'Material',
-  color: 'Color',
-  post: 'Post-Processing',
-}
+// categoryColors + categoryLabels imported from ~/data/techniqueCategories
 
 // Group prompt nodes by category
 const groupedNodes = computed(() => {
@@ -217,8 +197,11 @@ onUnmounted(() => {
   staggerTween?.kill()
 })
 
-async function handleFork() {
-  await fork({
+const playground = usePlayground()
+const quickForkBtnEl = ref<HTMLElement | null>(null)
+
+function handleOpenPlayground() {
+  playground.open({
     title: props.item.title,
     rawPrompt: props.item.rawPrompt,
     mjVersion: props.item.mjVersion,
@@ -421,39 +404,28 @@ function getHoveredDescription(nodes: PromptNode[]): string | null {
               </p>
             </div>
 
-            <!-- Fork Actions -->
+            <!-- Actions -->
             <div class="animate-in pt-2 space-y-2">
+              <!-- Open Playground — primary -->
               <button
                 class="btn-press fork-button group w-full"
-                @click="handleFork"
+                @click="handleOpenPlayground"
               >
-                <span v-if="!copied || copiedType !== 'fork'" class="flex items-center justify-center gap-2">
+                <span class="flex items-center justify-center gap-2">
                   <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" class="transition-transform duration-200 group-hover:rotate-12">
-                    <path d="M4 2v4a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2V2" />
-                    <circle cx="4" cy="2" r="1" />
-                    <circle cx="10" cy="2" r="1" />
-                    <line x1="7" y1="8" x2="7" y2="12" />
-                    <circle cx="7" cy="12" r="1" />
+                    <rect x="1" y="3" width="12" height="9" rx="1.5" />
+                    <path d="M4 3V1.5A.5.5 0 0 1 4.5 1h5a.5.5 0 0 1 .5.5V3" />
+                    <line x1="4" y1="6.5" x2="10" y2="6.5" />
+                    <line x1="4" y1="9" x2="7" y2="9" />
                   </svg>
-                  <span>Fork Template</span>
+                  <span>Open Playground</span>
                 </span>
-                <Transition name="feedback-slide" mode="out-in">
-                  <div v-if="copied && copiedType === 'fork'" class="flex flex-col items-center gap-0.5">
-                    <span class="text-accent-red font-medium flex items-center gap-1.5">
-                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="2 6 5 9 10 3" />
-                      </svg>
-                      Template copied
-                    </span>
-                    <span class="text-dark-400 text-[10px] italic">
-                      Paste into Midjourney and edit the bracketed sections
-                    </span>
-                  </div>
-                </Transition>
               </button>
 
+              <!-- Copy Raw Prompt — secondary quick action -->
               <button
                 v-if="item.rawPrompt"
+                ref="quickForkBtnEl"
                 class="btn-press quick-fork-button group w-full"
                 @click="handleQuickFork"
               >
