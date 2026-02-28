@@ -77,7 +77,7 @@
               class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               loading="lazy"
               placeholder
-              sizes="sm:50vw md:33vw"
+              sizes="sm:50vw md:33vw xxl:25vw"
             />
             <div v-else class="w-full h-full bg-dark-700 flex items-center justify-center">
               <span class="text-lavender-500 font-body text-xs">No image</span>

@@ -55,7 +55,7 @@
               class="w-full h-auto rounded-sm transition-transform duration-500 group-hover:scale-[1.01]"
               loading="eager"
               preload
-              sizes="100vw"
+              sizes="sm:100vw lg:80vw 2xl:60vw"
               draggable="false"
             />
             <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors rounded-sm flex items-center justify-center">
@@ -169,7 +169,7 @@
                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 loading="lazy"
                 placeholder
-                sizes="sm:50vw md:33vw"
+                sizes="sm:50vw md:33vw xxl:25vw"
               />
               <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
                 <span class="font-display text-sm font-semibold text-white">{{ related.title }}</span>

@@ -97,7 +97,7 @@
                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                 loading="lazy"
                 placeholder
-                sizes="sm:100vw md:50vw lg:33vw"
+                sizes="sm:100vw md:50vw lg:33vw xxl:25vw"
               />
             </div>
             <!-- Info -->

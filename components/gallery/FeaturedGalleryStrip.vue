@@ -401,7 +401,7 @@ onUnmounted(() => {
                 class="card-image"
                 loading="lazy"
                 placeholder
-                sizes="280px"
+                sizes="sm:280px xxl:400px"
                 draggable="false"
               />
               <div class="card-overlay">

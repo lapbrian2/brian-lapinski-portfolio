@@ -31,7 +31,7 @@
           :class="imgLoaded ? 'opacity-100' : 'opacity-0'"
           loading="lazy"
           placeholder
-          sizes="sm:100vw md:55vw"
+          sizes="sm:100vw md:55vw xxl:45vw"
           style="object-fit: cover;"
           @load="imgLoaded = true"
         />

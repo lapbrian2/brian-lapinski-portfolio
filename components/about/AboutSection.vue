@@ -285,7 +285,7 @@ const credentials = [
               :class="aboutImgLoaded ? 'opacity-100' : 'opacity-0'"
               loading="lazy"
               placeholder
-              sizes="sm:100vw md:50vw lg:33vw"
+              sizes="sm:100vw md:50vw lg:33vw xxl:25vw"
               draggable="false"
               @load="aboutImgLoaded = true"
             />
