@@ -37,6 +37,14 @@ export default defineEventHandler(async (event) => {
     }
   }
 
+  // Prevent clearing required fields
+  const requiredStringFields = ['title', 'category', 'medium', 'description', 'src', 'aspect'] as const
+  for (const field of requiredStringFields) {
+    if (field in updateData && (!updateData[field] || (typeof updateData[field] === 'string' && (updateData[field] as string).trim().length === 0))) {
+      throw createError({ statusCode: 400, statusMessage: `${field} cannot be empty` })
+    }
+  }
+
   if (Object.keys(updateData).length === 0) {
     throw createError({ statusCode: 400, statusMessage: 'No fields to update' })
   }

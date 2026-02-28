@@ -48,6 +48,7 @@ function showFirstImage(): void {
   if (firstFrameShown || imgEls.value.length < 2) return
   firstFrameShown = true
 
+  if (!imgEls.value?.length) return
   imgEls.value.forEach((el, i) => {
     gsap.set(el, { opacity: 0, scale: 1 })
   })

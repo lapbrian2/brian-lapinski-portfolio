@@ -23,7 +23,8 @@ export default defineEventHandler(async (event) => {
       ip: hashedIp,
       country,
     })
-  } catch {
+  } catch (err) {
+    console.error('Page view tracking failed:', err)
     // Silently fail
   }
 

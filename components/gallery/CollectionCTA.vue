@@ -93,6 +93,9 @@ onMounted(async () => {
 
   const { default: Splitting } = await import('splitting')
 
+  // Re-check refs after async gap — component may have unmounted
+  if (!sectionEl.value) return
+
   // Query link elements directly from DOM — avoids function-ref timing issues
   const linkElements = Array.from(
     sectionEl.value.querySelectorAll('.collection-cta__link'),

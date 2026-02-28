@@ -70,7 +70,8 @@ export default defineEventHandler(async (event) => {
       message: message.trim(),
       ip,
     })
-  } catch {
+  } catch (err) {
+    log.error('DB logging failed:', err)
     // Don't fail the request if DB logging fails
   }
 

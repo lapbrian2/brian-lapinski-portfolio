@@ -7,7 +7,8 @@ export default defineEventHandler(async (event) => {
   try {
     const session = await getUserSession(event)
     userId = session?.user?.id as string | undefined
-  } catch {
+  } catch (err) {
+    console.error('Session lookup failed:', err)
     // nuxt-auth-utils not configured
   }
 

@@ -4,7 +4,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useReducedMotion } from '~/composables/useMediaQuery'
 import { applyMagneticHover } from '~/composables/useMagneticHover'
 
-const MESSAGE_MAX = 1000
+const MESSAGE_MAX = 5000
 
 const { form, errors, status, serverError, submit, reset } = useContactForm()
 const formEl = ref<HTMLElement | null>(null)
@@ -138,7 +138,7 @@ onUnmounted(() => {
             v-model="form.message"
             required
             rows="5"
-            maxlength="1000"
+            maxlength="5000"
             placeholder="Tell me about your project, collaboration idea, or just say hello..."
             :aria-invalid="!!errors.message"
             :aria-describedby="errors.message ? 'contact-message-error' : undefined"

@@ -121,7 +121,10 @@ export const contactSubmissions = sqliteTable('contact_submissions', {
   message: text('message').notNull(),
   ip: text('ip'),
   createdAt: text('created_at').default(sql`(datetime('now'))`),
-})
+}, (table) => ({
+  createdAtIdx: index('contact_submissions_created_at_idx').on(table.createdAt),
+  ipIdx: index('contact_submissions_ip_idx').on(table.ip),
+}))
 
 // ─── Print Shop ───
 

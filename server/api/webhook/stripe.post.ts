@@ -53,7 +53,7 @@ export default defineEventHandler(async (event) => {
 
       // Validate price matches Stripe's charged amount
       const metadataPrice = Number(pricePaid)
-      if (session.amount_total && Math.abs(metadataPrice - session.amount_total) > 0) {
+      if (session.amount_total && Math.abs(metadataPrice - session.amount_total) > 1) {
         log.warn('prompt_purchase price mismatch — metadata:', metadataPrice, 'charged:', session.amount_total, 'session:', session.id)
       }
 

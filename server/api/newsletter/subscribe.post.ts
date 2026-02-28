@@ -100,7 +100,8 @@ export default defineEventHandler(async (event) => {
         subject: emailContent.subject,
         html: emailContent.html,
       })
-    } catch {
+    } catch (err) {
+      console.error('Welcome email failed:', err)
       // Never fail subscription for email error
     }
   }

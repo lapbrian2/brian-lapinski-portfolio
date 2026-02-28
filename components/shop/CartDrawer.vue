@@ -68,7 +68,7 @@
             </p>
             <div class="flex items-center gap-2 mt-2">
               <button
-                class="w-5 h-5 rounded-sm border border-white/[0.08] text-lavender-400 hover:text-white flex items-center justify-center text-xs transition-colors"
+                class="w-8 h-8 rounded-sm border border-white/[0.08] text-lavender-400 hover:text-white flex items-center justify-center text-sm transition-colors"
                 :aria-label="`Decrease quantity of ${item.artworkTitle}`"
                 @click="cart.updateQuantity(item.variantId, item.quantity - 1)"
               >
@@ -76,7 +76,7 @@
               </button>
               <span class="font-body text-xs text-lavender-200 w-4 text-center">{{ item.quantity }}</span>
               <button
-                class="w-5 h-5 rounded-sm border border-white/[0.08] text-lavender-400 hover:text-white flex items-center justify-center text-xs transition-colors"
+                class="w-8 h-8 rounded-sm border border-white/[0.08] text-lavender-400 hover:text-white flex items-center justify-center text-sm transition-colors"
                 :aria-label="`Increase quantity of ${item.artworkTitle}`"
                 @click="cart.updateQuantity(item.variantId, item.quantity + 1)"
               >
