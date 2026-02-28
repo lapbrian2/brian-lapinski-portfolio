@@ -259,11 +259,10 @@ async function handleNotify() {
   if (!notifyEmail.value) return
   notifyLoading.value = true
   try {
-    const waitlist = JSON.parse(localStorage.getItem('bl-shop-waitlist') || '[]') as string[]
-    if (!waitlist.includes(notifyEmail.value)) {
-      waitlist.push(notifyEmail.value)
-      localStorage.setItem('bl-shop-waitlist', JSON.stringify(waitlist))
-    }
+    await $fetch('/api/newsletter/subscribe', {
+      method: 'POST',
+      body: { email: notifyEmail.value },
+    })
     notifySubmitted.value = true
   } catch {
     notifySubmitted.value = true
