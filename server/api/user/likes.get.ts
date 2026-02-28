@@ -3,8 +3,13 @@ import { artworkLikes } from '~/server/db/schema'
 import { useDb } from '~/server/db'
 
 export default defineEventHandler(async (event) => {
-  const session = await getUserSession(event)
-  const userId = session?.user?.id as string | undefined
+  let userId: string | undefined
+  try {
+    const session = await getUserSession(event)
+    userId = session?.user?.id as string | undefined
+  } catch {
+    // nuxt-auth-utils not configured — no authenticated user
+  }
 
   if (!userId) {
     return { success: true, data: [] }

@@ -11,9 +11,14 @@ export default defineEventHandler(async (event) => {
 
   const db = useDb()
 
-  // Check if user is authenticated
-  const session = await getUserSession(event)
-  const userId = session?.user?.id as string | undefined
+  // Check if user is authenticated (graceful when auth module not configured)
+  let userId: string | undefined
+  try {
+    const session = await getUserSession(event)
+    userId = session?.user?.id as string | undefined
+  } catch {
+    // nuxt-auth-utils not configured — fall back to IP-based tracking
+  }
 
   // Build unique constraint: prefer userId, fall back to hashed IP
   let whereClause

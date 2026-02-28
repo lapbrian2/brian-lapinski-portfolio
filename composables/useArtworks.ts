@@ -6,7 +6,7 @@ import type { Artwork } from '~/types/artwork'
  */
 export function useArtworks() {
   const { data: response, pending, error, refresh } = useFetch<{ success: boolean; data: Artwork[] }>(
-    '/api/artworks',
+    '/api/artworks?nodes=true',
     { key: 'artworks-list', default: () => ({ success: true, data: [] }) },
   )
 
