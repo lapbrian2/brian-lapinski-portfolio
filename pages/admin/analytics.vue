@@ -101,7 +101,7 @@
             >
               <div class="flex items-center gap-3 min-w-0">
                 <span class="text-xs text-gray-500 w-5">{{ idx + 1 }}</span>
-                <span class="text-sm text-white truncate">{{ artwork.artworkId }}</span>
+                <span class="text-sm text-white truncate">{{ artworkTitles.get(artwork.artworkId) || artwork.artworkId }}</span>
               </div>
               <span class="text-sm text-gray-400 font-medium">{{ artwork.views }}</span>
             </div>
@@ -165,6 +165,7 @@ const dailyData = ref<DailyData[]>([])
 const artworkViews = ref<ArtworkView[]>([])
 const referrers = ref<Referrer[]>([])
 const revenueData = ref<RevenueData | null>(null)
+const artworkTitles = ref(new Map<string, string>())
 
 const maxDailyViews = computed(() =>
   Math.max(...dailyData.value.map(d => d.views), 1)
@@ -198,6 +199,16 @@ onMounted(async () => {
     artworkViews.value = artworksRes?.data || []
     referrers.value = referrersRes?.data || []
     revenueData.value = revenueRes?.data || null
+
+    // Resolve artwork titles for the Top Artworks table
+    try {
+      const artRes = await $fetch<{ success: boolean; data: Array<{ id: string; title: string }> }>('/api/artworks')
+      if (artRes?.data) {
+        const map = new Map<string, string>()
+        artRes.data.forEach(a => map.set(a.id, a.title))
+        artworkTitles.value = map
+      }
+    } catch {}
   } catch {
     // Silently fail
   } finally {
