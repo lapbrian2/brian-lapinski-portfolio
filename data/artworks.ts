@@ -29,6 +29,9 @@ export const artworks: Artwork[] = [
     aspect: 'square',
     year: 2025,
     dominantColor: '#9a8a7a',
+    rawPrompt: '(Portrait of a human face dissolving through painterly directional smear like wet oil paint dragged across a photograph:1.4), face almost recognizable with eyes as the most resolved anchor point features sliding and blurring into surrounding atmosphere, (near-monochromatic muted gray palette with just a whisper of warm flesh tone:1.3), no hard edges anywhere figure melting into background without boundary, heavy desaturation pulled to near-monochrome, lifted shadows with no deep darks everything floating in mid-tonal haze, (soft directional AI-painterly texture brushstroke-like marks throughout the dissolution:1.3), flat even diffuse lighting with no directional shadow no dramatic contrast, atmospheric pale fog quality, narrow compressed tonal range, the expression almost readable but dissolving before it can be named, quiet contemplative melancholy, gentle slow erasure like a memory fading',
+    hasPrompt: true,
+    promptPrice: 999,
   },
   {
     id: 'the-unraveling',

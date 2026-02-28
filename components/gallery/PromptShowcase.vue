@@ -1,86 +1,123 @@
 <template>
-  <section ref="sectionEl" class="relative py-24 px-6 md:px-12 overflow-hidden">
+  <section ref="sectionEl" class="relative py-24 px-6 md:px-12 overflow-hidden bg-dark-900">
     <!-- Background glow -->
     <div class="absolute inset-0 pointer-events-none">
       <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-accent-red/[0.04] rounded-full blur-[120px]" />
     </div>
 
-    <div class="relative max-w-4xl mx-auto text-center">
+    <div class="relative max-w-5xl mx-auto">
       <!-- Label -->
-      <p class="font-body text-xs uppercase tracking-[0.3em] text-accent-red mb-4">
-        Behind the Art
-      </p>
-      <div class="w-12 h-px bg-accent-red/40 mx-auto mb-8" />
+      <div class="text-center mb-12">
+        <p class="font-body text-xs uppercase tracking-[0.3em] text-accent-red mb-4">
+          Behind the Art
+        </p>
+        <div class="w-12 h-px bg-accent-red/40 mx-auto mb-8" />
+        <h2 ref="headlineEl" class="font-display text-3xl md:text-5xl font-bold text-lavender-100 leading-tight mb-5">
+          Unlock the Creative Process
+        </h2>
+        <p class="font-body text-base md:text-lg text-lavender-300 max-w-xl mx-auto leading-relaxed">
+          Every artwork begins as a prompt&mdash;a blueprint of mood, technique, and vision. Get the exact text behind the image and make it your own.
+        </p>
+      </div>
 
-      <!-- Headline -->
-      <h2 ref="headlineEl" class="font-display text-3xl md:text-5xl font-bold text-lavender-100 leading-tight mb-5">
-        Unlock the Creative Process
-      </h2>
-      <p class="font-body text-base md:text-lg text-lavender-300 max-w-xl mx-auto mb-4 leading-relaxed">
-        Every artwork starts with a prompt. Get the full blueprint&mdash;raw prompts, techniques, refinement notes&mdash;and remix them in the Playground.
-      </p>
-      <p class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-accent-red/10 border border-accent-red/20 text-accent-red font-body text-xs font-medium tracking-wide mb-12">
-        <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-          <circle cx="8" cy="8" r="6.5" />
-          <path d="M8 5v3l2 1" />
-        </svg>
-        New prompts being added — check back soon
-      </p>
+      <!-- Teaser card -->
+      <div class="teaser-card">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-0">
+          <!-- Left: Artwork image -->
+          <div class="relative aspect-square md:aspect-auto overflow-hidden">
+            <img
+              :src="featuredArtwork.src"
+              :alt="featuredArtwork.title"
+              class="w-full h-full object-cover"
+              loading="lazy"
+            >
+            <!-- Overlay gradient -->
+            <div class="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-dark-900/80 via-dark-900/20 to-transparent" />
+            <!-- Title overlay -->
+            <div class="absolute bottom-4 left-4 md:bottom-6 md:left-6">
+              <p class="font-body text-[10px] uppercase tracking-[0.2em] text-lavender-300/80 mb-1">Featured Prompt</p>
+              <h3 class="font-display text-xl md:text-2xl font-bold text-lavender-100">{{ featuredArtwork.title }}</h3>
+              <p class="font-body text-xs text-lavender-400 mt-1">{{ featuredArtwork.medium }} &middot; {{ featuredArtwork.year }}</p>
+            </div>
+          </div>
 
-      <!-- Feature cards -->
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-12 text-left">
-        <div class="feature-card">
-          <div class="feature-icon">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-              <rect x="2" y="3" width="16" height="14" rx="2" />
-              <line x1="6" y1="8" x2="14" y2="8" />
-              <line x1="6" y1="11" x2="11" y2="11" />
-            </svg>
+          <!-- Right: Blurred prompt teaser -->
+          <div class="relative p-6 md:p-8 flex flex-col justify-between min-h-[320px]">
+            <!-- Prompt preview (blurred) -->
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-4">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" class="text-accent-red">
+                  <rect x="2" y="3" width="12" height="10" rx="1.5" />
+                  <line x1="5" y1="7" x2="11" y2="7" />
+                  <line x1="5" y1="9.5" x2="9" y2="9.5" />
+                </svg>
+                <span class="font-body text-xs uppercase tracking-[0.15em] text-lavender-300">Raw Prompt</span>
+              </div>
+
+              <!-- Visible teaser text -->
+              <div class="relative">
+                <code class="block text-xs leading-relaxed font-mono text-lavender-200/70 break-words whitespace-pre-wrap">{{ promptTeaser }}</code>
+                <!-- Blur overlay that fades out the rest -->
+                <div class="prompt-blur-mask absolute bottom-0 left-0 right-0 h-24" />
+              </div>
+
+              <!-- Lock indicator -->
+              <div class="flex items-center gap-2 mt-4">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" class="text-lavender-500">
+                  <rect x="3" y="7" width="10" height="7" rx="1.5" />
+                  <path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" />
+                </svg>
+                <span class="font-body text-[11px] text-lavender-500">{{ remainingChars }}+ more characters hidden</span>
+              </div>
+            </div>
+
+            <!-- Price & CTA -->
+            <div class="mt-6 pt-5 border-t border-white/[0.06]">
+              <div class="flex items-center justify-between gap-4">
+                <div>
+                  <p class="font-display text-2xl font-bold text-lavender-100">$9.99</p>
+                  <p class="font-body text-[11px] text-lavender-500 mt-0.5">One-time unlock &middot; Yours forever</p>
+                </div>
+                <NuxtLink
+                  to="/gallery"
+                  class="inline-flex items-center gap-2 px-6 py-3 bg-accent-red hover:bg-accent-red-hover text-white text-sm font-semibold rounded-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-accent-red/20 group whitespace-nowrap"
+                >
+                  Browse Prompts
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-200 group-hover:translate-x-0.5">
+                    <line x1="3" y1="8" x2="13" y2="8" />
+                    <polyline points="9 4 13 8 9 12" />
+                  </svg>
+                </NuxtLink>
+              </div>
+            </div>
           </div>
-          <h3 class="font-display text-sm font-semibold text-lavender-100 mb-1">Full Prompts</h3>
-          <p class="font-body text-xs text-lavender-400 leading-relaxed">The exact text used to create each artwork, ready to paste into Midjourney.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-              <path d="M4 2v4a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2V2" />
-              <circle cx="4" cy="2" r="1" />
-              <circle cx="10" cy="2" r="1" />
-              <line x1="7" y1="8" x2="7" y2="12" />
-              <circle cx="7" cy="12" r="1" />
-              <path d="M13 10v4a2 2 0 0 0 2 2h2" />
-              <circle cx="17" cy="16" r="1" />
-            </svg>
-          </div>
-          <h3 class="font-display text-sm font-semibold text-lavender-100 mb-1">Technique Breakdown</h3>
-          <p class="font-body text-xs text-lavender-400 leading-relaxed">Lighting, composition, style, mood&mdash;every creative decision mapped and explained.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-              <rect x="1" y="3" width="18" height="14" rx="2" />
-              <path d="M5 3V1.5A.5.5 0 0 1 5.5 1h9a.5.5 0 0 1 .5.5V3" />
-              <line x1="5" y1="8" x2="15" y2="8" />
-              <line x1="5" y1="11" x2="10" y2="11" />
-              <circle cx="15" cy="13" r="2" />
-            </svg>
-          </div>
-          <h3 class="font-display text-sm font-semibold text-lavender-100 mb-1">Playground Access</h3>
-          <p class="font-body text-xs text-lavender-400 leading-relaxed">Remix, fork, and experiment with prompts in an interactive editing environment.</p>
         </div>
       </div>
 
-      <!-- CTA -->
-      <NuxtLink
-        to="/gallery"
-        class="inline-flex items-center gap-3 px-8 py-3.5 bg-accent-red hover:bg-accent-red-hover text-white text-sm font-semibold rounded-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-accent-red/20 group"
-      >
-        Browse Gallery
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-200 group-hover:translate-x-1">
-          <line x1="3" y1="8" x2="13" y2="8" />
-          <polyline points="9 4 13 8 9 12" />
-        </svg>
-      </NuxtLink>
+      <!-- Bottom feature highlights -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8 text-center">
+        <div class="feature-pill">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" class="text-accent-red">
+            <rect x="2" y="3" width="12" height="10" rx="1.5" />
+            <line x1="5" y1="7" x2="11" y2="7" />
+            <line x1="5" y1="9.5" x2="9" y2="9.5" />
+          </svg>
+          <span>Full Prompt Text</span>
+        </div>
+        <div class="feature-pill">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" class="text-accent-red">
+            <circle cx="8" cy="8" r="6" />
+            <path d="M8 5v3l2 1.5" />
+          </svg>
+          <span>Reusable Style</span>
+        </div>
+        <div class="feature-pill">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" class="text-accent-red">
+            <path d="M2 12l4-4 3 3 5-6" />
+          </svg>
+          <span>Paste &amp; Create</span>
+        </div>
+      </div>
     </div>
   </section>
 </template>
@@ -89,24 +126,43 @@
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useReducedMotion } from '~/composables/useMediaQuery'
+import { artworks } from '~/data/artworks'
 
 const sectionEl = ref<HTMLElement | null>(null)
 const headlineEl = ref<HTMLElement | null>(null)
 const reducedMotion = useReducedMotion()
 let ctx: gsap.Context | null = null
 
+// Get the first artwork that has a prompt
+const featuredArtwork = computed(() => {
+  return artworks.find(a => a.hasPrompt && a.rawPrompt) || artworks[0]
+})
+
+// Show first ~120 chars of prompt as teaser
+const TEASER_LENGTH = 120
+const promptTeaser = computed(() => {
+  const raw = featuredArtwork.value.rawPrompt || ''
+  if (raw.length <= TEASER_LENGTH) return raw
+  return raw.slice(0, TEASER_LENGTH) + '...'
+})
+
+const remainingChars = computed(() => {
+  const raw = featuredArtwork.value.rawPrompt || ''
+  return Math.max(0, raw.length - TEASER_LENGTH)
+})
+
 onMounted(() => {
   if (!sectionEl.value || reducedMotion.value) return
 
   ctx = gsap.context(() => {
-    const children = sectionEl.value!.querySelectorAll('.feature-card, h2, p, a')
-    gsap.set(children, { opacity: 0, y: 30 })
+    const animTargets = sectionEl.value!.querySelectorAll('.teaser-card, h2, p, .feature-pill')
+    gsap.set(animTargets, { opacity: 0, y: 30 })
     ScrollTrigger.create({
       trigger: sectionEl.value!,
       start: 'top 80%',
       once: true,
       onEnter: () => {
-        gsap.to(children, {
+        gsap.to(animTargets, {
           opacity: 1,
           y: 0,
           duration: 0.7,
@@ -124,29 +180,43 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.feature-card {
-  padding: 20px;
+.teaser-card {
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.06);
-  transition: border-color 0.3s ease, background 0.3s ease;
+  overflow: hidden;
+  transition: border-color 0.4s ease;
 }
 
-.feature-card:hover {
-  border-color: rgba(237, 84, 77, 0.2);
-  background: rgba(255, 255, 255, 0.04);
+.teaser-card:hover {
+  border-color: rgba(237, 84, 77, 0.15);
 }
 
-.feature-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  background: rgba(237, 84, 77, 0.08);
-  border: 1px solid rgba(237, 84, 77, 0.15);
-  color: #ed544d;
+.prompt-blur-mask {
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(15, 14, 23, 0.6) 40%,
+    rgba(15, 14, 23, 0.95) 100%
+  );
+  backdrop-filter: blur(4px);
+}
+
+.feature-pill {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 12px;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 12px;
+  color: #a5b0c8;
+  transition: border-color 0.3s ease;
+}
+
+.feature-pill:hover {
+  border-color: rgba(237, 84, 77, 0.2);
 }
 </style>

@@ -1,5 +1,5 @@
 /** Default prompt unlock price in cents (USD) */
-export const DEFAULT_PROMPT_PRICE = 399 // $3.99
+export const DEFAULT_PROMPT_PRICE = 999 // $9.99
 
 /** Min/max bounds for prompt pricing (cents) */
 const MIN_PRICE = 99 // $0.99
