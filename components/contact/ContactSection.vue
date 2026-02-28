@@ -1,5 +1,5 @@
 <template>
-  <section id="contact" ref="sectionEl" class="section noise-gradient relative overflow-hidden section-bleed-top">
+  <section id="contact" ref="sectionEl" class="section relative overflow-hidden section-bleed-top">
     <!-- Warm radial glow — reveals on scroll -->
     <div
       ref="glowEl"

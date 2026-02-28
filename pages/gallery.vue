@@ -21,7 +21,7 @@
     </header>
 
     <!-- Hero -->
-    <section class="noise-gradient pt-32 pb-8 px-6 md:px-12">
+    <section class="pt-32 pb-8 px-6 md:px-12">
       <div ref="heroEl" class="max-w-5xl mx-auto text-center">
         <p class="font-body text-xs uppercase tracking-[0.3em] text-accent-red mb-4">
           Full Portfolio
@@ -179,19 +179,18 @@ function setCategory(catId: string) {
         const newCards = gridEl.value?.querySelectorAll('.gallery-card')
         if (newCards?.length) {
           gsap.fromTo(newCards,
-            { opacity: 0, y: 30, filter: 'blur(8px)', scale: 1.04 },
+            { opacity: 0, y: 30, scale: 0.97 },
             {
               opacity: 1,
               y: 0,
-              filter: 'blur(0px)',
               scale: 1,
-              duration: 0.6,
-              stagger: { each: 0.05, from: 'end' },
-              ease: 'power2.out',
+              duration: 0.5,
+              stagger: { each: 0.04, from: 'end' },
+              ease: 'power3.out',
               force3D: true,
               onComplete() {
                 this.targets().forEach((el: HTMLElement) =>
-                  gsap.set(el, { clearProps: 'transform,willChange,force3D,filter' }),
+                  gsap.set(el, { clearProps: 'transform,willChange,force3D' }),
                 )
                 isAnimating = false
               },
@@ -304,7 +303,7 @@ onMounted(async () => {
     nextTick(() => {
       const cards = gridEl.value?.querySelectorAll('.gallery-card')
       if (cards?.length) {
-        gsap.set(cards, { opacity: 0, y: 30, filter: 'blur(8px)', scale: 1.04 })
+        gsap.set(cards, { opacity: 0, y: 30, scale: 0.97 })
         ScrollTrigger.create({
           trigger: gridSection.value!,
           start: 'top 90%',
@@ -313,15 +312,14 @@ onMounted(async () => {
             gsap.to(cards, {
               opacity: 1,
               y: 0,
-              filter: 'blur(0px)',
               scale: 1,
-              duration: 0.7,
-              stagger: { each: 0.06, from: 'end' },
-              ease: 'power2.out',
+              duration: 0.6,
+              stagger: { each: 0.05, from: 'end' },
+              ease: 'power3.out',
               force3D: true,
               onComplete() {
                 this.targets().forEach((el: HTMLElement) =>
-                  gsap.set(el, { clearProps: 'transform,willChange,force3D,filter' }),
+                  gsap.set(el, { clearProps: 'transform,willChange,force3D' }),
                 )
               },
             })

@@ -150,22 +150,23 @@ onMounted(async () => {
         delay: 0.2,
       })
 
-      // Title chars: blur-in from center like a camera focusing
+      // Title chars: scale-in from center
       const result = Splitting({ target: titleEl.value, by: 'chars' })
       const chars = result[0]?.chars || []
       if (chars.length) {
-        gsap.set(chars, { opacity: 0, filter: 'blur(12px)', scale: 0.7 })
+        gsap.set(chars, { opacity: 0, scale: 0.7, y: 20 })
         gsap.to(chars, {
           opacity: 1,
-          filter: 'blur(0px)',
           scale: 1,
+          y: 0,
           duration: 0.8,
           stagger: { each: 0.04, from: 'center' },
           delay: 0.3,
           ease: 'power3.out',
+          force3D: true,
           onComplete() {
             this.targets().forEach((el: HTMLElement) =>
-              gsap.set(el, { clearProps: 'transform,willChange,filter' }),
+              gsap.set(el, { clearProps: 'transform,willChange,force3D' }),
             )
           },
         })
@@ -175,7 +176,7 @@ onMounted(async () => {
     if (gridEl.value) {
       const cards = gridEl.value.querySelectorAll('a')
       if (cards.length) {
-        gsap.set(cards, { y: 30, opacity: 0, filter: 'blur(8px)', scale: 1.04 })
+        gsap.set(cards, { y: 30, opacity: 0, scale: 0.97 })
         ScrollTrigger.create({
           trigger: gridEl.value,
           start: 'top 85%',
@@ -184,15 +185,14 @@ onMounted(async () => {
             gsap.to(cards, {
               y: 0,
               opacity: 1,
-              filter: 'blur(0px)',
               scale: 1,
-              duration: 0.7,
+              duration: 0.6,
               stagger: 0.1,
               ease: 'power2.out',
               force3D: true,
               onComplete() {
                 this.targets().forEach((el: HTMLElement) =>
-                  gsap.set(el, { clearProps: 'transform,willChange,force3D,filter' }),
+                  gsap.set(el, { clearProps: 'transform,willChange,force3D' }),
                 )
               },
             })

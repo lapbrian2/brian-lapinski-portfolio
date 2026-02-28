@@ -124,7 +124,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <section class="hero-section noise-gradient relative h-screen w-full overflow-hidden bg-dark-900">
+  <section class="hero-section relative h-screen w-full overflow-hidden bg-dark-900">
     <!-- Artwork background layer — crossfading Ken Burns cycle -->
     <div class="absolute inset-0 z-[1]">
       <img
