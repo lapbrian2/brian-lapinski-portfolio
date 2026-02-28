@@ -262,7 +262,7 @@ onUnmounted(() => {
           v-for="cat in categories"
           :key="cat.to"
           :to="cat.to"
-          class="collection-cta__link group"
+          class="collection-cta__link group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-red focus-visible:ring-offset-2 focus-visible:ring-offset-dark-900 rounded-sm"
           @mouseenter="onLinkEnter(cat.preview)"
           @mouseleave="onLinkLeave"
         >
@@ -290,7 +290,7 @@ onUnmounted(() => {
       <div class="text-center mt-10">
         <NuxtLink
           to="/gallery"
-          class="inline-flex items-center gap-2 px-6 py-3 border border-white/[0.08] rounded-full font-body text-sm text-lavender-300 hover:border-accent-red/30 hover:text-accent-red transition-all duration-300 group"
+          class="inline-flex items-center gap-2 px-6 py-3 border border-white/[0.08] rounded-full font-body text-sm text-lavender-300 hover:border-accent-red/30 hover:text-accent-red transition-all duration-300 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-red focus-visible:ring-offset-2 focus-visible:ring-offset-dark-900"
         >
           View All Works
           <svg class="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

@@ -60,7 +60,7 @@
           v-for="collection in collections"
           :key="collection.id"
           :to="`/collections/${collection.slug}`"
-          class="group relative bg-dark-800 rounded-sm overflow-hidden border border-white/[0.04] hover:border-white/[0.1] transition-all duration-300"
+          class="group relative bg-dark-800 rounded-sm overflow-hidden border border-white/[0.04] hover:border-white/[0.1] transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-red focus-visible:ring-offset-2 focus-visible:ring-offset-dark-900"
         >
           <!-- Cover Image -->
           <div class="aspect-[4/3] overflow-hidden">

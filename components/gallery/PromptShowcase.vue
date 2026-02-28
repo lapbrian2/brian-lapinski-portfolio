@@ -16,8 +16,15 @@
       <h2 ref="headlineEl" class="font-display text-3xl md:text-5xl font-bold text-lavender-100 leading-tight mb-5">
         Unlock the Creative Process
       </h2>
-      <p class="font-body text-base md:text-lg text-lavender-300 max-w-xl mx-auto mb-12 leading-relaxed">
+      <p class="font-body text-base md:text-lg text-lavender-300 max-w-xl mx-auto mb-4 leading-relaxed">
         Every artwork starts with a prompt. Get the full blueprint&mdash;raw prompts, techniques, refinement notes&mdash;and remix them in the Playground.
+      </p>
+      <p class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-accent-red/10 border border-accent-red/20 text-accent-red font-body text-xs font-medium tracking-wide mb-12">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <circle cx="8" cy="8" r="6.5" />
+          <path d="M8 5v3l2 1" />
+        </svg>
+        New prompts being added — check back soon
       </p>
 
       <!-- Feature cards -->

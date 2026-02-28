@@ -43,7 +43,7 @@
           <button
             v-for="cat in categories"
             :key="cat.id"
-            class="filter-pill flex-shrink-0 px-5 py-2 rounded-full font-body text-sm transition-all duration-300"
+            class="filter-pill flex-shrink-0 px-5 py-2 rounded-full font-body text-sm transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-red focus-visible:ring-offset-2 focus-visible:ring-offset-dark-900"
             :class="activeCategory === cat.id
               ? 'bg-accent-red text-white shadow-lg shadow-accent-red/20'
               : 'border border-white/[0.08] text-lavender-300 hover:border-white/[0.15] hover:text-lavender-100'"
@@ -67,7 +67,7 @@
             v-for="artwork in filteredArtworks"
             :key="artwork.id"
             ref="cardRefs"
-            class="gallery-card break-inside-avoid mb-4 group relative overflow-hidden rounded-sm cursor-pointer"
+            class="gallery-card break-inside-avoid mb-4 group relative overflow-hidden rounded-sm cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-red focus-visible:ring-offset-2 focus-visible:ring-offset-dark-900"
             :data-artwork-id="artwork.id"
             data-cursor-text="View"
             role="button"
@@ -114,12 +114,12 @@
               </span>
             </div>
 
-            <!-- Hover overlay -->
-            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400 flex flex-col justify-end p-5">
-              <h3 class="font-display text-base md:text-lg font-semibold text-white mb-1 translate-y-3 group-hover:translate-y-0 transition-transform duration-400">
+            <!-- Hover overlay (desktop) / always visible (mobile) -->
+            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-400 flex flex-col justify-end p-5">
+              <h3 class="font-display text-base md:text-lg font-semibold text-white mb-1 sm:translate-y-3 sm:group-hover:translate-y-0 transition-transform duration-400">
                 {{ artwork.title }}
               </h3>
-              <div class="flex items-center justify-between translate-y-3 group-hover:translate-y-0 transition-transform duration-400 delay-75">
+              <div class="flex items-center justify-between sm:translate-y-3 sm:group-hover:translate-y-0 transition-transform duration-400 delay-75">
                 <p class="font-body text-xs uppercase tracking-[0.12em] text-lavender-300/70">
                   {{ artwork.medium }} &middot; {{ artwork.year }}
                 </p>

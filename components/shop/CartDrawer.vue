@@ -69,6 +69,7 @@
             <div class="flex items-center gap-2 mt-2">
               <button
                 class="w-5 h-5 rounded-sm border border-white/[0.08] text-lavender-400 hover:text-white flex items-center justify-center text-xs transition-colors"
+                :aria-label="`Decrease quantity of ${item.artworkTitle}`"
                 @click="cart.updateQuantity(item.variantId, item.quantity - 1)"
               >
                 &minus;
@@ -76,6 +77,7 @@
               <span class="font-body text-xs text-lavender-200 w-4 text-center">{{ item.quantity }}</span>
               <button
                 class="w-5 h-5 rounded-sm border border-white/[0.08] text-lavender-400 hover:text-white flex items-center justify-center text-xs transition-colors"
+                :aria-label="`Increase quantity of ${item.artworkTitle}`"
                 @click="cart.updateQuantity(item.variantId, item.quantity + 1)"
               >
                 +
@@ -139,12 +141,15 @@ watch(() => cart.isOpen.value, (open) => {
   if (!drawerEl.value) return
 
   if (open) {
+    // Lock body scroll when drawer opens (prevents scrolling behind on mobile)
+    document.body.style.overflow = 'hidden'
     gsap.to(drawerEl.value, {
       x: 0,
       duration: 0.35,
       ease: 'power3.out',
     })
   } else {
+    document.body.style.overflow = ''
     gsap.to(drawerEl.value, {
       x: '100%',
       duration: 0.25,
@@ -166,6 +171,8 @@ onMounted(() => {
 
 onUnmounted(() => {
   document.removeEventListener('keydown', onKeydown)
+  // Restore body scroll in case drawer was open when unmounting
+  document.body.style.overflow = ''
 })
 </script>
 

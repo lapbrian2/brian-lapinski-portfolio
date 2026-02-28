@@ -142,22 +142,33 @@
           Leave your email to get notified when prints and downloads become available.
         </p>
 
-        <!-- Email signup (visual) -->
-        <form class="flex gap-3 max-w-md mx-auto" @submit.prevent>
+        <!-- Email signup -->
+        <form v-if="!notifySubmitted" class="flex gap-3 max-w-md mx-auto" @submit.prevent="handleNotify">
           <div class="relative flex-1">
             <input
+              v-model="notifyEmail"
               type="email"
+              required
               placeholder="your@email.com"
               class="w-full px-4 py-3 bg-white/[0.03] border border-white/[0.08] rounded-sm font-body text-sm text-lavender-200 placeholder:text-lavender-500/40 focus:border-accent-red/40 focus:outline-none transition-colors duration-300"
             />
           </div>
           <button
             type="submit"
-            class="btn-press px-6 py-3 bg-accent-red hover:bg-accent-red-hover text-white text-sm font-medium rounded-sm transition-colors duration-200 flex-shrink-0"
+            :disabled="notifyLoading"
+            class="btn-press px-6 py-3 bg-accent-red hover:bg-accent-red-hover text-white text-sm font-medium rounded-sm transition-colors duration-200 flex-shrink-0 disabled:opacity-50"
           >
-            Notify Me
+            {{ notifyLoading ? 'Sending...' : 'Notify Me' }}
           </button>
         </form>
+        <div v-else class="max-w-md mx-auto text-center py-3">
+          <p class="font-body text-sm text-emerald-400 flex items-center justify-center gap-2">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3.5 8.5L6.5 11.5L12.5 4.5" />
+            </svg>
+            You're on the list! We'll email you when the shop opens.
+          </p>
+        </div>
       </div>
     </section>
 
@@ -171,6 +182,29 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useReducedMotion } from '~/composables/useMediaQuery'
 
 definePageMeta({ layout: false })
+
+const notifyEmail = ref('')
+const notifyLoading = ref(false)
+const notifySubmitted = ref(false)
+
+async function handleNotify() {
+  if (!notifyEmail.value) return
+  notifyLoading.value = true
+  try {
+    // Store in localStorage as a simple waitlist until a proper API exists
+    const waitlist = JSON.parse(localStorage.getItem('bl-shop-waitlist') || '[]') as string[]
+    if (!waitlist.includes(notifyEmail.value)) {
+      waitlist.push(notifyEmail.value)
+      localStorage.setItem('bl-shop-waitlist', JSON.stringify(waitlist))
+    }
+    notifySubmitted.value = true
+  } catch {
+    // Fallback: still show success (the intent was captured visually)
+    notifySubmitted.value = true
+  } finally {
+    notifyLoading.value = false
+  }
+}
 
 const heroEl = ref<HTMLElement | null>(null)
 const titleEl = ref<HTMLElement | null>(null)

@@ -35,7 +35,7 @@
           :href="`#${link.id}`"
           :data-nav="link.id"
           :class="[
-            'relative font-body text-sm uppercase tracking-wider transition-colors duration-200 hover-reveal',
+            'relative font-body text-sm uppercase tracking-wider transition-colors duration-200 hover-reveal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-red focus-visible:ring-offset-2 focus-visible:ring-offset-dark-900 rounded-sm',
             activeSection === link.id
               ? 'text-lavender-100'
               : 'text-lavender-400 hover:text-lavender-200',
@@ -52,7 +52,7 @@
           v-for="page in pageLinks"
           :key="page.to"
           :to="page.to"
-          class="relative font-body text-sm uppercase tracking-wider transition-colors duration-200 hover-reveal text-lavender-400 hover:text-lavender-200"
+          class="relative font-body text-sm uppercase tracking-wider transition-colors duration-200 hover-reveal text-lavender-400 hover:text-lavender-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-red focus-visible:ring-offset-2 focus-visible:ring-offset-dark-900 rounded-sm"
         >
           {{ page.label }}
         </NuxtLink>
@@ -61,7 +61,7 @@
         <span class="w-px h-4 bg-lavender-400/20" aria-hidden="true" />
         <div v-if="loggedIn" class="relative">
           <button
-            class="flex items-center gap-2 group"
+            class="flex items-center gap-2 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-red rounded-full"
             aria-label="User menu"
             @click="userMenuOpen = !userMenuOpen"
           >

@@ -152,7 +152,7 @@ function onMouseLeave() {
 <template>
   <button
     ref="buttonEl"
-    class="btn-press resonance-button group relative flex items-center justify-center rounded-full transition-all duration-200 cursor-hover"
+    class="btn-press resonance-button group relative flex items-center justify-center rounded-full transition-all duration-200 cursor-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-red focus-visible:ring-offset-2 focus-visible:ring-offset-black"
     :class="[
       sizeClasses,
       liked
