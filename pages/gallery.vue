@@ -65,6 +65,23 @@
           </button>
         </div>
 
+        <!-- Sort + Category Row -->
+        <div class="flex items-center justify-between max-w-md mx-auto mb-2">
+          <div class="flex items-center gap-1.5">
+            <button
+              v-for="opt in sortOptions"
+              :key="opt.value"
+              class="sort-pill px-3 py-1.5 rounded-full font-body text-xs transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-red"
+              :class="sortBy === opt.value
+                ? 'bg-white/10 text-lavender-100'
+                : 'text-lavender-500 hover:text-lavender-300'"
+              @click="sortBy = opt.value"
+            >
+              {{ opt.label }}
+            </button>
+          </div>
+        </div>
+
         <!-- Category Pills -->
         <div class="flex justify-center">
         <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
@@ -117,61 +134,75 @@
               draggable="false"
             />
 
-            <!-- Prompt badge (always visible) -->
+            <!-- Featured badge (top-left) -->
+            <span
+              v-if="artwork.featured"
+              class="absolute top-3 left-3 z-10 featured-badge pointer-events-none"
+            >
+              <svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M8 1l2.2 4.5 5 .7-3.6 3.5.9 5L8 12.4 3.5 14.7l.9-5-3.6-3.5 5-.7z" />
+              </svg>
+              Featured
+            </span>
+
+            <!-- Prompt badge (top-right, always visible) -->
             <div
               v-if="artwork.hasPrompt"
               class="absolute top-3 right-3 z-10 pointer-events-none"
             >
-              <span
-                v-if="isPurchased(artwork.id)"
-                class="prompt-badge prompt-badge--unlocked"
-              >
-                <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="2 6 5 9 10 3" />
-                </svg>
-                Unlocked
-              </span>
-              <span
-                v-else
-                class="prompt-badge prompt-badge--locked"
-              >
-                <svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-                  <rect x="2" y="8" width="12" height="8" rx="1.5" />
-                  <path d="M5 8V5a3 3 0 0 1 6 0v3" />
-                </svg>
-                Prompt ${{ ((artwork.promptPrice || 399) / 100).toFixed(2) }}
-              </span>
-            </div>
-
-            <!-- Hover overlay (desktop) / always visible (mobile) -->
-            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-400 flex flex-col justify-end p-5">
-              <h3 class="font-display text-base md:text-lg font-semibold text-white mb-1 sm:translate-y-3 sm:group-hover:translate-y-0 transition-transform duration-400">
-                {{ artwork.title }}
-              </h3>
-              <div class="flex items-center justify-between sm:translate-y-3 sm:group-hover:translate-y-0 transition-transform duration-400 delay-75">
-                <p class="font-body text-xs uppercase tracking-[0.12em] text-lavender-300/70">
-                  {{ artwork.medium }} &middot; {{ artwork.year }}
-                </p>
-                <!-- Prompt unlock hint on hover -->
                 <span
-                  v-if="artwork.hasPrompt && !isPurchased(artwork.id)"
-                  class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-accent-red/20 border border-accent-red/30 text-accent-red font-body text-[10px] font-medium tracking-wide"
+                  v-if="isPurchased(artwork.id)"
+                  class="prompt-badge prompt-badge--unlocked"
                 >
-                  <svg width="8" height="8" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-                    <rect x="2" y="8" width="12" height="8" rx="1.5" />
-                    <path d="M5 8V5a3 3 0 0 1 6 0v3" />
-                  </svg>
-                  ${{ ((artwork.promptPrice || 399) / 100).toFixed(2) }}
-                </span>
-                <span
-                  v-else-if="artwork.hasPrompt && isPurchased(artwork.id)"
-                  class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 font-body text-[10px] font-medium tracking-wide"
-                >
-                  <svg width="8" height="8" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="2 6 5 9 10 3" />
                   </svg>
                   Unlocked
                 </span>
+                <span
+                  v-else
+                  class="prompt-badge prompt-badge--locked"
+                >
+                  <svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <rect x="2" y="8" width="12" height="8" rx="1.5" />
+                    <path d="M5 8V5a3 3 0 0 1 6 0v3" />
+                  </svg>
+                  Prompt ${{ ((artwork.promptPrice || 399) / 100).toFixed(2) }}
+                </span>
+              </div>
+
+            <!-- Like button (bottom-right) -->
+            <div v-if="isMounted" class="absolute bottom-3 right-3 z-10">
+              <ResonanceButton :artwork-id="artwork.id" size="sm" />
+            </div>
+
+            <!-- Hover overlay (desktop) / always visible (mobile) -->
+            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-400 flex flex-col justify-end p-5 pb-14">
+              <h3 class="font-display text-base md:text-lg font-semibold text-white mb-1 sm:translate-y-3 sm:group-hover:translate-y-0 transition-transform duration-400">
+                {{ artwork.title }}
+              </h3>
+              <div class="flex items-center gap-3 sm:translate-y-3 sm:group-hover:translate-y-0 transition-transform duration-400 delay-75">
+                <p class="font-body text-xs uppercase tracking-[0.12em] text-lavender-300/70">
+                  {{ artwork.medium }} &middot; {{ artwork.year }}
+                </p>
+                <!-- Stats: views + likes -->
+                <div class="flex items-center gap-2 ml-auto">
+                  <span v-if="artwork.viewCount" class="inline-flex items-center gap-1 text-lavender-500/70 text-[10px] font-body">
+                    <svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                      <path d="M1 8s3-5.5 7-5.5S15 8 15 8s-3 5.5-7 5.5S1 8 1 8z" />
+                      <circle cx="8" cy="8" r="2.5" />
+                    </svg>
+                    {{ artwork.viewCount }}
+                  </span>
+                  <span v-if="likes.getLikeCount(artwork.id)" class="inline-flex items-center gap-1 text-lavender-500/70 text-[10px] font-body">
+                    <svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                      <circle cx="8" cy="8" r="7" />
+                      <circle cx="8" cy="8" r="4" />
+                      <circle cx="8" cy="8" r="1.5" fill="currentColor" />
+                    </svg>
+                    {{ likes.getLikeCount(artwork.id) }}
+                  </span>
+                </div>
               </div>
             </div>
 
@@ -203,6 +234,7 @@ definePageMeta({ layout: false })
 
 const { artworks } = useArtworks()
 const lightbox = useLightbox()
+const likes = useLikes()
 const reducedMotion = useReducedMotion()
 const toast = useToast()
 const { isPurchased, loggedIn } = usePromptPurchases()
@@ -215,6 +247,12 @@ const gridSection = ref<HTMLElement | null>(null)
 
 const activeCategory = ref('all')
 const searchQuery = ref('')
+const isMounted = ref(false)
+const sortBy = ref<'latest' | 'popular'>('latest')
+const sortOptions = [
+  { value: 'latest' as const, label: 'Latest' },
+  { value: 'popular' as const, label: 'Popular' },
+]
 const debouncedSearch = useDebounce(searchQuery, 300)
 let ctx: gsap.Context | null = null
 let isAnimating = false
@@ -238,6 +276,13 @@ const filteredArtworks = computed(() => {
       || a.medium?.toLowerCase().includes(q)
       || a.description?.toLowerCase().includes(q),
     )
+  }
+  if (sortBy.value === 'popular') {
+    results = [...results].sort((a, b) => {
+      const aScore = (likes.getLikeCount(a.id) * 3) + (a.viewCount || 0)
+      const bScore = (likes.getLikeCount(b.id) * 3) + (b.viewCount || 0)
+      return bScore - aScore
+    })
   }
   return results
 })
@@ -372,7 +417,10 @@ function handleStripeReturn(arts: Artwork[]) {
   router.replace({ query: Object.keys(cleanQuery).length > 0 ? cleanQuery : undefined })
 }
 
-onMounted(() => handleStripeReturn(artworks.value))
+onMounted(() => {
+  isMounted.value = true
+  handleStripeReturn(artworks.value)
+})
 watch(() => artworks.value, (arts) => handleStripeReturn(arts), { once: true })
 
 // GSAP entrance animations
@@ -574,5 +622,27 @@ watch(artworks, (arts) => {
 
 .gallery-card:hover .prompt-badge--locked {
   box-shadow: 0 4px 20px rgba(237, 84, 77, 0.25);
+}
+
+/* Featured badge */
+.featured-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 100px;
+  backdrop-filter: blur(12px);
+  font-family: var(--font-body, 'PP Neue Montreal', sans-serif);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  background: rgba(212, 175, 55, 0.2);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  color: #d4af37;
+  box-shadow: 0 2px 12px rgba(212, 175, 55, 0.15);
+}
+
+.gallery-card:hover .featured-badge {
+  transform: scale(1.05);
 }
 </style>

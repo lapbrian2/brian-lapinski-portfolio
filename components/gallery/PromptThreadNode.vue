@@ -52,9 +52,24 @@
           {{ artwork.title }}
         </h3>
 
-        <p class="font-body text-xs uppercase tracking-[0.15em] text-lavender-400 mb-4">
+        <p class="font-body text-xs uppercase tracking-[0.15em] text-lavender-400 mb-3">
           {{ artwork.medium }} &middot; {{ artwork.year }}
         </p>
+
+        <!-- Like button + stats -->
+        <div class="flex items-center gap-3 mb-4">
+          <ResonanceButton :artwork-id="artwork.id" size="sm" />
+          <span v-if="likes.getLikeCount(artwork.id)" class="inline-flex items-center gap-1 text-lavender-500/70 text-xs font-body">
+            {{ likes.getLikeCount(artwork.id) }} {{ likes.getLikeCount(artwork.id) === 1 ? 'resonance' : 'resonances' }}
+          </span>
+          <span v-if="artwork.viewCount" class="inline-flex items-center gap-1 text-lavender-500/50 text-xs font-body ml-auto">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+              <path d="M1 8s3-5.5 7-5.5S15 8 15 8s-3 5.5-7 5.5S1 8 1 8z" />
+              <circle cx="8" cy="8" r="2.5" />
+            </svg>
+            {{ artwork.viewCount }}
+          </span>
+        </div>
 
         <!-- Raw prompt in monospace -->
         <div v-if="artwork.rawPrompt" class="mb-4">
@@ -93,6 +108,7 @@ const props = defineProps<{
 
 const allArtworks = inject<Ref<Artwork[]>>('threadArtworks')
 const lightbox = inject<ReturnType<typeof useLightbox>>('threadLightbox')
+const likes = useLikes()
 
 const nodeEl = ref<HTMLElement | null>(null)
 const imageWrapEl = ref<HTMLElement | null>(null)

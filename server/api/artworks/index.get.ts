@@ -1,5 +1,5 @@
-import { eq, asc, and, inArray, count } from 'drizzle-orm'
-import { artworks, techniques, artworkTechniques, artworkLikes, promptPurchases } from '~/server/db/schema'
+import { eq, asc, and, inArray, count, isNotNull } from 'drizzle-orm'
+import { artworks, techniques, artworkTechniques, artworkLikes, promptPurchases, pageViews } from '~/server/db/schema'
 import { useDb } from '~/server/db'
 import { getPromptPrice } from '~/server/utils/prompt-pricing'
 
@@ -31,20 +31,17 @@ export default defineEventHandler(async (event) => {
     purchasedIds = new Set(purchases.map(p => p.artworkId))
   }
 
-  // Return all artworks (filtered by category if specified)
-  let results
+  // Return published artworks (filtered by category if specified)
+  const conditions = [eq(artworks.published, true)]
   if (category && category !== 'all') {
-    results = await db
-      .select()
-      .from(artworks)
-      .where(eq(artworks.category, category))
-      .orderBy(asc(artworks.sortOrder))
-  } else {
-    results = await db
-      .select()
-      .from(artworks)
-      .orderBy(asc(artworks.sortOrder))
+    conditions.push(eq(artworks.category, category))
   }
+
+  const results = await db
+    .select()
+    .from(artworks)
+    .where(and(...conditions))
+    .orderBy(asc(artworks.sortOrder))
 
   // Fetch like counts for all artworks
   const likeCounts = await db
@@ -58,6 +55,21 @@ export default defineEventHandler(async (event) => {
   const likeMap = new Map<string, number>()
   for (const lc of likeCounts) {
     likeMap.set(lc.artworkId, lc.total)
+  }
+
+  // Fetch view counts for all artworks
+  const viewCounts = await db
+    .select({
+      artworkId: pageViews.artworkId,
+      total: count(),
+    })
+    .from(pageViews)
+    .where(isNotNull(pageViews.artworkId))
+    .groupBy(pageViews.artworkId)
+
+  const viewMap = new Map<string, number>()
+  for (const vc of viewCounts) {
+    if (vc.artworkId) viewMap.set(vc.artworkId, vc.total)
   }
 
   // If nodes requested, hydrate each artwork with its technique nodes
@@ -102,6 +114,7 @@ export default defineEventHandler(async (event) => {
           description: unlocked ? node.description : null,
         })),
         likeCount: likeMap.get(artwork.id) || 0,
+        viewCount: viewMap.get(artwork.id) || 0,
         promptUnlocked: unlocked,
         promptPrice: getPromptPrice(artwork.promptPrice),
         hasPrompt: !!artwork.rawPrompt,
@@ -126,6 +139,7 @@ export default defineEventHandler(async (event) => {
       rawPrompt: unlocked ? artwork.rawPrompt : null,
       refinementNotes: unlocked ? artwork.refinementNotes : null,
       likeCount: likeMap.get(artwork.id) || 0,
+      viewCount: viewMap.get(artwork.id) || 0,
       promptUnlocked: unlocked,
       promptPrice: getPromptPrice(artwork.promptPrice),
       hasPrompt: !!artwork.rawPrompt,

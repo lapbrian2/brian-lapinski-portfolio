@@ -35,6 +35,8 @@
         <option value="landscapes">Landscapes</option>
         <option value="abstract">Abstract</option>
         <option value="surreal">Surreal</option>
+        <option value="anime">Anime</option>
+        <option value="sci-fi">Sci-Fi</option>
       </select>
     </div>
 
@@ -104,6 +106,7 @@
             <th class="px-5 py-3 text-xs font-medium text-gray-400 uppercase tracking-wider">Title</th>
             <th class="px-5 py-3 text-xs font-medium text-gray-400 uppercase tracking-wider">Category</th>
             <th class="px-5 py-3 text-xs font-medium text-gray-400 uppercase tracking-wider">Year</th>
+            <th class="px-5 py-3 text-xs font-medium text-gray-400 uppercase tracking-wider">Featured</th>
             <th class="px-5 py-3 text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
             <th class="px-5 py-3 text-xs font-medium text-gray-400 uppercase tracking-wider text-right">Actions</th>
           </tr>
@@ -146,6 +149,20 @@
               </span>
             </td>
             <td class="px-5 py-3 text-sm text-gray-400">{{ artwork.year }}</td>
+            <td class="px-5 py-3">
+              <button
+                @click="toggleFeatured(artwork)"
+                class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full transition-colors"
+                :class="artwork.featured
+                  ? 'bg-amber-500/15 text-amber-400 border border-amber-500/25 hover:bg-amber-500/25'
+                  : 'bg-gray-800 text-gray-600 border border-gray-700 hover:text-gray-400'"
+              >
+                <svg width="10" height="10" viewBox="0 0 16 16" :fill="artwork.featured ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="1.5">
+                  <path d="M8 1l2.2 4.5 5 .7-3.6 3.5.9 5L8 12.4 3.5 14.7l.9-5-3.6-3.5 5-.7z" />
+                </svg>
+                {{ artwork.featured ? 'Yes' : 'No' }}
+              </button>
+            </td>
             <td class="px-5 py-3">
               <span
                 class="inline-flex px-2.5 py-1 text-xs font-medium rounded-full"
@@ -230,6 +247,7 @@ interface ArtworkItem {
   year: number
   sortOrder: number
   published: boolean
+  featured: boolean
 }
 
 const artworksList = ref<ArtworkItem[]>([])
@@ -310,6 +328,19 @@ async function bulkPublish(published: boolean) {
     alert(getFetchErrorMessage(e, 'Failed to update artworks'))
   } finally {
     bulkUpdating.value = false
+  }
+}
+
+async function toggleFeatured(artwork: ArtworkItem) {
+  const newVal = !artwork.featured
+  try {
+    await $fetch(`/api/admin/artworks/${artwork.id}`, {
+      method: 'PUT',
+      body: { featured: newVal },
+    })
+    artwork.featured = newVal
+  } catch (e) {
+    alert(getFetchErrorMessage(e, 'Failed to update featured status'))
   }
 }
 

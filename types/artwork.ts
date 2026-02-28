@@ -17,6 +17,7 @@ export interface Artwork {
   refinementNotes?: string | null
   promptNodes?: PromptNode[]
   likeCount?: number
+  viewCount?: number
   // Purchase gating
   promptUnlocked?: boolean
   promptPrice?: number
