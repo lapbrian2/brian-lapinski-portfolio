@@ -299,7 +299,7 @@ onMounted(() => {
     if (relatedEl.value) {
       const cards = relatedEl.value.querySelectorAll('.grid > a')
       if (cards.length) {
-        gsap.set(cards, { opacity: 0, y: 40, scale: 0.95 })
+        gsap.set(cards, { opacity: 0, y: 30, scale: 1.04, filter: 'blur(8px)' })
         ScrollTrigger.create({
           trigger: relatedEl.value,
           start: 'top 85%',
@@ -309,12 +309,13 @@ onMounted(() => {
               opacity: 1,
               y: 0,
               scale: 1,
-              duration: 0.6,
+              filter: 'blur(0px)',
+              duration: 0.7,
               stagger: 0.12,
-              ease: 'power3.out',
+              ease: 'power2.out',
               force3D: true,
               onComplete() {
-                this.targets().forEach((el: HTMLElement) => gsap.set(el, { clearProps: 'transform,willChange,force3D' }))
+                this.targets().forEach((el: HTMLElement) => gsap.set(el, { clearProps: 'transform,willChange,force3D,filter' }))
               },
             })
           },
