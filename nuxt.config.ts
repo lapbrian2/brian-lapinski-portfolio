@@ -88,7 +88,7 @@ export default defineNuxtConfig({
     tursoAuthToken: process.env.TURSO_AUTH_TOKEN || '',
     resendApiKey: process.env.RESEND_API_KEY || '',
     resendFromEmail: process.env.RESEND_FROM_EMAIL || 'noreply@lapinski.art',
-    contactNotificationEmail: process.env.CONTACT_NOTIFICATION_EMAIL || 'brian@lapinski.art',
+    contactNotificationEmail: process.env.CONTACT_NOTIFICATION_EMAIL || 'brianlapinskiart@gmail.com',
     adminPassword: process.env.ADMIN_PASSWORD || '',
     adminSessionSecret: process.env.ADMIN_SESSION_SECRET || '',
     blobToken: process.env.BLOB_READ_WRITE_TOKEN || '',

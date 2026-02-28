@@ -92,7 +92,7 @@ Create a `.env` file from `.env.example`:
 | `TURSO_AUTH_TOKEN` | Yes | Turso authentication token |
 | `RESEND_API_KEY` | No | Resend API key for sending contact emails |
 | `RESEND_FROM_EMAIL` | No | Sender email (default: `noreply@lapinski.art`) |
-| `CONTACT_NOTIFICATION_EMAIL` | No | Where contact submissions go (default: `brian@lapinski.art`) |
+| `CONTACT_NOTIFICATION_EMAIL` | No | Where contact submissions go (default: `brianlapinskiart@gmail.com`) |
 | `ADMIN_PASSWORD` | Yes | Password for the admin dashboard |
 | `ADMIN_SESSION_SECRET` | Yes | Random 32+ char string for signing session cookies |
 | `BLOB_READ_WRITE_TOKEN` | No | Vercel Blob token for admin image uploads |
