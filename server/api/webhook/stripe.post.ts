@@ -3,7 +3,10 @@ import { orders, orderItems, printVariants, printProducts, artworks, promptPurch
 import { useDb } from '~/server/db'
 import { orderConfirmationEmail, adminOrderNotificationEmail } from '~/server/utils/email-templates'
 import { promptPurchaseEmail } from '~/server/utils/prompt-email-templates'
+import { createLogger } from '~/server/utils/logger'
 import type Stripe from 'stripe'
+
+const log = createLogger('webhook')
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
@@ -28,7 +31,7 @@ export default defineEventHandler(async (event) => {
       config.stripeWebhookSecret as string,
     ) as Stripe.Event
   } catch (err) {
-    console.error('Stripe webhook signature verification failed:', err)
+    log.error('Stripe signature verification failed:', err)
     throw createError({ statusCode: 400, statusMessage: 'Webhook signature verification failed' })
   }
 
@@ -44,14 +47,14 @@ export default defineEventHandler(async (event) => {
 
       // Validate metadata fields exist
       if (!userId || !artworkId || !pricePaid) {
-        console.error('[webhook] prompt_purchase missing metadata:', { userId, artworkId, pricePaid, sessionId: session.id })
+        log.error('prompt_purchase missing metadata:', { userId, artworkId, pricePaid, sessionId: session.id })
         return { received: true }
       }
 
       // Validate price matches Stripe's charged amount
       const metadataPrice = Number(pricePaid)
       if (session.amount_total && Math.abs(metadataPrice - session.amount_total) > 0) {
-        console.warn('[webhook] prompt_purchase price mismatch — metadata:', metadataPrice, 'charged:', session.amount_total, 'session:', session.id)
+        log.warn('prompt_purchase price mismatch — metadata:', metadataPrice, 'charged:', session.amount_total, 'session:', session.id)
       }
 
       // Idempotency: check if already recorded
@@ -73,7 +76,7 @@ export default defineEventHandler(async (event) => {
           email: session.customer_details?.email || null,
         })
       } catch (err) {
-        console.error('[webhook] Failed to insert prompt_purchase:', err, { sessionId: session.id, userId, artworkId })
+        log.error('Failed to insert prompt_purchase:', err, { sessionId: session.id, userId, artworkId })
         // Still return 200 — Stripe will retry, idempotency check will handle it
         return { received: true }
       }
@@ -105,7 +108,7 @@ export default defineEventHandler(async (event) => {
             html: emailContent.html,
           })
         } catch (err) {
-          console.error('[webhook] Prompt purchase email failed:', err)
+          log.error('Prompt purchase email failed:', err)
           // Don't fail the webhook for email errors
         }
       }
@@ -120,7 +123,7 @@ export default defineEventHandler(async (event) => {
     if (orderId) {
       const numOrderId = Number(orderId)
       if (isNaN(numOrderId)) {
-        console.error('[webhook] Invalid orderId in metadata:', orderId, 'session:', session.id)
+        log.error('Invalid orderId in metadata:', orderId, 'session:', session.id)
         return { received: true }
       }
 
@@ -209,7 +212,7 @@ export default defineEventHandler(async (event) => {
             html: adminNotif.html,
           })
         } catch (err) {
-          console.error('Order email notification failed:', err)
+          log.error('Order email notification failed:', err)
           // Don't fail the webhook — order is already recorded
         }
       }
@@ -231,7 +234,7 @@ export default defineEventHandler(async (event) => {
           })
           .where(eq(promptPurchases.stripePaymentIntentId, paymentIntentId))
       } catch (err) {
-        console.error('[webhook] Failed to process refund:', err, { paymentIntentId })
+        log.error('Failed to process refund:', err, { paymentIntentId })
       }
     }
   }

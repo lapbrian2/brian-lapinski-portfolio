@@ -1,6 +1,9 @@
 import { eq, and } from 'drizzle-orm'
 import { users } from '~/server/db/schema'
 import { useDb } from '~/server/db'
+import { createLogger } from '~/server/utils/logger'
+
+const log = createLogger('auth:github')
 
 export default defineOAuthGitHubEventHandler({
   config: {
@@ -53,7 +56,7 @@ export default defineOAuthGitHubEventHandler({
     return sendRedirect(event, '/')
   },
   onError(event, error) {
-    console.error('GitHub OAuth error:', error)
+    log.error('OAuth error:', error)
     return sendRedirect(event, '/?auth=error')
   },
 })

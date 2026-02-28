@@ -2,6 +2,16 @@
   <div>
     <h1 class="text-2xl font-display font-bold text-white mb-8">Dashboard</h1>
 
+    <!-- Error Banner -->
+    <div v-if="statsError" class="mb-6 px-4 py-3 bg-red-500/10 border border-red-500/20 rounded-lg flex items-center gap-3">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="text-red-400 flex-shrink-0">
+        <circle cx="12" cy="12" r="10" />
+        <line x1="12" y1="8" x2="12" y2="12" />
+        <line x1="12" y1="16" x2="12.01" y2="16" />
+      </svg>
+      <span class="text-sm text-red-300">{{ statsError }}</span>
+    </div>
+
     <!-- Quick Stats -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
       <div
@@ -77,6 +87,7 @@ import type { ArtworksApiResponse, SubmissionsApiResponse, DashboardStat } from 
 
 const dashboardStats = ref<DashboardStat[]>([])
 const recentSubmissions = ref<Submission[]>([])
+const statsError = ref('')
 
 onMounted(async () => {
   try {
@@ -100,7 +111,7 @@ onMounted(async () => {
       navigateTo('/admin/login')
       return
     }
-    // Silently fail on dashboard — not critical
+    statsError.value = 'Failed to load dashboard stats. Please refresh to try again.'
   }
 })
 

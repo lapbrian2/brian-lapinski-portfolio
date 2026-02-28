@@ -1,6 +1,9 @@
 import { eq, and } from 'drizzle-orm'
 import { users } from '~/server/db/schema'
 import { useDb } from '~/server/db'
+import { createLogger } from '~/server/utils/logger'
+
+const log = createLogger('auth:google')
 
 export default defineOAuthGoogleEventHandler({
   async onSuccess(event, { user: googleUser }) {
@@ -49,7 +52,7 @@ export default defineOAuthGoogleEventHandler({
     return sendRedirect(event, '/')
   },
   onError(event, error) {
-    console.error('Google OAuth error:', error)
+    log.error('OAuth error:', error)
     return sendRedirect(event, '/?auth=error')
   },
 })

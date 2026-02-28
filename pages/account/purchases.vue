@@ -42,6 +42,24 @@
           <p class="font-body text-sm text-lavender-400">Loading your prompts...</p>
         </div>
 
+        <!-- Error State -->
+        <div v-else-if="fetchError" class="text-center py-16">
+          <div class="w-16 h-16 rounded-full border border-accent-red/20 bg-accent-red/5 flex items-center justify-center mx-auto mb-6">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-accent-red/60">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+          </div>
+          <p class="font-body text-sm text-lavender-400 mb-6">{{ fetchError }}</p>
+          <button
+            class="inline-flex items-center gap-2 px-6 py-3 bg-accent-red hover:bg-accent-red-hover text-white text-sm font-medium rounded-sm transition-colors"
+            @click="$router.go(0)"
+          >
+            Try Again
+          </button>
+        </div>
+
         <!-- Empty State -->
         <div v-else-if="!purchases.length" class="text-center py-16">
           <div class="w-16 h-16 rounded-full border border-white/[0.08] bg-white/[0.02] flex items-center justify-center mx-auto mb-6">
@@ -118,6 +136,7 @@ interface PurchaseDetail {
 
 const loading = ref(true)
 const purchases = ref<PurchaseDetail[]>([])
+const fetchError = ref('')
 
 // Auth check — redirect if not logged in
 let loggedIn = ref(false)
@@ -140,7 +159,7 @@ onMounted(async () => {
     )
     purchases.value = response.data
   } catch {
-    // Silently fail — empty state will show
+    fetchError.value = 'Unable to load your purchases. Please try again later.'
   } finally {
     loading.value = false
   }

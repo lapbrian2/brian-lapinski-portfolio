@@ -187,6 +187,7 @@
                 type="email"
                 required
                 placeholder="your@email.com"
+                aria-label="Email address for shop notifications"
                 class="w-full px-4 py-3 bg-white/[0.03] border border-white/[0.08] rounded-sm font-body text-sm text-lavender-200 placeholder:text-lavender-500/40 focus:border-accent-red/40 focus:outline-none transition-colors duration-300"
               />
             </div>

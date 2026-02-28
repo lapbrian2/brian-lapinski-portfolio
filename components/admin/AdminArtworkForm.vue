@@ -14,6 +14,11 @@
           @dragover.prevent="dragOver = true"
           @dragleave="dragOver = false"
           @drop.prevent="handleDrop"
+          role="button"
+          aria-label="Upload artwork image"
+          tabindex="0"
+          @keydown.enter="fileInput?.click()"
+          @keydown.space.prevent="fileInput?.click()"
           class="flex-1 border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors"
           :class="dragOver ? 'border-accent-red bg-accent-red/5' : 'border-gray-700 hover:border-gray-500'"
         >

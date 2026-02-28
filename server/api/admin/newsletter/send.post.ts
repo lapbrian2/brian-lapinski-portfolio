@@ -1,6 +1,9 @@
 import { isNull } from 'drizzle-orm'
 import { subscribers } from '~/server/db/schema'
 import { useDb } from '~/server/db'
+import { createLogger } from '~/server/utils/logger'
+
+const log = createLogger('newsletter')
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
@@ -66,7 +69,7 @@ export default defineEventHandler(async (event) => {
       })
       sent++
     } catch (err) {
-      console.error(`[newsletter] Failed to send to ${sub.email}:`, err)
+      log.error(`Failed to send to ${sub.email}:`, err)
       failed++
     }
   }

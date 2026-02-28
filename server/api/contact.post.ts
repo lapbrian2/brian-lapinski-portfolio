@@ -1,6 +1,9 @@
 import { Resend } from 'resend'
 import { contactSubmissions } from '~/server/db/schema'
 import { useDb } from '~/server/db'
+import { createLogger } from '~/server/utils/logger'
+
+const log = createLogger('contact')
 
 // Simple in-memory rate limiter (per IP, resets on cold start)
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>()
@@ -92,7 +95,7 @@ export default defineEventHandler(async (event) => {
         `,
       })
     } catch (err) {
-      console.error('Resend email failed:', err)
+      log.error('Resend email failed:', err)
       // Don't fail the request if email fails — the submission is logged
     }
   }

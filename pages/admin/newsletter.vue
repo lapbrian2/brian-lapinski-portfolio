@@ -52,7 +52,7 @@
             <span class="text-xs text-gray-400 uppercase tracking-wider">Preview</span>
           </div>
           <div class="p-6 bg-[#0a0a0f]">
-            <div class="max-w-[560px] mx-auto" v-html="form.html" />
+            <div class="max-w-[560px] mx-auto" v-html="sanitizedHtml" />
           </div>
         </div>
 
@@ -100,12 +100,16 @@
 </template>
 
 <script setup lang="ts">
+import DOMPurify from 'isomorphic-dompurify'
+
 definePageMeta({ layout: 'admin', middleware: 'admin' })
 
 const form = reactive({
   subject: '',
   html: '',
 })
+
+const sanitizedHtml = computed(() => DOMPurify.sanitize(form.html))
 
 const sending = ref(false)
 const showPreview = ref(false)

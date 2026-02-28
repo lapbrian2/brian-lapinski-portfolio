@@ -1,6 +1,9 @@
 import { eq } from 'drizzle-orm'
 import { promptPurchases } from '~/server/db/schema'
 import { useDb } from '~/server/db'
+import { createLogger } from '~/server/utils/logger'
+
+const log = createLogger('admin:refund')
 
 export default defineEventHandler(async (event) => {
   const numId = requireNumericParam(event, 'id', 'Purchase ID')
@@ -38,7 +41,7 @@ export default defineEventHandler(async (event) => {
       payment_intent: purchase.stripePaymentIntentId,
     })
   } catch (err) {
-    console.error('[admin] Stripe refund failed:', err, { purchaseId: numId })
+    log.error('Stripe refund failed:', err, { purchaseId: numId })
     throw createError({ statusCode: 500, statusMessage: 'Stripe refund failed — check logs' })
   }
 

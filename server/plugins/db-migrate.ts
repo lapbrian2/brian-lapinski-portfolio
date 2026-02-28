@@ -5,7 +5,10 @@
 export default defineNitroPlugin(async () => {
   try {
     const config = useRuntimeConfig()
-    if (!config.tursoUrl || !config.tursoAuthToken) return
+    if (!config.tursoUrl || !config.tursoAuthToken) {
+      console.warn('[db-migrate] Skipping migrations — TURSO_DATABASE_URL or TURSO_AUTH_TOKEN not configured')
+      return
+    }
 
     const { createClient } = await import('@libsql/client')
     const client = createClient({

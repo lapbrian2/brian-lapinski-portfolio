@@ -6,6 +6,8 @@ export default defineNuxtConfig({
     '@nuxt/image',
     // Only load auth module when session password is configured
     ...(process.env.NUXT_SESSION_PASSWORD ? ['nuxt-auth-utils'] as const : []),
+    // Error tracking (loads only when SENTRY_DSN is set)
+    ...(process.env.SENTRY_DSN ? ['@sentry/nuxt/module'] as const : []),
   ],
 
   app: {
@@ -97,6 +99,7 @@ export default defineNuxtConfig({
     public: {
       siteUrl: process.env.SITE_URL || 'https://lapinski.art',
       stripePublishableKey: process.env.STRIPE_PUBLISHABLE_KEY || '',
+      sentryDsn: process.env.SENTRY_DSN || '',
     },
   },
 

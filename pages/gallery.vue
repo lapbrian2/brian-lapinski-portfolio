@@ -195,6 +195,7 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { categories } from '~/data/artworks'
 import { useReducedMotion } from '~/composables/useMediaQuery'
+import { useDebounce } from '~/composables/useDebounce'
 import type { Artwork } from '~/types/artwork'
 import type { SourceRect } from '~/composables/useLightbox'
 
@@ -214,6 +215,7 @@ const gridSection = ref<HTMLElement | null>(null)
 
 const activeCategory = ref('all')
 const searchQuery = ref('')
+const debouncedSearch = useDebounce(searchQuery, 300)
 let ctx: gsap.Context | null = null
 let isAnimating = false
 
@@ -229,7 +231,7 @@ const filteredArtworks = computed(() => {
   if (activeCategory.value !== 'all') {
     results = results.filter(a => a.category === activeCategory.value)
   }
-  const q = searchQuery.value.trim().toLowerCase()
+  const q = debouncedSearch.value.trim().toLowerCase()
   if (q) {
     results = results.filter(a =>
       a.title.toLowerCase().includes(q)

@@ -2,6 +2,9 @@ import { eq, and } from 'drizzle-orm'
 import { artworks, promptPurchases } from '~/server/db/schema'
 import { useDb } from '~/server/db'
 import { getPromptPrice } from '~/server/utils/prompt-pricing'
+import { createLogger } from '~/server/utils/logger'
+
+const log = createLogger('prompts')
 
 export default defineEventHandler(async (event) => {
   // Auth required
@@ -95,7 +98,7 @@ export default defineEventHandler(async (event) => {
       cancel_url: `${baseUrl}/gallery`,
     })
   } catch (err) {
-    console.error('Stripe checkout session creation failed:', err)
+    log.error('Stripe checkout session creation failed:', err)
     throw createError({ statusCode: 500, statusMessage: 'Payment setup failed — please try again' })
   }
 

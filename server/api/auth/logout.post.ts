@@ -1,6 +1,9 @@
 import { eq } from 'drizzle-orm'
 import { sessions } from '~/server/db/schema'
 import { useDb } from '~/server/db'
+import { createLogger } from '~/server/utils/logger'
+
+const log = createLogger('auth')
 
 export default defineEventHandler(async (event) => {
   const sessionId = getCookie(event, 'admin_session')
@@ -10,7 +13,7 @@ export default defineEventHandler(async (event) => {
       const db = useDb()
       await db.delete(sessions).where(eq(sessions.id, sessionId))
     } catch (err) {
-      console.error('[logout] Session deletion failed:', err)
+      log.error('Session deletion failed:', err)
     }
   }
 

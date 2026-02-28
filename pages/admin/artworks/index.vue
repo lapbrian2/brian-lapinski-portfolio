@@ -161,14 +161,14 @@
                 <NuxtLink
                   :to="`/admin/artworks/${artwork.id}`"
                   class="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-colors"
-                  title="Edit"
+                  :aria-label="`Edit ${artwork.title}`"
                 >
                   <IconEdit class="w-4 h-4" />
                 </NuxtLink>
                 <button
                   @click="confirmDelete(artwork)"
                   class="p-2 text-gray-400 hover:text-red-400 hover:bg-gray-700 rounded-lg transition-colors"
-                  title="Delete"
+                  :aria-label="`Delete ${artwork.title}`"
                 >
                   <IconTrash class="w-4 h-4" />
                 </button>
