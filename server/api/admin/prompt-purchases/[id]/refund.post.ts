@@ -3,10 +3,7 @@ import { promptPurchases } from '~/server/db/schema'
 import { useDb } from '~/server/db'
 
 export default defineEventHandler(async (event) => {
-  const id = getRouterParam(event, 'id')
-  if (!id) {
-    throw createError({ statusCode: 400, statusMessage: 'Purchase ID required' })
-  }
+  const numId = requireNumericParam(event, 'id', 'Purchase ID')
 
   const db = useDb()
 
@@ -18,15 +15,15 @@ export default defineEventHandler(async (event) => {
       stripePaymentIntentId: promptPurchases.stripePaymentIntentId,
     })
     .from(promptPurchases)
-    .where(eq(promptPurchases.id, Number(id)))
+    .where(eq(promptPurchases.id, numId))
     .limit(1)
 
   if (!purchase) {
     throw createError({ statusCode: 404, statusMessage: 'Purchase not found' })
   }
 
-  if (purchase.status === 'refunded') {
-    throw createError({ statusCode: 400, statusMessage: 'Purchase already refunded' })
+  if (purchase.status !== 'completed') {
+    throw createError({ statusCode: 400, statusMessage: `Cannot refund purchase with status '${purchase.status}'` })
   }
 
   if (!purchase.stripePaymentIntentId) {
@@ -41,7 +38,7 @@ export default defineEventHandler(async (event) => {
       payment_intent: purchase.stripePaymentIntentId,
     })
   } catch (err) {
-    console.error('[admin] Stripe refund failed:', err, { purchaseId: id })
+    console.error('[admin] Stripe refund failed:', err, { purchaseId: numId })
     throw createError({ statusCode: 500, statusMessage: 'Stripe refund failed — check logs' })
   }
 
@@ -52,7 +49,7 @@ export default defineEventHandler(async (event) => {
       status: 'refunded',
       refundedAt: new Date().toISOString(),
     })
-    .where(eq(promptPurchases.id, Number(id)))
+    .where(eq(promptPurchases.id, numId))
 
   return { success: true }
 })

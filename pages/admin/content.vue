@@ -88,8 +88,8 @@ async function saveContent(entry: ContentEntry) {
     })
     saved.value = entry.key
     setTimeout(() => { if (saved.value === entry.key) saved.value = null }, 2000)
-  } catch (e: any) {
-    alert(e?.data?.statusMessage || 'Failed to save')
+  } catch (e) {
+    alert(getFetchErrorMessage(e, 'Failed to save'))
   } finally {
     saving.value = null
   }

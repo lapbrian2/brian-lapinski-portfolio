@@ -166,8 +166,8 @@ async function createCollection() {
     newCollection.coverImage = ''
     newCollection.featured = false
     await fetchCollections()
-  } catch (e: any) {
-    alert(e?.data?.statusMessage || 'Failed to create collection')
+  } catch (e) {
+    alert(getFetchErrorMessage(e, 'Failed to create collection'))
   } finally {
     creating.value = false
   }
@@ -178,8 +178,8 @@ async function deleteCollection(id: number) {
   try {
     await $fetch(`/api/admin/collections/${id}`, { method: 'DELETE' })
     await fetchCollections()
-  } catch (e: any) {
-    alert(e?.data?.statusMessage || 'Failed to delete collection')
+  } catch (e) {
+    alert(getFetchErrorMessage(e, 'Failed to delete collection'))
   }
 }
 </script>

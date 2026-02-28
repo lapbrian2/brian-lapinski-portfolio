@@ -15,7 +15,25 @@ export default defineEventHandler(async (event) => {
 
   for (const field of fields) {
     if (body[field] !== undefined) {
-      updateData[field] = numericFields.has(field) ? Number(body[field]) : body[field]
+      if (numericFields.has(field)) {
+        const num = Number(body[field])
+        if (isNaN(num)) {
+          throw createError({ statusCode: 400, statusMessage: `${field} must be a valid number` })
+        }
+        // Range validation
+        if (field === 'year' && (num < 1900 || num > 2100)) {
+          throw createError({ statusCode: 400, statusMessage: 'Year must be between 1900 and 2100' })
+        }
+        if (field === 'sortOrder' && (num < -1000 || num > 10000)) {
+          throw createError({ statusCode: 400, statusMessage: 'Sort order must be between -1000 and 10000' })
+        }
+        if (field === 'promptPrice' && (num < 99 || num > 9999)) {
+          throw createError({ statusCode: 400, statusMessage: 'Prompt price must be between $0.99 and $99.99' })
+        }
+        updateData[field] = num
+      } else {
+        updateData[field] = body[field]
+      }
     }
   }
 

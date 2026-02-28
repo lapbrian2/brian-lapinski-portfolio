@@ -118,11 +118,17 @@ export default defineEventHandler(async (event) => {
     const customerEmail = session.customer_details?.email || ''
 
     if (orderId) {
+      const numOrderId = Number(orderId)
+      if (isNaN(numOrderId)) {
+        console.error('[webhook] Invalid orderId in metadata:', orderId, 'session:', session.id)
+        return { received: true }
+      }
+
       // Idempotency guard — skip if already processed
       const [existingOrder] = await db
         .select({ status: orders.status })
         .from(orders)
-        .where(eq(orders.id, Number(orderId)))
+        .where(eq(orders.id, numOrderId))
         .limit(1)
       if (!existingOrder || existingOrder.status === 'paid') {
         return { received: true }
@@ -141,13 +147,13 @@ export default defineEventHandler(async (event) => {
             : null,
           updatedAt: new Date().toISOString(),
         })
-        .where(eq(orders.id, Number(orderId)))
+        .where(eq(orders.id, numOrderId))
 
       // Fetch order details for email
       const [order] = await db
         .select()
         .from(orders)
-        .where(eq(orders.id, Number(orderId)))
+        .where(eq(orders.id, numOrderId))
         .limit(1)
 
       const items = await db
@@ -162,7 +168,7 @@ export default defineEventHandler(async (event) => {
         .innerJoin(printVariants, eq(orderItems.variantId, printVariants.id))
         .innerJoin(printProducts, eq(printVariants.productId, printProducts.id))
         .innerJoin(artworks, eq(printProducts.artworkId, artworks.id))
-        .where(eq(orderItems.orderId, Number(orderId)))
+        .where(eq(orderItems.orderId, numOrderId))
 
       // Send email notifications
       if (config.resendApiKey && order) {

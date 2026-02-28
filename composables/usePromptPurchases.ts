@@ -95,6 +95,11 @@ export function usePromptPurchases() {
       }
 
       if (response.url) {
+        // Validate redirect URL is a legitimate Stripe checkout
+        if (!response.url.startsWith('https://checkout.stripe.com')) {
+          toast.show('Unexpected redirect — purchase cancelled', { type: 'error' })
+          return
+        }
         // Store which artwork to re-open on return
         if (import.meta.client) {
           localStorage.setItem('bl-last-viewed-artwork', artworkId)

@@ -132,8 +132,8 @@ async function createProduct() {
     // Refresh
     const res = await $fetch<{ data: PrintProduct[] }>('/api/admin/shop/products')
     products.value = res.data || []
-  } catch (e: any) {
-    alert(e?.data?.statusMessage || 'Failed to create product')
+  } catch (e) {
+    alert(getFetchErrorMessage(e, 'Failed to create product'))
   } finally {
     creating.value = false
   }
@@ -146,8 +146,8 @@ async function toggleActive(product: PrintProduct) {
       body: { active: !product.active },
     })
     product.active = !product.active
-  } catch (e: any) {
-    alert(e?.data?.statusMessage || 'Failed to update')
+  } catch (e) {
+    alert(getFetchErrorMessage(e, 'Failed to update'))
   }
 }
 </script>

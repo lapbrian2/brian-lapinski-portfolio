@@ -64,8 +64,8 @@ async function handleLogin() {
   try {
     await login(password.value)
     await navigateTo('/admin')
-  } catch (e: any) {
-    error.value = e?.data?.statusMessage || 'Invalid password'
+  } catch (e) {
+    error.value = getFetchErrorMessage(e, 'Invalid password')
   } finally {
     submitting.value = false
   }

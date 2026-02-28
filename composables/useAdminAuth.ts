@@ -15,16 +15,25 @@ export function useAdminAuth() {
   }
 
   async function login(password: string) {
-    const res = await $fetch('/api/auth/login', {
-      method: 'POST',
-      body: { password },
-    })
-    isAuthenticated.value = true
-    return res
+    try {
+      const res = await $fetch('/api/auth/login', {
+        method: 'POST',
+        body: { password },
+      })
+      isAuthenticated.value = true
+      return res
+    } catch (err) {
+      isAuthenticated.value = false
+      throw err
+    }
   }
 
   async function logout() {
-    await $fetch('/api/auth/logout', { method: 'POST' })
+    try {
+      await $fetch('/api/auth/logout', { method: 'POST' })
+    } catch {
+      // Continue with local logout even if server call fails
+    }
     isAuthenticated.value = false
     navigateTo('/admin/login')
   }

@@ -3,11 +3,8 @@ import { collections, collectionArtworks } from '~/server/db/schema'
 import { useDb } from '~/server/db'
 
 export default defineEventHandler(async (event) => {
-  const id = getRouterParam(event, 'id')
-  if (!id) throw createError({ statusCode: 400, statusMessage: 'ID required' })
-
+  const collectionId = requireNumericParam(event, 'id')
   const db = useDb()
-  const collectionId = Number(id)
 
   // Delete artwork associations first
   await db.delete(collectionArtworks).where(eq(collectionArtworks.collectionId, collectionId))

@@ -1,3 +1,4 @@
+import type { H3Event } from 'h3'
 import { pageViews } from '~/server/db/schema'
 import { useDb } from '~/server/db'
 import { hashIp } from '~/server/utils/hash-ip'
@@ -26,15 +27,13 @@ export default defineEventHandler(async (event) => {
   trackPageView(event, path, userAgent).catch(() => {})
 })
 
-async function trackPageView(event: any, path: string, userAgent: string) {
+async function trackPageView(event: H3Event, path: string, userAgent: string) {
   try {
     const db = useDb()
 
-    // Hash IP for privacy (SHA-256)
-    const ip = getRequestHeader(event, 'x-forwarded-for')?.split(',')[0]?.trim()
-      || getRequestHeader(event, 'x-real-ip')
-      || ''
-    const hashedIp = ip ? await hashIp(ip) : null
+    // Hash IP for privacy (SHA-256) — use consistent IP resolution
+    const rawIp = getRequestIP(event, { xForwardedFor: true }) || ''
+    const hashedIp = rawIp ? await hashIp(rawIp) : null
 
     // Get country from Vercel's free geo header
     const country = getRequestHeader(event, 'x-vercel-ip-country') || null

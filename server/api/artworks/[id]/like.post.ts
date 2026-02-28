@@ -20,6 +20,10 @@ export default defineEventHandler(async (event) => {
     // nuxt-auth-utils not configured — fall back to IP-based tracking
   }
 
+  // Resolve IP once using consistent utility
+  const rawIp = getRequestIP(event, { xForwardedFor: true }) || ''
+  const hashedIp = rawIp ? await hashIp(rawIp) : 'anonymous'
+
   // Build unique constraint: prefer userId, fall back to hashed IP
   let whereClause
   if (userId) {
@@ -28,11 +32,6 @@ export default defineEventHandler(async (event) => {
       eq(artworkLikes.userId, userId),
     )
   } else {
-    const ip = getRequestHeader(event, 'x-forwarded-for')?.split(',')[0]?.trim()
-      || getRequestHeader(event, 'x-real-ip')
-      || ''
-    const hashedIp = ip ? await hashIp(ip) : 'anonymous'
-
     whereClause = and(
       eq(artworkLikes.artworkId, artworkId),
       eq(artworkLikes.ip, hashedIp),
@@ -53,12 +52,7 @@ export default defineEventHandler(async (event) => {
     await db.delete(artworkLikes).where(whereClause)
     liked = false
   } else {
-    // Like — build insert values
-    const ip = getRequestHeader(event, 'x-forwarded-for')?.split(',')[0]?.trim()
-      || getRequestHeader(event, 'x-real-ip')
-      || ''
-    const hashedIp = ip ? await hashIp(ip) : 'anonymous'
-
+    // Like
     await db.insert(artworkLikes).values({
       artworkId,
       ip: hashedIp,

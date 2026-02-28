@@ -9,7 +9,9 @@ export default defineEventHandler(async (event) => {
     try {
       const db = useDb()
       await db.delete(sessions).where(eq(sessions.id, sessionId))
-    } catch {}
+    } catch (err) {
+      console.error('[logout] Session deletion failed:', err)
+    }
   }
 
   deleteCookie(event, 'admin_session', { path: '/' })

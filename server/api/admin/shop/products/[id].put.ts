@@ -3,8 +3,7 @@ import { printProducts, printVariants } from '~/server/db/schema'
 import { useDb } from '~/server/db'
 
 export default defineEventHandler(async (event) => {
-  const id = getRouterParam(event, 'id')
-  if (!id) throw createError({ statusCode: 400, statusMessage: 'Product ID required' })
+  const numId = requireNumericParam(event, 'id', 'Product ID')
 
   const body = await readBody(event)
   const db = useDb()
@@ -13,7 +12,7 @@ export default defineEventHandler(async (event) => {
   const [existing] = await db
     .select({ id: printProducts.id })
     .from(printProducts)
-    .where(eq(printProducts.id, Number(id)))
+    .where(eq(printProducts.id, numId))
     .limit(1)
 
   if (!existing) {
@@ -28,15 +27,32 @@ export default defineEventHandler(async (event) => {
         active: body.active,
         updatedAt: new Date().toISOString(),
       })
-      .where(eq(printProducts.id, Number(id)))
+      .where(eq(printProducts.id, numId))
   }
 
   // Handle variants: add or update
   if (body.variants && Array.isArray(body.variants)) {
     for (const variant of body.variants) {
+      // Validate numeric variant fields
+      if (variant.sizeWidth !== undefined) {
+        const w = Number(variant.sizeWidth)
+        if (isNaN(w) || w <= 0 || w > 10000) throw createError({ statusCode: 400, statusMessage: 'sizeWidth must be between 1 and 10000' })
+      }
+      if (variant.sizeHeight !== undefined) {
+        const h = Number(variant.sizeHeight)
+        if (isNaN(h) || h <= 0 || h > 10000) throw createError({ statusCode: 400, statusMessage: 'sizeHeight must be between 1 and 10000' })
+      }
+      if (variant.price !== undefined) {
+        const p = Number(variant.price)
+        if (isNaN(p) || p < 100) throw createError({ statusCode: 400, statusMessage: 'Price must be at least $1.00 (100 cents)' })
+      }
+
       if (variant.id) {
+        const variantId = Number(variant.id)
+        if (isNaN(variantId)) throw createError({ statusCode: 400, statusMessage: 'Variant ID must be a number' })
+
         // Update existing variant
-        const updateData: Record<string, any> = {}
+        const updateData: Record<string, unknown> = {}
         if (variant.sizeName !== undefined) updateData.sizeName = variant.sizeName
         if (variant.sizeWidth !== undefined) updateData.sizeWidth = Number(variant.sizeWidth)
         if (variant.sizeHeight !== undefined) updateData.sizeHeight = Number(variant.sizeHeight)
@@ -51,8 +67,8 @@ export default defineEventHandler(async (event) => {
             .update(printVariants)
             .set(updateData)
             .where(and(
-              eq(printVariants.id, Number(variant.id)),
-              eq(printVariants.productId, Number(id)),
+              eq(printVariants.id, variantId),
+              eq(printVariants.productId, numId),
             ))
         }
       } else {
@@ -61,7 +77,7 @@ export default defineEventHandler(async (event) => {
           throw createError({ statusCode: 400, statusMessage: 'New variants require sizeName, sizeWidth, sizeHeight, and price' })
         }
         await db.insert(printVariants).values({
-          productId: Number(id),
+          productId: numId,
           sizeName: variant.sizeName,
           sizeWidth: Number(variant.sizeWidth),
           sizeHeight: Number(variant.sizeHeight),
@@ -74,5 +90,5 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  return { success: true, data: { id: Number(id) } }
+  return { success: true, data: { id: numId } }
 })

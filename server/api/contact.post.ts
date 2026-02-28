@@ -5,6 +5,14 @@ import { useDb } from '~/server/db'
 // Simple in-memory rate limiter (per IP, resets on cold start)
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>()
 
+// Purge expired entries every 30 minutes to prevent unbounded growth
+setInterval(() => {
+  const now = Date.now()
+  for (const [key, entry] of rateLimitMap) {
+    if (now > entry.resetAt) rateLimitMap.delete(key)
+  }
+}, 30 * 60 * 1000)
+
 function checkRateLimit(ip: string): boolean {
   const now = Date.now()
   const entry = rateLimitMap.get(ip)

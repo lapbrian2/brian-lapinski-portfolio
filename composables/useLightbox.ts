@@ -1,5 +1,6 @@
 import { computed } from 'vue'
 import type { PromptNode, TechniqueCategory } from '~/types/artwork'
+import type { LenisInstance } from '~/types/lenis'
 
 export interface LightboxItem {
   id?: string
@@ -39,11 +40,11 @@ function useLightboxState() {
   return { isOpen, items, currentIndex, direction, sourceRect, sourceArtworkId }
 }
 
-function getLenis(): any {
+function getLenis(): LenisInstance | null {
   if (typeof window === 'undefined') return null
   try {
     const nuxtApp = useNuxtApp()
-    return nuxtApp.$lenis || null
+    return (nuxtApp.$lenis as LenisInstance) || null
   } catch {
     return null
   }

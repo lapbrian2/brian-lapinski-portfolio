@@ -3,15 +3,13 @@ import { collections, collectionArtworks } from '~/server/db/schema'
 import { useDb } from '~/server/db'
 
 export default defineEventHandler(async (event) => {
-  const id = getRouterParam(event, 'id')
-  if (!id) throw createError({ statusCode: 400, statusMessage: 'ID required' })
+  const collectionId = requireNumericParam(event, 'id')
 
   const body = await readBody(event)
   const db = useDb()
-  const collectionId = Number(id)
 
   // Update collection fields if any are provided
-  const updateData: Record<string, any> = {}
+  const updateData: Record<string, unknown> = {}
   const fields = ['title', 'slug', 'description', 'coverImage', 'sortOrder', 'featured'] as const
 
   for (const field of fields) {

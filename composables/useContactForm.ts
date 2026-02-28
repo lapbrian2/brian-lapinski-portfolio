@@ -42,9 +42,9 @@ export function useContactForm() {
       form.email = ''
       form.message = ''
       form.website = ''
-    } catch (err: any) {
+    } catch (err) {
       status.value = 'error'
-      serverError.value = err?.data?.statusMessage || 'Something went wrong. Please try again.'
+      serverError.value = getFetchErrorMessage(err, 'Something went wrong. Please try again.')
     }
   }
 

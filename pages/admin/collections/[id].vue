@@ -299,8 +299,8 @@ async function saveCollection() {
       },
     })
     alert('Collection saved successfully.')
-  } catch (e: any) {
-    alert(e?.data?.statusMessage || 'Failed to save collection')
+  } catch (e) {
+    alert(getFetchErrorMessage(e, 'Failed to save collection'))
   } finally {
     saving.value = false
   }

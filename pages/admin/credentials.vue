@@ -152,8 +152,8 @@ async function addCredential() {
     newCredential.name = ''
     showAddForm.value = false
     await fetchCredentials()
-  } catch (e: any) {
-    alert(e?.data?.statusMessage || 'Failed to add credential')
+  } catch (e) {
+    alert(getFetchErrorMessage(e, 'Failed to add credential'))
   } finally {
     addingCredential.value = false
   }
@@ -172,8 +172,8 @@ async function saveEdit(id: number) {
     })
     editingId.value = null
     await fetchCredentials()
-  } catch (e: any) {
-    alert(e?.data?.statusMessage || 'Failed to update')
+  } catch (e) {
+    alert(getFetchErrorMessage(e, 'Failed to update'))
   }
 }
 
@@ -182,8 +182,8 @@ async function deleteCredential(id: number) {
   try {
     await $fetch(`/api/admin/credentials/${id}`, { method: 'DELETE' })
     credentialsList.value = credentialsList.value.filter(c => c.id !== id)
-  } catch (e: any) {
-    alert(e?.data?.statusMessage || 'Failed to delete')
+  } catch (e) {
+    alert(getFetchErrorMessage(e, 'Failed to delete'))
   }
 }
 </script>

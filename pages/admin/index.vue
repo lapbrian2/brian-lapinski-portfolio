@@ -88,14 +88,15 @@ onMounted(async () => {
 
     dashboardStats.value = [
       { label: 'Total Artworks', value: artworksRes.data?.length || 0 },
-      { label: 'Categories', value: new Set(artworksRes.data?.map((a: any) => a.category)).size || 0 },
+      { label: 'Categories', value: new Set(artworksRes.data?.map((a: { category: string }) => a.category)).size || 0 },
       { label: 'Messages', value: submissionsRes.data?.length || 0 },
       { label: 'Stats Entries', value: statsRes.data?.length || 0 },
     ]
 
     recentSubmissions.value = submissionsRes.data || []
-  } catch (err: any) {
-    if (err?.statusCode === 401 || err?.response?.status === 401) {
+  } catch (err) {
+    const fetchErr = err as { statusCode?: number; response?: { status?: number } } | undefined
+    if (fetchErr?.statusCode === 401 || fetchErr?.response?.status === 401) {
       navigateTo('/admin/login')
       return
     }

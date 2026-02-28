@@ -156,8 +156,8 @@ async function handleDelete() {
     await $fetch(`/api/admin/artworks/${deleteTarget.value.id}`, { method: 'DELETE' })
     artworksList.value = artworksList.value.filter(a => a.id !== deleteTarget.value!.id)
     deleteTarget.value = null
-  } catch (e: any) {
-    alert(e?.data?.statusMessage || 'Failed to delete artwork')
+  } catch (e) {
+    alert(getFetchErrorMessage(e, 'Failed to delete artwork'))
   } finally {
     deleting.value = false
   }

@@ -152,8 +152,8 @@ async function addVariant() {
     newVariant.sizeHeight = 0
     newVariantPriceDollars.value = 0
     await fetchProduct()
-  } catch (e: any) {
-    alert(e?.data?.statusMessage || 'Failed to add variant')
+  } catch (e) {
+    alert(getFetchErrorMessage(e, 'Failed to add variant'))
   } finally {
     addingVariant.value = false
   }
@@ -167,8 +167,8 @@ async function deleteVariant(variantId: number) {
       body: { deleteVariantId: variantId },
     })
     await fetchProduct()
-  } catch (e: any) {
-    alert(e?.data?.statusMessage || 'Failed to delete variant')
+  } catch (e) {
+    alert(getFetchErrorMessage(e, 'Failed to delete variant'))
   }
 }
 </script>

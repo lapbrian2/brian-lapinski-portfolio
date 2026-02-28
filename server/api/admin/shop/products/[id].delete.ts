@@ -3,11 +3,10 @@ import { printProducts } from '~/server/db/schema'
 import { useDb } from '~/server/db'
 
 export default defineEventHandler(async (event) => {
-  const id = getRouterParam(event, 'id')
-  if (!id) throw createError({ statusCode: 400, statusMessage: 'Product ID required' })
+  const numId = requireNumericParam(event, 'id', 'Product ID')
 
   const db = useDb()
-  await db.delete(printProducts).where(eq(printProducts.id, Number(id)))
+  await db.delete(printProducts).where(eq(printProducts.id, numId))
 
-  return { success: true, data: { deleted: Number(id) } }
+  return { success: true, data: { deleted: numId } }
 })

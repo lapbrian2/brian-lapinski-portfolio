@@ -188,6 +188,9 @@ export const promptPurchases = sqliteTable('prompt_purchases', {
 }, (table) => ({
   userArtworkIdx: index('prompt_purchases_user_artwork_idx').on(table.userId, table.artworkId),
   userIdx: index('prompt_purchases_user_idx').on(table.userId),
+  sessionIdx: index('prompt_purchases_session_idx').on(table.stripeSessionId),
+  paymentIntentIdx: index('prompt_purchases_payment_intent_idx').on(table.stripePaymentIntentId),
+  createdAtIdx: index('prompt_purchases_created_at_idx').on(table.createdAt),
 }))
 
 // ─── Collections & Curation ───
