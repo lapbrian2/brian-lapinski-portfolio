@@ -140,6 +140,10 @@ let isAnimating = false
 // 3D tilt on gallery cards (desktop only, event-delegated)
 useTiltHover(gridEl, { selector: '.gallery-card' })
 
+// Scroll velocity → subtle skew on gallery grid
+const { velocity } = useScrollVelocity()
+let skewTo: gsap.QuickToFunc | null = null
+
 const filteredArtworks = computed(() => {
   if (activeCategory.value === 'all') return artworks.value
   return artworks.value.filter(a => a.category === activeCategory.value)
@@ -238,6 +242,11 @@ onMounted(async () => {
   if (typeof window === 'undefined') return
   gsap.registerPlugin(ScrollTrigger)
 
+  // Velocity-driven skew on gallery grid (desktop only)
+  if (gridEl.value && window.matchMedia('(hover: hover)').matches) {
+    skewTo = gsap.quickTo(gridEl.value, 'skewY', { duration: 0.4, ease: 'power2.out' })
+  }
+
   if (reducedMotion.value) return
 
   const { default: Splitting } = await import('splitting')
@@ -323,8 +332,16 @@ onMounted(async () => {
   })
 })
 
+// Drive skew from velocity (clamped to ±1.5deg)
+watch(velocity, (v) => {
+  if (!skewTo) return
+  const clamped = Math.max(-1.5, Math.min(1.5, v * 0.15))
+  skewTo(clamped)
+})
+
 onUnmounted(() => {
   ctx?.revert()
+  if (gridEl.value) gsap.set(gridEl.value, { clearProps: 'skewY' })
 })
 
 // SEO
