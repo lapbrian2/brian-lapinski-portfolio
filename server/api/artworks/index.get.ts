@@ -2,26 +2,13 @@ import { eq, asc, inArray, count } from 'drizzle-orm'
 import { artworks, techniques, artworkTechniques, artworkLikes } from '~/server/db/schema'
 import { useDb } from '~/server/db'
 
-// Known artwork IDs that have image files — fallback when published column doesn't exist yet
-const KNOWN_IMAGE_IDS = new Set([
-  'veiled-gaze', 'the-unraveling', 'through-glass', 'the-other-side', 'beneath-the-surface',
-  'half-remembered', 'erosion', 'gilt-veil', 'the-elder', 'the-patriarch', 'the-youth',
-  'the-vanishing', 'signal-fade', 'bloom-and-bone', 'impasto-man', 'silk-valley', 'the-grove',
-  'mountain-veil', 'wind-song', 'the-wanderer', 'blue-architecture', 'luminous-grove',
-  'twisted-sentinels', 'the-canopy', 'red-shift', 'night-patrol', 'the-infiltrator',
-  'the-operator', 'the-submersible', 'the-scouts', 'city-of-lights', 'the-threshold',
-  'golden-passage', 'desert-cathedral', 'the-departure', 'the-deep', 'bioluminescence',
-  'leviathan', 'the-wreckage', 'the-procession', 'the-colonnade',
-])
-
 export default defineEventHandler(async (event) => {
   const db = useDb()
   const query = getQuery(event)
   const category = query.category as string | undefined
   const withNodes = query.nodes === 'true' // ?nodes=true to include prompt nodes
 
-  // Filter to artworks with known images.
-  // Uses KNOWN_IMAGE_IDS until db:seed is run to mark artworks as published.
+  // Return all artworks (filtered by category if specified)
   let results
   if (category && category !== 'all') {
     results = await db
@@ -35,7 +22,6 @@ export default defineEventHandler(async (event) => {
       .from(artworks)
       .orderBy(asc(artworks.sortOrder))
   }
-  results = results.filter((a) => KNOWN_IMAGE_IDS.has(a.id))
 
   // Fetch like counts for all artworks
   const likeCounts = await db
