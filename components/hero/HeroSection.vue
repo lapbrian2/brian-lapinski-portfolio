@@ -136,6 +136,8 @@ onUnmounted(() => {
         class="absolute inset-0 w-full h-full object-cover hero-img"
         style="opacity: 0"
         :loading="i === 0 ? 'eager' : 'lazy'"
+        :fetchpriority="i === 0 ? 'high' : undefined"
+        decoding="async"
         draggable="false"
       />
     </div>

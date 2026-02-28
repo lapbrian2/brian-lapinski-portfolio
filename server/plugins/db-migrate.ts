@@ -135,6 +135,17 @@ export default defineNitroPlugin(async () => {
     // Time-range index for admin queries
     await client.execute(`CREATE INDEX IF NOT EXISTS prompt_purchases_created_at_idx ON prompt_purchases(created_at)`)
 
+    // Newsletter subscribers table
+    await client.execute(`
+      CREATE TABLE IF NOT EXISTS subscribers (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        email TEXT NOT NULL UNIQUE,
+        name TEXT,
+        created_at TEXT DEFAULT (datetime('now')),
+        unsubscribed_at TEXT
+      )
+    `)
+
     console.log('[db-migrate] All tables ready')
   } catch (err) {
     console.warn('[db-migrate] Migration check failed:', err)

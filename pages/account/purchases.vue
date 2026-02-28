@@ -72,12 +72,14 @@
           >
             <!-- Thumbnail -->
             <div class="aspect-[4/3] bg-dark-800 overflow-hidden">
-              <img
+              <NuxtImg
                 v-if="purchase.src"
                 :src="purchase.src"
                 :alt="purchase.title"
                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                 loading="lazy"
+                placeholder
+                sizes="sm:100vw md:50vw lg:33vw"
               />
             </div>
             <!-- Info -->

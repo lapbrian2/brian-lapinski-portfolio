@@ -34,6 +34,7 @@ export default defineEventHandler(async (event) => {
 
   const urls = [
     { loc: '/', priority: '1.0', changefreq: 'weekly' },
+    { loc: '/gallery', priority: '0.9', changefreq: 'weekly' },
     ...categories.map((cat) => ({
       loc: `/${cat}`,
       priority: '0.8',

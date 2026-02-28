@@ -213,8 +213,12 @@ useHead({
     { name: 'description', content: 'Curated thematic collections of AI artworks by Brian Lapinski.' },
     { property: 'og:title', content: 'Collections — Brian Lapinski' },
     { property: 'og:description', content: 'Curated thematic collections of AI artworks.' },
+    { property: 'og:image', content: 'https://lapinski.art/images/artworks/the-threshold.webp' },
     { property: 'og:type', content: 'website' },
     { name: 'twitter:card', content: 'summary_large_image' },
+    { name: 'twitter:title', content: 'Collections | Brian Lapinski' },
+    { name: 'twitter:description', content: 'Curated thematic collections of AI artworks.' },
+    { name: 'twitter:image', content: 'https://lapinski.art/images/artworks/the-threshold.webp' },
   ],
 })
 </script>

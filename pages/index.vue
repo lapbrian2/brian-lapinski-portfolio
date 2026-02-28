@@ -14,6 +14,13 @@
     <PromptShowcase />
     <ScrollMarquee text="Let's Create" />
     <ContactSection />
+
+    <!-- Newsletter signup -->
+    <section class="section relative overflow-hidden py-16 md:py-24">
+      <div class="max-w-5xl mx-auto px-6 md:px-12">
+        <NewsletterSignup />
+      </div>
+    </section>
   </div>
 </template>
 

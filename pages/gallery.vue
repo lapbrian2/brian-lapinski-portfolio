@@ -445,10 +445,12 @@ useHead({
     { name: 'description', content: 'Browse the full portfolio of AI artworks by Brian Lapinski — portraits, landscapes, abstract, surreal, anime, and sci-fi.' },
     { property: 'og:title', content: 'Gallery — AI Art by Brian Lapinski' },
     { property: 'og:description', content: 'Browse the full portfolio of AI artworks by Brian Lapinski.' },
+    { property: 'og:image', content: 'https://lapinski.art/images/artworks/the-threshold.webp' },
     { property: 'og:type', content: 'website' },
     { name: 'twitter:card', content: 'summary_large_image' },
     { name: 'twitter:title', content: 'Gallery | Brian Lapinski' },
     { name: 'twitter:description', content: 'Browse the full portfolio of AI artworks by Brian Lapinski.' },
+    { name: 'twitter:image', content: 'https://lapinski.art/images/artworks/the-threshold.webp' },
   ],
 })
 </script>

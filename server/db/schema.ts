@@ -212,3 +212,12 @@ export const collectionArtworks = sqliteTable('collection_artworks', {
   artworkId: text('artwork_id').notNull().references(() => artworks.id, { onDelete: 'cascade' }),
   sortOrder: integer('sort_order').notNull().default(0),
 })
+
+// Newsletter subscribers
+export const subscribers = sqliteTable('subscribers', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  email: text('email').notNull().unique(),
+  name: text('name'),
+  createdAt: text('created_at').default(sql`(datetime('now'))`),
+  unsubscribedAt: text('unsubscribed_at'),
+})

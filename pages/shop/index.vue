@@ -315,8 +315,12 @@ useHead({
     { name: 'description', content: 'Limited edition prints and high-resolution digital downloads of original AI artworks by Brian Lapinski. Coming soon.' },
     { property: 'og:title', content: 'Print Shop — Coming Soon | Brian Lapinski' },
     { property: 'og:description', content: 'Limited edition prints and high-resolution downloads of original AI artworks. Coming soon.' },
+    { property: 'og:image', content: 'https://lapinski.art/images/artworks/the-threshold.webp' },
     { property: 'og:type', content: 'website' },
     { name: 'twitter:card', content: 'summary_large_image' },
+    { name: 'twitter:title', content: 'Print Shop | Brian Lapinski' },
+    { name: 'twitter:description', content: 'Limited edition prints and high-resolution downloads of original AI artworks.' },
+    { name: 'twitter:image', content: 'https://lapinski.art/images/artworks/the-threshold.webp' },
   ],
 })
 </script>
