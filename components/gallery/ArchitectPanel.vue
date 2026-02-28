@@ -33,6 +33,47 @@ function onContentScroll(e: Event): void {
 let activeTween: gsap.core.Tween | null = null
 let staggerTween: gsap.core.Tween | null = null
 
+// ── Feature: Interactive Token Focus (hyper-focus) ──
+const hoveredNodeId = ref<string | null>(null)
+
+function onTokenEnter(nodeId: string) {
+  hoveredNodeId.value = nodeId
+}
+
+function onTokenLeave() {
+  hoveredNodeId.value = null
+}
+
+// ── Feature: Progressive Disclosure ──
+const DISCLOSURE_KEY = 'bl-architect-mode'
+const mode = ref<'beginner' | 'advanced'>('beginner')
+
+if (import.meta.client) {
+  onMounted(() => {
+    try {
+      const stored = localStorage.getItem(DISCLOSURE_KEY)
+      if (stored === 'beginner' || stored === 'advanced') {
+        mode.value = stored
+      }
+    } catch {
+      // Corrupt storage — use default
+    }
+  })
+}
+
+function toggleMode() {
+  mode.value = mode.value === 'beginner' ? 'advanced' : 'beginner'
+  if (import.meta.client) {
+    try {
+      localStorage.setItem(DISCLOSURE_KEY, mode.value)
+    } catch {
+      // Storage full
+    }
+  }
+}
+
+const beginnerCategories: TechniqueCategory[] = ['style', 'mood', 'lighting']
+
 // Technique category color mapping — matches the Ossuary design system
 const categoryColors: Record<TechniqueCategory, { bg: string; text: string; border: string; dot: string }> = {
   lighting: { bg: 'bg-amber-500/10', text: 'text-amber-300', border: 'border-amber-500/20', dot: 'bg-amber-400' },
@@ -65,6 +106,18 @@ const groupedNodes = computed(() => {
     groups.get(node.category)!.push(node)
   }
   return groups
+})
+
+// Filtered nodes based on disclosure mode
+const visibleNodes = computed(() => {
+  if (mode.value === 'advanced') return groupedNodes.value
+  const filtered = new Map<TechniqueCategory, PromptNode[]>()
+  for (const [cat, nodes] of groupedNodes.value) {
+    if (beginnerCategories.includes(cat)) {
+      filtered.set(cat, nodes)
+    }
+  }
+  return filtered
 })
 
 const hasOssuaryData = computed(() => {
@@ -131,6 +184,25 @@ watch(() => props.visible, (open) => {
   }
 })
 
+// Re-animate content when disclosure mode changes
+watch(mode, () => {
+  if (!props.visible || !contentEl.value) return
+  nextTick(() => {
+    const children = contentEl.value!.querySelectorAll('.animate-in')
+    gsap.fromTo(children, {
+      opacity: 0.5,
+      y: 6,
+    }, {
+      opacity: 1,
+      y: 0,
+      duration: 0.3,
+      stagger: 0.04,
+      ease: 'power2.out',
+      overwrite: 'auto',
+    })
+  })
+})
+
 // Reset panel position on orientation change to prevent stale transforms
 watch(isMobile, () => {
   if (props.visible && panelEl.value) {
@@ -162,6 +234,13 @@ async function handleQuickFork() {
     promptNodes: props.item.promptNodes,
   })
 }
+
+// Helper: get hovered node's description within a category group
+function getHoveredDescription(nodes: PromptNode[]): string | null {
+  if (!hoveredNodeId.value) return null
+  const node = nodes.find(n => n.id === hoveredNodeId.value)
+  return node?.description || null
+}
 </script>
 
 <template>
@@ -189,16 +268,34 @@ async function handleQuickFork() {
             Prompt Architecture
           </span>
         </div>
-        <button
-          class="w-7 h-7 flex items-center justify-center rounded-full hover:bg-white/10 text-lavender-400 hover:text-white transition-all duration-200"
-          aria-label="Close architect panel"
-          @click="emit('close')"
-        >
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-            <line x1="1" y1="1" x2="11" y2="11" />
-            <line x1="11" y1="1" x2="1" y2="11" />
-          </svg>
-        </button>
+        <div class="flex items-center gap-2">
+          <!-- Disclosure mode toggle -->
+          <button
+            v-if="groupedNodes.size > 0"
+            class="mode-toggle"
+            :class="mode === 'advanced' ? 'is-advanced' : ''"
+            :aria-label="`Switch to ${mode === 'beginner' ? 'advanced' : 'beginner'} mode`"
+            @click="toggleMode"
+          >
+            <span class="mode-toggle-track">
+              <span class="mode-toggle-thumb" />
+            </span>
+            <span class="text-[9px] uppercase tracking-[0.15em] font-body">
+              {{ mode === 'beginner' ? 'Core' : 'Full' }}
+            </span>
+          </button>
+          <!-- Close button -->
+          <button
+            class="w-7 h-7 flex items-center justify-center rounded-full hover:bg-white/10 text-lavender-400 hover:text-white transition-all duration-200"
+            aria-label="Close architect panel"
+            @click="emit('close')"
+          >
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+              <line x1="1" y1="1" x2="11" y2="11" />
+              <line x1="11" y1="1" x2="1" y2="11" />
+            </svg>
+          </button>
+        </div>
       </div>
 
       <!-- Scrollable body with fade indicators -->
@@ -237,10 +334,10 @@ async function handleQuickFork() {
               </span>
             </div>
 
-            <!-- Technique Tokens -->
-            <div v-if="groupedNodes.size > 0" class="space-y-3.5">
+            <!-- Technique Tokens (filtered by disclosure mode) -->
+            <div v-if="visibleNodes.size > 0" class="space-y-3.5">
               <div
-                v-for="[category, nodes] in groupedNodes"
+                v-for="[category, nodes] in visibleNodes"
                 :key="category"
                 class="animate-in"
               >
@@ -255,25 +352,53 @@ async function handleQuickFork() {
                   </span>
                 </div>
 
-                <!-- Tokens -->
+                <!-- Tokens with interactive focus -->
                 <div class="flex flex-wrap gap-1.5">
                   <span
                     v-for="node in nodes"
                     :key="node.id"
                     class="technique-token"
-                    :class="[categoryColors[category]?.bg, categoryColors[category]?.border]"
-                    :title="node.description || undefined"
+                    :class="[
+                      categoryColors[category]?.bg,
+                      categoryColors[category]?.border,
+                      hoveredNodeId && hoveredNodeId !== node.id ? 'is-dimmed' : '',
+                      hoveredNodeId === node.id ? 'is-focused' : '',
+                    ]"
+                    @mouseenter="onTokenEnter(node.id)"
+                    @mouseleave="onTokenLeave"
                   >
                     <span class="text-[11px] font-body" :class="categoryColors[category]?.text">
                       {{ node.name }}
                     </span>
                   </span>
                 </div>
+
+                <!-- Inline description tooltip for hovered token -->
+                <Transition name="token-desc">
+                  <div
+                    v-if="getHoveredDescription(nodes)"
+                    class="mt-2 px-2.5 py-2 rounded-md bg-white/[0.04] border border-white/[0.06]"
+                  >
+                    <p class="text-[10px] font-body text-lavender-300/60 leading-relaxed">
+                      {{ getHoveredDescription(nodes) }}
+                    </p>
+                  </div>
+                </Transition>
               </div>
             </div>
 
-            <!-- Raw Prompt -->
-            <div v-if="item.rawPrompt" class="animate-in">
+            <!-- Beginner mode hint -->
+            <div v-if="mode === 'beginner' && groupedNodes.size > visibleNodes.size" class="animate-in">
+              <button
+                class="text-[10px] font-body text-lavender-400/40 hover:text-lavender-300/60 transition-colors"
+                @click="toggleMode"
+              >
+                + {{ groupedNodes.size - visibleNodes.size }} more categories &middot; Switch to Full
+              </button>
+            </div>
+
+            <!-- Raw Prompt (advanced only) -->
+            <div v-if="item.rawPrompt && mode === 'advanced'" class="animate-in">
               <div class="flex items-center gap-2 mb-2">
                 <span class="text-[10px] uppercase tracking-[0.2em] font-body text-lavender-400/50">
                   Raw Prompt
@@ -284,8 +409,8 @@ async function handleQuickFork() {
               </div>
             </div>
 
-            <!-- Refinement Notes -->
-            <div v-if="item.refinementNotes" class="animate-in">
+            <!-- Refinement Notes (advanced only) -->
+            <div v-if="item.refinementNotes && mode === 'advanced'" class="animate-in">
               <div class="flex items-center gap-2 mb-2">
                 <span class="text-[10px] uppercase tracking-[0.2em] font-body text-lavender-400/50">
                   Artist Notes
@@ -397,19 +522,93 @@ async function handleQuickFork() {
   }
 }
 
+/* ── Technique tokens with interactive focus ── */
 .technique-token {
   display: inline-flex;
   align-items: center;
   padding: 3px 10px;
   border-radius: 100px;
   border: 1px solid;
-  transition: all 0.2s ease;
+  transition: opacity 0.2s ease, transform 0.2s ease;
   cursor: default;
 }
 
-.technique-token:hover {
-  filter: brightness(1.3);
-  transform: translateY(-1px);
+.technique-token.is-dimmed {
+  opacity: 0.25;
+}
+
+.technique-token.is-focused {
+  opacity: 1;
+  transform: translateY(-1px) scale(1.05);
+}
+
+/* ── Token description tooltip transition ── */
+.token-desc-enter-active {
+  transition: opacity 0.2s ease, max-height 0.25s ease;
+  overflow: hidden;
+}
+.token-desc-leave-active {
+  transition: opacity 0.15s ease, max-height 0.15s ease;
+  overflow: hidden;
+}
+.token-desc-enter-from,
+.token-desc-leave-to {
+  opacity: 0;
+  max-height: 0;
+}
+
+/* ── Disclosure mode toggle ── */
+.mode-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px 3px 4px;
+  border-radius: 100px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(126, 127, 143, 1);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.mode-toggle:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+  color: rgba(201, 210, 231, 1);
+}
+
+.mode-toggle.is-advanced {
+  background: rgba(237, 84, 77, 0.08);
+  border-color: rgba(237, 84, 77, 0.2);
+  color: #ed544d;
+}
+
+.mode-toggle-track {
+  width: 22px;
+  height: 12px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  position: relative;
+  transition: background 0.25s ease;
+}
+
+.mode-toggle.is-advanced .mode-toggle-track {
+  background: rgba(237, 84, 77, 0.3);
+}
+
+.mode-toggle-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(165, 176, 200, 1);
+  transition: transform 0.25s ease, background 0.25s ease;
+}
+
+.mode-toggle.is-advanced .mode-toggle-thumb {
+  transform: translateX(10px);
+  background: #ed544d;
 }
 
 .prompt-block {
