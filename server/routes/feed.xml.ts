@@ -37,7 +37,7 @@ export default defineEventHandler(async (event) => {
       .select(selectFields)
       .from(artworks)
       .orderBy(desc(artworks.createdAt))
-      .limit(20)
+      .limit(50)
   } catch {
     rows = []
   }

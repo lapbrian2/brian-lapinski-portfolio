@@ -89,6 +89,22 @@ export function useWebsiteSchema() {
         description: 'A curated gallery of AI-generated artworks spanning portraits, landscapes, abstract, and surreal categories.',
         founder: getCreator(),
       },
+      {
+        '@type': 'Organization',
+        name: 'Brian Lapinski',
+        url: baseUrl,
+        logo: `${baseUrl}/favicon.svg`,
+        sameAs: [
+          'https://twitter.com/Lapbrian2',
+          'https://www.instagram.com/lapbrian2',
+          'https://www.linkedin.com/in/brian-lapinski',
+        ],
+        contactPoint: {
+          '@type': 'ContactPoint',
+          contactType: 'customer service',
+          url: `${baseUrl}/contact`,
+        },
+      },
     ],
   }
 
