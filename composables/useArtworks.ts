@@ -1,19 +1,21 @@
-import { artworks as staticArtworks } from '~/data/artworks'
 import type { Artwork } from '~/types/artwork'
 
 /**
- * Returns artworks from the static data file.
- *
- * The Turso DB currently has stale artwork records whose images were replaced
- * in commit d4d7aa2. Until db:seed is re-run to sync the DB with the current
- * image set, we use the static data which matches the actual image files.
- *
- * TODO: Switch back to useFetch('/api/artworks') after running db:seed
+ * Fetches artworks from the API (backed by Turso DB).
+ * Returns reactive artworks list with like counts and optional prompt nodes.
  */
 export function useArtworks() {
-  const artworks = computed<Artwork[]>(() => staticArtworks)
-  const pending = ref(false)
-  const error = ref<Error | null>(null)
+  const { data: response, pending, error, refresh } = useFetch<{ success: boolean; data: Artwork[] }>(
+    '/api/artworks',
+    { key: 'artworks-list', default: () => ({ success: true, data: [] }) },
+  )
 
-  return { artworks, pending, error }
+  const artworks = computed<Artwork[]>(() => response.value?.data || [])
+
+  const likes = useLikes()
+  watch(artworks, (arts) => {
+    if (arts.length) likes.seedCounts(arts)
+  }, { immediate: true })
+
+  return { artworks, pending, error, refresh }
 }
