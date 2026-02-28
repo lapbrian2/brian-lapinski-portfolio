@@ -2,6 +2,8 @@ import { eq } from 'drizzle-orm'
 import { orders, orderItems, printVariants, printProducts, artworks, promptPurchases } from '~/server/db/schema'
 import { useDb } from '~/server/db'
 import { orderConfirmationEmail, adminOrderNotificationEmail } from '~/server/utils/email-templates'
+import { promptPurchaseEmail } from '~/server/utils/prompt-email-templates'
+import type Stripe from 'stripe'
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
@@ -18,26 +20,39 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Missing stripe-signature header' })
   }
 
-  let stripeEvent
+  let stripeEvent: Stripe.Event
   try {
     stripeEvent = stripe.webhooks.constructEvent(
       rawBody,
       signature,
       config.stripeWebhookSecret as string,
-    )
-  } catch (err: any) {
+    ) as Stripe.Event
+  } catch (err) {
     console.error('Stripe webhook signature verification failed:', err)
     throw createError({ statusCode: 400, statusMessage: 'Webhook signature verification failed' })
   }
 
   const db = useDb()
 
+  // ── Handle checkout.session.completed ──
   if (stripeEvent.type === 'checkout.session.completed') {
-    const session = stripeEvent.data.object as any
+    const session = stripeEvent.data.object as Stripe.Checkout.Session
 
     // ── Prompt purchase handling ──
     if (session.metadata?.type === 'prompt_purchase') {
       const { userId, artworkId, pricePaid } = session.metadata
+
+      // Validate metadata fields exist
+      if (!userId || !artworkId || !pricePaid) {
+        console.error('[webhook] prompt_purchase missing metadata:', { userId, artworkId, pricePaid, sessionId: session.id })
+        return { received: true }
+      }
+
+      // Validate price matches Stripe's charged amount
+      const metadataPrice = Number(pricePaid)
+      if (session.amount_total && Math.abs(metadataPrice - session.amount_total) > 0) {
+        console.warn('[webhook] prompt_purchase price mismatch — metadata:', metadataPrice, 'charged:', session.amount_total, 'session:', session.id)
+      }
 
       // Idempotency: check if already recorded
       const [existing] = await db
@@ -47,14 +62,53 @@ export default defineEventHandler(async (event) => {
         .limit(1)
       if (existing) return { received: true }
 
-      await db.insert(promptPurchases).values({
-        userId,
-        artworkId,
-        stripeSessionId: session.id,
-        stripePaymentIntentId: session.payment_intent || null,
-        pricePaid: Number(pricePaid),
-        status: 'completed',
-      })
+      try {
+        await db.insert(promptPurchases).values({
+          userId,
+          artworkId,
+          stripeSessionId: session.id,
+          stripePaymentIntentId: (session.payment_intent as string) || null,
+          pricePaid: metadataPrice,
+          status: 'completed',
+          email: session.customer_details?.email || null,
+        })
+      } catch (err) {
+        console.error('[webhook] Failed to insert prompt_purchase:', err, { sessionId: session.id, userId, artworkId })
+        // Still return 200 — Stripe will retry, idempotency check will handle it
+        return { received: true }
+      }
+
+      // Send confirmation email to buyer
+      const buyerEmail = session.customer_details?.email
+      if (buyerEmail && config.resendApiKey) {
+        try {
+          // Fetch artwork title for email
+          const [artwork] = await db
+            .select({ title: artworks.title })
+            .from(artworks)
+            .where(eq(artworks.id, artworkId))
+            .limit(1)
+
+          const baseUrl = config.public.siteUrl as string
+          const emailContent = promptPurchaseEmail({
+            title: artwork?.title || 'Untitled',
+            price: metadataPrice,
+            galleryUrl: `${baseUrl}/gallery?prompt_unlocked=${artworkId}`,
+          })
+
+          const { Resend } = await import('resend')
+          const resend = new Resend(config.resendApiKey as string)
+          await resend.emails.send({
+            from: config.resendFromEmail as string,
+            to: buyerEmail,
+            subject: emailContent.subject,
+            html: emailContent.html,
+          })
+        } catch (err) {
+          console.error('[webhook] Prompt purchase email failed:', err)
+          // Don't fail the webhook for email errors
+        }
+      }
 
       return { received: true }
     }
@@ -80,7 +134,7 @@ export default defineEventHandler(async (event) => {
         .set({
           status: 'paid',
           email: customerEmail,
-          stripePaymentIntentId: session.payment_intent || null,
+          stripePaymentIntentId: (session.payment_intent as string) || null,
           shippingName: session.shipping_details?.name || session.customer_details?.name || null,
           shippingAddress: session.shipping_details?.address
             ? JSON.stringify(session.shipping_details.address)
@@ -152,6 +206,26 @@ export default defineEventHandler(async (event) => {
           console.error('Order email notification failed:', err)
           // Don't fail the webhook — order is already recorded
         }
+      }
+    }
+  }
+
+  // ── Handle charge.refunded — auto-revoke prompt access ──
+  if (stripeEvent.type === 'charge.refunded') {
+    const charge = stripeEvent.data.object as Stripe.Charge
+    const paymentIntentId = charge.payment_intent as string | null
+
+    if (paymentIntentId) {
+      try {
+        await db
+          .update(promptPurchases)
+          .set({
+            status: 'refunded',
+            refundedAt: new Date().toISOString(),
+          })
+          .where(eq(promptPurchases.stripePaymentIntentId, paymentIntentId))
+      } catch (err) {
+        console.error('[webhook] Failed to process refund:', err, { paymentIntentId })
       }
     }
   }

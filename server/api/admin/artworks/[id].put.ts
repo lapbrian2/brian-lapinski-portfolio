@@ -10,11 +10,12 @@ export default defineEventHandler(async (event) => {
   const db = useDb()
 
   const updateData: Record<string, unknown> = {}
-  const fields = ['title', 'category', 'medium', 'description', 'src', 'aspect', 'year', 'sortOrder', 'featured', 'published', 'rawPrompt', 'mjVersion', 'refinementNotes', 'dominantColor'] as const
+  const fields = ['title', 'category', 'medium', 'description', 'src', 'aspect', 'year', 'sortOrder', 'featured', 'published', 'rawPrompt', 'mjVersion', 'refinementNotes', 'dominantColor', 'promptPrice'] as const
+  const numericFields = new Set(['year', 'sortOrder', 'promptPrice'])
 
   for (const field of fields) {
     if (body[field] !== undefined) {
-      updateData[field] = field === 'year' || field === 'sortOrder' ? Number(body[field]) : body[field]
+      updateData[field] = numericFields.has(field) ? Number(body[field]) : body[field]
     }
   }
 

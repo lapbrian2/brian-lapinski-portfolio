@@ -120,6 +120,21 @@ export default defineNitroPlugin(async () => {
       // Column already exists
     }
 
+    // Add email + refunded_at columns to prompt_purchases (may already exist)
+    try {
+      await client.execute(`ALTER TABLE prompt_purchases ADD COLUMN email TEXT`)
+    } catch {
+      // Column already exists
+    }
+    try {
+      await client.execute(`ALTER TABLE prompt_purchases ADD COLUMN refunded_at TEXT`)
+    } catch {
+      // Column already exists
+    }
+
+    // Time-range index for admin queries
+    await client.execute(`CREATE INDEX IF NOT EXISTS prompt_purchases_created_at_idx ON prompt_purchases(created_at)`)
+
     console.log('[db-migrate] All tables ready')
   } catch (err) {
     console.warn('[db-migrate] Migration check failed:', err)

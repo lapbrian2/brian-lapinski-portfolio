@@ -126,6 +126,7 @@ definePageMeta({ layout: false })
 const { artworks } = useArtworks()
 const lightbox = useLightbox()
 const reducedMotion = useReducedMotion()
+const toast = useToast()
 
 const heroEl = ref<HTMLElement | null>(null)
 const titleEl = ref<HTMLElement | null>(null)
@@ -240,48 +241,18 @@ function openLightbox(artwork: Artwork, event: Event) {
 }
 
 // Auto-open lightbox on Stripe return (?prompt_unlocked=artworkId)
-onMounted(() => {
-  if (typeof window === 'undefined') return
-  const route = useRoute()
-  const unlockedId = route.query.prompt_unlocked as string | undefined
-  if (unlockedId && artworks.value.length > 0) {
-    // Find the artwork and open lightbox to it
-    const idx = artworks.value.findIndex(a => a.id === unlockedId)
-    if (idx >= 0) {
-      const items = artworks.value.map(a => ({
-        id: a.id,
-        src: a.src,
-        title: a.title,
-        medium: a.medium,
-        description: a.description,
-        year: a.year,
-        rawPrompt: a.rawPrompt,
-        mjVersion: a.mjVersion,
-        refinementNotes: a.refinementNotes,
-        promptNodes: a.promptNodes,
-        promptUnlocked: true, // Just purchased
-        promptPrice: a.promptPrice,
-        hasPrompt: a.hasPrompt,
-      }))
-      lightbox.open(items, idx)
-    }
-    // Clean up URL params
-    const router = useRouter()
-    const cleanQuery = { ...route.query }
-    delete cleanQuery.prompt_unlocked
-    delete cleanQuery.session_id
-    router.replace({ query: Object.keys(cleanQuery).length > 0 ? cleanQuery : undefined })
-  }
-})
+// Shared handler works for both immediate (artworks already loaded) and deferred (async fetch)
+let stripeReturnHandled = false
 
-// Also handle case where artworks load after mount (async fetch)
-watch(() => artworks.value, (arts) => {
-  if (typeof window === 'undefined' || !arts.length) return
+function handleStripeReturn(arts: Artwork[]) {
+  if (stripeReturnHandled || typeof window === 'undefined' || !arts.length) return
   const route = useRoute()
   const unlockedId = route.query.prompt_unlocked as string | undefined
   if (!unlockedId) return
+
   const idx = arts.findIndex(a => a.id === unlockedId)
   if (idx >= 0) {
+    stripeReturnHandled = true
     const items = arts.map(a => ({
       id: a.id,
       src: a.src,
@@ -298,13 +269,19 @@ watch(() => artworks.value, (arts) => {
       hasPrompt: a.hasPrompt,
     }))
     lightbox.open(items, idx)
+    toast.show('Prompt unlocked!', { type: 'success' })
   }
+
+  // Clean up URL params
   const router = useRouter()
   const cleanQuery = { ...route.query }
   delete cleanQuery.prompt_unlocked
   delete cleanQuery.session_id
   router.replace({ query: Object.keys(cleanQuery).length > 0 ? cleanQuery : undefined })
-}, { once: true })
+}
+
+onMounted(() => handleStripeReturn(artworks.value))
+watch(() => artworks.value, (arts) => handleStripeReturn(arts), { once: true })
 
 // GSAP entrance animations
 onMounted(async () => {

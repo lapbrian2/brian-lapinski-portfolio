@@ -5,6 +5,9 @@
 export function usePromptPurchases() {
   const purchasedIds = useState<Set<string>>('prompt-purchased-ids', () => new Set())
   const pendingPurchase = useState<string | null>('prompt-purchase-pending', () => null)
+  const isHydrated = useState('prompt-purchases-hydrated', () => false)
+
+  const toast = useToast()
 
   // Auth state — gracefully handle missing NUXT_SESSION_PASSWORD
   let loggedIn = ref(false)
@@ -38,11 +41,26 @@ export function usePromptPurchases() {
         try {
           const response = await $fetch<{ success: boolean; data: string[] }>('/api/prompts/purchased')
           if (response.data.length > 0) {
-            purchasedIds.value = new Set(response.data)
+            // UNION with existing set (preserves URL-sourced IDs) instead of overwriting
+            const merged = new Set([...purchasedIds.value, ...response.data])
+            purchasedIds.value = merged
           }
         } catch {
           // Silently fail
         }
+      }
+
+      isHydrated.value = true
+
+      // Resume purchase intent after OAuth redirect
+      try {
+        const intentId = localStorage.getItem('bl-prompt-purchase-intent')
+        if (intentId && loggedIn.value) {
+          localStorage.removeItem('bl-prompt-purchase-intent')
+          await purchasePrompt(intentId)
+        }
+      } catch {
+        // Storage access failed
       }
     })
   }
@@ -72,6 +90,7 @@ export function usePromptPurchases() {
         const next = new Set(purchasedIds.value)
         next.add(artworkId)
         purchasedIds.value = next
+        toast.show('You already own this prompt!', { type: 'success' })
         return
       }
 
@@ -82,6 +101,8 @@ export function usePromptPurchases() {
         }
         window.location.href = response.url
       }
+    } catch {
+      toast.show('Purchase failed — please try again', { type: 'error' })
     } finally {
       pendingPurchase.value = null
     }
@@ -90,6 +111,7 @@ export function usePromptPurchases() {
   return {
     purchasedIds,
     pendingPurchase,
+    isHydrated,
     isPurchased,
     purchasePrompt,
     loggedIn,

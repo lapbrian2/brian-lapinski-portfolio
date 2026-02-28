@@ -41,6 +41,49 @@
         </div>
       </div>
 
+      <!-- Prompt Revenue -->
+      <div v-if="revenueData" class="mb-8">
+        <h2 class="text-lg font-display font-semibold text-white mb-4">Prompt Revenue</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+          <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
+            <div class="text-sm text-gray-400 mb-1">All Time</div>
+            <div class="text-2xl font-display font-bold text-green-400">${{ (revenueData.totalRevenue / 100).toFixed(2) }}</div>
+            <div class="text-xs text-gray-500 mt-1">{{ revenueData.totalPurchases }} purchases</div>
+          </div>
+          <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
+            <div class="text-sm text-gray-400 mb-1">This Month</div>
+            <div class="text-2xl font-display font-bold text-white">${{ (revenueData.monthRevenue / 100).toFixed(2) }}</div>
+          </div>
+          <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
+            <div class="text-sm text-gray-400 mb-1">Last 7 Days</div>
+            <div class="text-2xl font-display font-bold text-white">${{ (revenueData.weekRevenue / 100).toFixed(2) }}</div>
+          </div>
+        </div>
+
+        <!-- Top Selling Prompts -->
+        <div v-if="revenueData.topPrompts.length" class="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
+          <div class="px-5 py-4 border-b border-gray-800">
+            <h3 class="text-sm font-semibold text-gray-300 uppercase tracking-wider">Top Selling Prompts</h3>
+          </div>
+          <div class="divide-y divide-gray-800">
+            <div
+              v-for="(prompt, idx) in revenueData.topPrompts"
+              :key="prompt.artworkId"
+              class="flex items-center justify-between px-5 py-3"
+            >
+              <div class="flex items-center gap-3 min-w-0">
+                <span class="text-xs text-gray-500 w-5">{{ idx + 1 }}</span>
+                <span class="text-sm text-white truncate">{{ prompt.title }}</span>
+              </div>
+              <div class="flex items-center gap-4 flex-shrink-0">
+                <span class="text-xs text-gray-400">{{ prompt.count }} sales</span>
+                <span class="text-sm text-green-400 font-medium">${{ (prompt.revenue / 100).toFixed(2) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Top Artworks -->
         <div class="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
@@ -101,11 +144,27 @@ import type {
   AnalyticsArtworksResponse, AnalyticsReferrersResponse,
 } from '~/types/api'
 
+interface RevenueTopPrompt {
+  artworkId: string
+  title: string
+  revenue: number
+  count: number
+}
+
+interface RevenueData {
+  totalRevenue: number
+  monthRevenue: number
+  weekRevenue: number
+  totalPurchases: number
+  topPrompts: RevenueTopPrompt[]
+}
+
 const loading = ref(true)
 const overviewCards = ref<DashboardStat[]>([])
 const dailyData = ref<DailyData[]>([])
 const artworkViews = ref<ArtworkView[]>([])
 const referrers = ref<Referrer[]>([])
+const revenueData = ref<RevenueData | null>(null)
 
 const maxDailyViews = computed(() =>
   Math.max(...dailyData.value.map(d => d.views), 1)
@@ -117,11 +176,12 @@ function getBarHeight(views: number) {
 
 onMounted(async () => {
   try {
-    const [overviewRes, dailyRes, artworksRes, referrersRes] = await Promise.all([
+    const [overviewRes, dailyRes, artworksRes, referrersRes, revenueRes] = await Promise.all([
       $fetch<AnalyticsOverviewResponse>('/api/admin/analytics/overview').catch(() => null),
       $fetch<AnalyticsDailyResponse>('/api/admin/analytics/daily').catch(() => null),
       $fetch<AnalyticsArtworksResponse>('/api/admin/analytics/artworks').catch(() => null),
       $fetch<AnalyticsReferrersResponse>('/api/admin/analytics/referrers').catch(() => null),
+      $fetch<{ success: boolean; data: RevenueData }>('/api/admin/analytics/revenue').catch(() => null),
     ])
 
     if (overviewRes?.data) {
@@ -137,6 +197,7 @@ onMounted(async () => {
     dailyData.value = dailyRes?.data || []
     artworkViews.value = artworksRes?.data || []
     referrers.value = referrersRes?.data || []
+    revenueData.value = revenueRes?.data || null
   } catch {
     // Silently fail
   } finally {

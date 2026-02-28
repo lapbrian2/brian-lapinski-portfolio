@@ -172,6 +172,27 @@
           class="admin-input resize-none"
         />
       </div>
+
+      <!-- Prompt Pricing -->
+      <div>
+        <label class="block text-sm font-medium text-gray-400 mb-1.5">Prompt Price (cents)</label>
+        <div class="flex items-center gap-3">
+          <input
+            v-model.number="form.promptPrice"
+            type="number"
+            min="99"
+            max="9999"
+            placeholder="Leave blank for default ($3.99)"
+            class="admin-input flex-1"
+          />
+          <span v-if="form.promptPrice" class="text-sm text-green-400 font-medium whitespace-nowrap">
+            ${{ (form.promptPrice / 100).toFixed(2) }}
+          </span>
+          <span v-else class="text-sm text-gray-500 font-medium whitespace-nowrap">
+            $3.99 default
+          </span>
+        </div>
+      </div>
     </div>
 
     <!-- Technique Selector -->
@@ -275,6 +296,7 @@ interface ArtworkFormData {
   mjVersion: string
   refinementNotes: string
   dominantColor: string
+  promptPrice: number | null
 }
 
 interface Technique {
@@ -317,6 +339,7 @@ const form = reactive<ArtworkFormData>({
   mjVersion: props.initialData?.mjVersion || '',
   refinementNotes: props.initialData?.refinementNotes || '',
   dominantColor: props.initialData?.dominantColor || '',
+  promptPrice: props.initialData?.promptPrice ?? null,
   published: props.initialData?.published ?? false,
 })
 

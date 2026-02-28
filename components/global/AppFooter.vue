@@ -140,6 +140,7 @@ const pageLinks = [
   { to: '/gallery', label: 'Gallery' },
   { to: '/shop', label: 'Shop' },
   { to: '/collections', label: 'Collections' },
+  { to: '/account/purchases', label: 'My Prompts' },
 ]
 
 const footerEl = ref<HTMLElement | null>(null)

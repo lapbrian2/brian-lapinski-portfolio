@@ -182,6 +182,8 @@ export const promptPurchases = sqliteTable('prompt_purchases', {
   stripePaymentIntentId: text('stripe_payment_intent_id'),
   pricePaid: integer('price_paid').notNull(), // cents at time of purchase
   status: text('status').notNull().default('completed'), // 'completed' | 'refunded'
+  email: text('email'), // buyer email from Stripe session
+  refundedAt: text('refunded_at'), // null until refunded
   createdAt: text('created_at').default(sql`(datetime('now'))`),
 }, (table) => ({
   userArtworkIdx: index('prompt_purchases_user_artwork_idx').on(table.userId, table.artworkId),

@@ -207,6 +207,13 @@ const isUnlocked = computed(() => {
   return props.item.promptUnlocked || (props.item.id ? isPurchased(props.item.id) : false)
 })
 
+function handleSignInToUnlock() {
+  if (import.meta.client && props.item.id) {
+    localStorage.setItem('bl-prompt-purchase-intent', props.item.id)
+  }
+  navigateTo('/auth/github')
+}
+
 function handleOpenPlayground() {
   playground.open({
     title: props.item.title,
@@ -419,6 +426,7 @@ function getHoveredDescription(nodes: PromptNode[]): string | null {
                       v-if="loggedIn"
                       class="unlock-button"
                       :disabled="pendingPurchase === item.id"
+                      :aria-busy="pendingPurchase === item.id"
                       @click="purchasePrompt(item.id!)"
                     >
                       <span v-if="pendingPurchase === item.id" class="flex items-center gap-2">
@@ -432,7 +440,7 @@ function getHoveredDescription(nodes: PromptNode[]): string | null {
                     <button
                       v-else
                       class="unlock-button"
-                      @click="navigateTo('/auth/github')"
+                      @click="handleSignInToUnlock"
                     >
                       Sign in to Unlock
                     </button>

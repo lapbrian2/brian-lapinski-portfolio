@@ -18,10 +18,11 @@ export default defineEventHandler(async (event) => {
   }
 
   const body = await readBody(event)
-  const artworkId = body?.artworkId as string | undefined
+  const artworkId = body?.artworkId
 
-  if (!artworkId) {
-    throw createError({ statusCode: 400, statusMessage: 'artworkId required' })
+  // Input validation
+  if (!artworkId || typeof artworkId !== 'string' || artworkId.length === 0 || artworkId.length > 100) {
+    throw createError({ statusCode: 400, statusMessage: 'Valid artworkId required' })
   }
 
   const db = useDb()
@@ -66,31 +67,37 @@ export default defineEventHandler(async (event) => {
   const baseUrl = config.public.siteUrl as string
 
   // Create Stripe checkout session
-  const stripe = new (await import('stripe')).default(config.stripeSecretKey as string)
+  let session
+  try {
+    const stripe = new (await import('stripe')).default(config.stripeSecretKey as string)
 
-  const session = await stripe.checkout.sessions.create({
-    mode: 'payment',
-    payment_method_types: ['card'],
-    line_items: [{
-      price_data: {
-        currency: 'usd',
-        product_data: {
-          name: `Prompt Unlock: ${artwork.title}`,
-          description: 'Full prompt text, technique descriptions, refinement notes, and Playground access',
+    session = await stripe.checkout.sessions.create({
+      mode: 'payment',
+      // Let Stripe auto-detect payment methods (card, Apple Pay, Google Pay, Link)
+      line_items: [{
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: `Prompt Unlock: ${artwork.title}`,
+            description: 'Full prompt text, technique descriptions, refinement notes, and Playground access',
+          },
+          unit_amount: price,
         },
-        unit_amount: price,
+        quantity: 1,
+      }],
+      metadata: {
+        type: 'prompt_purchase',
+        userId,
+        artworkId,
+        pricePaid: String(price),
       },
-      quantity: 1,
-    }],
-    metadata: {
-      type: 'prompt_purchase',
-      userId,
-      artworkId,
-      pricePaid: String(price),
-    },
-    success_url: `${baseUrl}/gallery?prompt_unlocked=${artworkId}&session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${baseUrl}/gallery`,
-  })
+      success_url: `${baseUrl}/gallery?prompt_unlocked=${artworkId}&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${baseUrl}/gallery`,
+    })
+  } catch (err) {
+    console.error('Stripe checkout session creation failed:', err)
+    throw createError({ statusCode: 500, statusMessage: 'Payment setup failed — please try again' })
+  }
 
   return { success: true, url: session.url }
 })
