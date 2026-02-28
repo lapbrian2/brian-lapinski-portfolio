@@ -11,6 +11,7 @@
     <AboutSection />
     <SectionDivider />
     <ProcessSection />
+    <PromptShowcase />
     <ScrollMarquee text="Let's Create" />
     <ContactSection />
   </div>

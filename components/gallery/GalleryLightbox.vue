@@ -8,6 +8,7 @@ import type { PrintProduct } from '~/types/shop'
 const lightbox = useLightbox()
 const playground = usePlayground()
 const { copied, copiedType } = usePromptFork()
+const { isPurchased, purchasePrompt, pendingPurchase, loggedIn } = usePromptPurchases()
 const reducedMotion = useReducedMotion()
 const isMobile = useIsMobile()
 const imageEl = ref<HTMLElement | null>(null)
@@ -56,6 +57,37 @@ const hasOssuaryData = computed(() => {
   const item = lightbox.currentItem.value
   return !!(item?.hasPrompt || item?.rawPrompt || item?.promptNodes?.length)
 })
+
+// Prompt purchase state for current item
+const currentPromptState = computed(() => {
+  const item = lightbox.currentItem.value
+  if (!item?.hasPrompt) return null
+  const unlocked = item.promptUnlocked || (item.id ? isPurchased(item.id) : false)
+  return {
+    hasPrompt: true,
+    unlocked,
+    price: item.promptPrice || 399,
+    id: item.id,
+  }
+})
+
+function handleCaptionUnlock() {
+  const item = lightbox.currentItem.value
+  if (!item?.id) return
+  if (!loggedIn.value) {
+    if (import.meta.client) {
+      localStorage.setItem('bl-prompt-purchase-intent', item.id)
+    }
+    navigateTo('/auth/github')
+    return
+  }
+  purchasePrompt(item.id)
+}
+
+function handleCaptionViewPrompt() {
+  showArchitect.value = true
+  showCaption.value = false
+}
 
 function onBackdropClick(e: MouseEvent) {
   const target = e.target as HTMLElement
@@ -591,8 +623,8 @@ onUnmounted(() => {
             v-if="hasOssuaryData"
             class="btn-press schema-button group"
             :class="showArchitect ? 'active' : ''"
-            aria-label="View prompt architecture"
-            title="View prompt architecture"
+            aria-label="View prompt details"
+            title="View prompt details"
             :aria-pressed="showArchitect"
             @click.stop="toggleArchitect"
           >
@@ -603,7 +635,7 @@ onUnmounted(() => {
               <line x1="7" y1="8" x2="7" y2="12" />
               <circle cx="7" cy="12" r="1" />
             </svg>
-            <span class="hidden sm:inline">Schema</span>
+            <span class="hidden sm:inline">Prompt</span>
           </button>
 
           <!-- Buy Print -->
@@ -744,6 +776,39 @@ onUnmounted(() => {
               <div class="flex justify-center mt-3">
                 <ArtworkStats :artwork-id="lightbox.currentItem.value.id" />
               </div>
+
+              <!-- Prompt unlock CTA — always visible in caption -->
+              <div v-if="currentPromptState" class="mt-4">
+                <button
+                  v-if="currentPromptState.unlocked"
+                  class="prompt-caption-btn prompt-caption-btn--unlocked"
+                  @click.stop="handleCaptionViewPrompt"
+                >
+                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <path d="M4 9V6a4 4 0 1 1 8 0" />
+                    <rect x="2" y="9" width="12" height="7" rx="1.5" />
+                  </svg>
+                  View Prompt
+                </button>
+                <button
+                  v-else
+                  class="prompt-caption-btn prompt-caption-btn--locked"
+                  :disabled="pendingPurchase === currentPromptState.id"
+                  @click.stop="handleCaptionUnlock"
+                >
+                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <rect x="2" y="8" width="12" height="8" rx="1.5" />
+                    <path d="M5 8V5a3 3 0 0 1 6 0v3" />
+                  </svg>
+                  <template v-if="pendingPurchase === currentPromptState.id">
+                    <span class="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                    Processing...
+                  </template>
+                  <template v-else>
+                    Unlock Prompt &mdash; ${{ (currentPromptState.price / 100).toFixed(2) }}
+                  </template>
+                </button>
+              </div>
             </div>
           </div>
         </Transition>
@@ -783,7 +848,7 @@ onUnmounted(() => {
             </span>
             <span v-if="hasOssuaryData" class="flex items-center gap-1.5 text-[10px] text-lavender-400/40 font-body tracking-wide">
               <kbd class="px-1.5 py-0.5 rounded bg-white/[0.06] text-lavender-300/50 font-mono text-[9px]">A</kbd>
-              Schema
+              Prompt
             </span>
             <span class="flex items-center gap-1.5 text-[10px] text-lavender-400/40 font-body tracking-wide">
               <kbd class="px-1.5 py-0.5 rounded bg-white/[0.06] text-lavender-300/50 font-mono text-[9px]">Esc</kbd>
@@ -952,5 +1017,50 @@ onUnmounted(() => {
 .scrim-fade-enter-from,
 .scrim-fade-leave-to {
   opacity: 0;
+}
+
+/* Prompt CTA in caption */
+.prompt-caption-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  border-radius: 100px;
+  font-family: var(--font-body, 'PP Neue Montreal', sans-serif);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.prompt-caption-btn--locked {
+  background: rgba(237, 84, 77, 0.15);
+  border: 1px solid rgba(237, 84, 77, 0.35);
+  color: #ed544d;
+}
+
+.prompt-caption-btn--locked:hover:not(:disabled) {
+  background: rgba(237, 84, 77, 0.25);
+  border-color: rgba(237, 84, 77, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(237, 84, 77, 0.2);
+}
+
+.prompt-caption-btn--locked:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.prompt-caption-btn--unlocked {
+  background: rgba(74, 222, 128, 0.1);
+  border: 1px solid rgba(74, 222, 128, 0.25);
+  color: #4ade80;
+}
+
+.prompt-caption-btn--unlocked:hover {
+  background: rgba(74, 222, 128, 0.2);
+  border-color: rgba(74, 222, 128, 0.4);
+  transform: translateY(-2px);
 }
 </style>

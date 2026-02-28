@@ -96,23 +96,21 @@
               <span
                 v-if="isPurchased(artwork.id)"
                 class="prompt-badge prompt-badge--unlocked"
-                title="Prompt unlocked"
               >
-                <svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-                  <path d="M4 9V6a4 4 0 1 1 8 0" />
-                  <rect x="2" y="9" width="12" height="7" rx="1.5" fill="currentColor" stroke="none" opacity="0.2" />
-                  <rect x="2" y="9" width="12" height="7" rx="1.5" />
+                <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="2 6 5 9 10 3" />
                 </svg>
+                Unlocked
               </span>
               <span
                 v-else
                 class="prompt-badge prompt-badge--locked"
-                title="Prompt available"
               >
                 <svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
                   <rect x="2" y="8" width="12" height="8" rx="1.5" />
                   <path d="M5 8V5a3 3 0 0 1 6 0v3" />
                 </svg>
+                Prompt ${{ ((artwork.promptPrice || 399) / 100).toFixed(2) }}
               </span>
             </div>
 
@@ -490,18 +488,22 @@ useHead({
 .prompt-badge {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  backdrop-filter: blur(8px);
-  transition: transform 0.3s ease, opacity 0.3s ease;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 100px;
+  backdrop-filter: blur(12px);
+  font-family: var(--font-body, 'PP Neue Montreal', sans-serif);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .prompt-badge--locked {
-  background: rgba(237, 84, 77, 0.15);
-  border: 1px solid rgba(237, 84, 77, 0.3);
+  background: rgba(237, 84, 77, 0.2);
+  border: 1px solid rgba(237, 84, 77, 0.35);
   color: #ed544d;
+  box-shadow: 0 2px 12px rgba(237, 84, 77, 0.15);
 }
 
 .prompt-badge--unlocked {
@@ -511,6 +513,10 @@ useHead({
 }
 
 .gallery-card:hover .prompt-badge {
-  transform: scale(1.1);
+  transform: scale(1.05);
+}
+
+.gallery-card:hover .prompt-badge--locked {
+  box-shadow: 0 4px 20px rgba(237, 84, 77, 0.25);
 }
 </style>
