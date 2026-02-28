@@ -517,6 +517,12 @@ watch(artworks, (arts) => {
 
 @media (max-width: 640px) {
   .gallery-masonry {
+    column-count: 2;
+  }
+}
+
+@media (max-width: 480px) {
+  .gallery-masonry {
     column-count: 1;
   }
 }

@@ -684,7 +684,7 @@ onUnmounted(() => {
       <!-- Previous arrow -->
       <button
         v-if="lightbox.hasPrev.value"
-        class="btn-press absolute left-3 md:left-6 top-1/2 -translate-y-1/2 w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-lavender-300 hover:text-lavender-100 transition-all duration-200 z-10 cursor-hover group"
+        class="btn-press absolute left-1 md:left-4 lg:left-6 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 flex items-center justify-center rounded-full bg-black/30 md:bg-white/5 hover:bg-white/10 text-lavender-300 hover:text-lavender-100 transition-all duration-200 z-10 cursor-hover group"
         aria-label="Previous artwork"
         @click="lightbox.prev()"
       >
@@ -696,7 +696,7 @@ onUnmounted(() => {
       <!-- Next arrow -->
       <button
         v-if="lightbox.hasNext.value"
-        class="btn-press absolute right-3 md:right-6 top-1/2 -translate-y-1/2 w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-lavender-300 hover:text-lavender-100 transition-all duration-200 z-10 cursor-hover group"
+        class="btn-press absolute right-1 md:right-4 lg:right-6 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 flex items-center justify-center rounded-full bg-black/30 md:bg-white/5 hover:bg-white/10 text-lavender-300 hover:text-lavender-100 transition-all duration-200 z-10 cursor-hover group"
         aria-label="Next artwork"
         @click="lightbox.next()"
       >

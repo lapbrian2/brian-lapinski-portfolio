@@ -100,27 +100,27 @@
       <!-- Mobile Hamburger Button -->
       <button
         ref="hamburgerEl"
-        class="btn-press md:hidden relative z-50 w-8 h-6 flex flex-col justify-between"
+        class="btn-press md:hidden relative z-50 w-11 h-11 flex flex-col items-center justify-center gap-1.5"
         aria-label="Toggle navigation menu"
         :aria-expanded="mobileOpen"
         @click="toggleMobile"
       >
         <span
           :class="[
-            'block w-full h-0.5 bg-lavender-100 transition-all duration-300 origin-center',
-            mobileOpen ? 'rotate-45 translate-y-[11px]' : '',
+            'block w-6 h-0.5 bg-lavender-100 transition-all duration-300 origin-center',
+            mobileOpen ? 'rotate-45 translate-y-[8px]' : '',
           ]"
         />
         <span
           :class="[
-            'block w-full h-0.5 bg-lavender-100 transition-all duration-300',
+            'block w-6 h-0.5 bg-lavender-100 transition-all duration-300',
             mobileOpen ? 'opacity-0 scale-x-0' : 'opacity-100 scale-x-100',
           ]"
         />
         <span
           :class="[
-            'block w-full h-0.5 bg-lavender-100 transition-all duration-300 origin-center',
-            mobileOpen ? '-rotate-45 -translate-y-[11px]' : '',
+            'block w-6 h-0.5 bg-lavender-100 transition-all duration-300 origin-center',
+            mobileOpen ? '-rotate-45 -translate-y-[8px]' : '',
           ]"
         />
       </button>

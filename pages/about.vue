@@ -22,7 +22,7 @@
 
     <!-- Hero -->
     <section class="pt-32 pb-12 px-6 md:px-12">
-      <div class="max-w-5xl mx-auto text-center">
+      <div ref="heroEl" class="max-w-5xl mx-auto text-center">
         <p class="font-body text-xs uppercase tracking-[0.3em] text-accent-red mb-4">
           The Artist
         </p>
@@ -38,7 +38,7 @@
 
     <!-- Artist Statement -->
     <section class="px-6 md:px-12 pb-16">
-      <div class="max-w-3xl mx-auto">
+      <div ref="statementEl" class="max-w-3xl mx-auto">
         <div class="glass rounded-lg p-8 md:p-10 space-y-6">
           <h2 class="font-display text-xl font-bold text-lavender-100">Artist Statement</h2>
           <p class="font-body text-sm text-lavender-300 leading-relaxed">
@@ -56,7 +56,7 @@
 
     <!-- Process -->
     <section class="px-6 md:px-12 pb-16">
-      <div class="max-w-3xl mx-auto">
+      <div ref="processEl" class="max-w-3xl mx-auto">
         <h2 class="font-display text-xl font-bold text-lavender-100 mb-6 text-center">Creative Process</h2>
         <div class="space-y-4">
           <div class="glass rounded-lg p-6 flex gap-5">
@@ -112,7 +112,7 @@
 
     <!-- Why Prompts -->
     <section class="px-6 md:px-12 pb-16">
-      <div class="max-w-3xl mx-auto">
+      <div ref="whyEl" class="max-w-3xl mx-auto">
         <div class="glass rounded-lg p-8 md:p-10 space-y-6">
           <h2 class="font-display text-xl font-bold text-lavender-100">Why I Share Prompts</h2>
           <p class="font-body text-sm text-lavender-300 leading-relaxed">
@@ -142,7 +142,106 @@
 </template>
 
 <script setup lang="ts">
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { useReducedMotion } from '~/composables/useMediaQuery'
+
 definePageMeta({ layout: false })
+
+const heroEl = ref<HTMLElement | null>(null)
+const statementEl = ref<HTMLElement | null>(null)
+const processEl = ref<HTMLElement | null>(null)
+const whyEl = ref<HTMLElement | null>(null)
+
+const reducedMotion = useReducedMotion()
+let ctx: gsap.Context | null = null
+
+onMounted(() => {
+  if (reducedMotion.value) return
+  gsap.registerPlugin(ScrollTrigger)
+
+  ctx = gsap.context(() => {
+    // Hero entrance: staggered fade-up
+    if (heroEl.value) {
+      const children = heroEl.value.children
+      gsap.set(children, { opacity: 0, y: 20 })
+      gsap.to(children, {
+        opacity: 1,
+        y: 0,
+        duration: 0.6,
+        stagger: 0.08,
+        delay: 0.15,
+        ease: 'power3.out',
+        onComplete() {
+          this.targets().forEach((el: HTMLElement) => gsap.set(el, { clearProps: 'transform,opacity' }))
+        },
+      })
+    }
+
+    // Artist Statement: scroll reveal
+    if (statementEl.value) {
+      gsap.set(statementEl.value, { opacity: 0, y: 30 })
+      ScrollTrigger.create({
+        trigger: statementEl.value,
+        start: 'top 85%',
+        once: true,
+        onEnter: () => {
+          gsap.to(statementEl.value!, {
+            opacity: 1,
+            y: 0,
+            duration: 0.7,
+            ease: 'power3.out',
+          })
+        },
+      })
+    }
+
+    // Creative Process: stagger each step card
+    if (processEl.value) {
+      const cards = processEl.value.querySelectorAll('.glass')
+      gsap.set(cards, { opacity: 0, y: 25 })
+      ScrollTrigger.create({
+        trigger: processEl.value,
+        start: 'top 85%',
+        once: true,
+        onEnter: () => {
+          gsap.to(cards, {
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+            stagger: 0.12,
+            ease: 'power3.out',
+            onComplete() {
+              this.targets().forEach((el: HTMLElement) => gsap.set(el, { clearProps: 'transform,opacity' }))
+            },
+          })
+        },
+      })
+    }
+
+    // Why I Share: scroll reveal
+    if (whyEl.value) {
+      gsap.set(whyEl.value, { opacity: 0, y: 30 })
+      ScrollTrigger.create({
+        trigger: whyEl.value,
+        start: 'top 85%',
+        once: true,
+        onEnter: () => {
+          gsap.to(whyEl.value!, {
+            opacity: 1,
+            y: 0,
+            duration: 0.7,
+            ease: 'power3.out',
+          })
+        },
+      })
+    }
+  })
+})
+
+onUnmounted(() => {
+  ctx?.revert()
+})
 
 useHead({
   title: 'About | Brian Lapinski',

@@ -59,7 +59,7 @@
     <!-- Product Detail -->
     <template v-else>
       <section class="pt-32 pb-16 px-6 md:px-12">
-        <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
+        <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-16">
           <!-- Image -->
           <div ref="imageEl" class="relative">
             <NuxtImg

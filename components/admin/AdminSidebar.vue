@@ -1,13 +1,29 @@
 <template>
-  <aside class="fixed top-0 left-0 h-screen w-64 bg-gray-900 border-r border-gray-800 flex flex-col z-50">
+  <aside
+    :class="[
+      'fixed top-0 left-0 h-screen w-64 bg-gray-900 border-r border-gray-800 flex flex-col z-50 transition-transform duration-300',
+      open ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
+    ]"
+  >
     <!-- Logo -->
-    <div class="p-6 border-b border-gray-800">
+    <div class="p-6 border-b border-gray-800 flex items-center justify-between">
       <NuxtLink to="/admin" class="flex items-center gap-3">
         <div class="w-8 h-8 bg-accent-red rounded-lg flex items-center justify-center text-white font-display font-bold text-sm">
           BL
         </div>
         <span class="font-display font-semibold text-lg">Admin Panel</span>
       </NuxtLink>
+      <!-- Close button (mobile only) -->
+      <button
+        class="lg:hidden w-9 h-9 flex items-center justify-center rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
+        aria-label="Close sidebar"
+        @click="$emit('close')"
+      >
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <line x1="2" y1="2" x2="14" y2="14" />
+          <line x1="14" y1="2" x2="2" y2="14" />
+        </svg>
+      </button>
     </div>
 
     <!-- Navigation -->
@@ -53,6 +69,14 @@
 </template>
 
 <script setup lang="ts">
+defineProps<{
+  open: boolean
+}>()
+
+defineEmits<{
+  close: []
+}>()
+
 const route = useRoute()
 const { logout } = useAdminAuth()
 
