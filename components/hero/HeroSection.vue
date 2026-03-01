@@ -195,6 +195,14 @@ html.gsap-ready .hero-img:first-child {
 .hero-monogram {
   font-size: clamp(10rem, 30vw, 22rem);
   letter-spacing: 0.08em;
+  opacity: 0;
+  animation: monogram-fadein 2.5s ease 4s forwards;
+}
+
+@keyframes monogram-fadein {
+  to {
+    opacity: 1;
+  }
 }
 
 .hero-overlay {
