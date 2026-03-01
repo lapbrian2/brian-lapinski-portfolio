@@ -105,64 +105,23 @@ function exitSequence() {
   if (barEl.value) barEl.value.style.transform = 'scaleX(1)'
   if (percentEl.value) percentEl.value.textContent = '100%'
 
-  // Signal hero to prep its first image BEFORE the visual exit starts
-  // — gives it a head start while the loader is still fully opaque
+  // Signal hero to start showing its image — it renders behind us
+  // at z-[1..20] while we're at z-[100]. As we dissolve, it bleeds through.
   emit('bridge-ready')
 
-  const tl = gsap.timeline({
+  // Single dissolve — the entire loader fades away as one element.
+  // No curtain wipe, no staged exits. The hero image + text entrance
+  // overlap with this fade, making it feel like one continuous motion.
+  gsap.to(loaderEl.value, {
+    opacity: 0,
+    duration: 1.0,
+    delay: 0.3,
+    ease: 'power2.inOut',
     onComplete: () => {
       hidden.value = true
       emit('complete')
     },
   })
-
-  // Everything fades out together — simple, fast, unified
-  const fadeTargets = [
-    barEl.value?.parentElement,
-    percentEl.value,
-    loadingLabelEl.value,
-    taglineEl.value,
-    skipHintEl.value,
-  ].filter(Boolean)
-
-  tl.to(fadeTargets, {
-    opacity: 0,
-    duration: 0.3,
-    ease: 'power2.in',
-  })
-
-  // Lines retract
-  tl.to([lineTopEl.value, lineBottomEl.value], {
-    width: 0,
-    duration: 0.3,
-    ease: 'power2.in',
-  }, '-=0.2')
-
-  // Background sharpens + overlay fades to transparent
-  if (bgImgEl.value) {
-    tl.to(bgImgEl.value, {
-      filter: 'blur(0px) saturate(1)',
-      scale: 1,
-      opacity: 0.75,
-      duration: 0.5,
-      ease: 'power2.out',
-    }, '-=0.3')
-  }
-
-  if (overlayEl.value) {
-    tl.to(overlayEl.value, {
-      opacity: 0,
-      duration: 0.5,
-      ease: 'power2.out',
-    }, '<')
-  }
-
-  // Curtain wipe — split from center
-  tl.to(loaderEl.value, {
-    clipPath: 'inset(50% 0 50% 0)',
-    duration: 0.6,
-    ease: 'power3.inOut',
-  }, '+=0.15')
 }
 
 function skip(e?: KeyboardEvent | MouseEvent) {
