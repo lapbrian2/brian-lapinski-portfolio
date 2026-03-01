@@ -37,18 +37,10 @@
         AI Art Portfolio
       </span>
 
-      <!-- BL monogram -->
-      <span
-        ref="brandEl"
-        class="font-display text-6xl md:text-7xl font-bold text-lavender-100 tracking-[0.3em] opacity-0"
-      >
-        BL
-      </span>
-
-      <!-- Name reveal underneath -->
+      <!-- Name -->
       <span
         ref="nameEl"
-        class="font-display text-sm md:text-base font-medium text-lavender-300/70 tracking-[0.25em] mt-4 opacity-0 uppercase"
+        class="font-display text-sm md:text-base font-medium text-lavender-300/70 tracking-[0.25em] mt-1 opacity-0 uppercase"
       >
         Brian Lapinski
       </span>
@@ -94,7 +86,6 @@
 import gsap from 'gsap'
 
 const loaderEl = ref<HTMLElement | null>(null)
-const brandEl = ref<HTMLElement | null>(null)
 const nameEl = ref<HTMLElement | null>(null)
 const taglineEl = ref<HTMLElement | null>(null)
 const barEl = ref<HTMLElement | null>(null)
@@ -160,19 +151,6 @@ function exitSequence() {
     duration: 0.25,
     ease: 'power2.in',
   }, '-=0.25')
-
-  // Brand scales up and dissolves
-  tl.to(
-    brandEl.value,
-    {
-      scale: 1.3,
-      letterSpacing: '0.6em',
-      opacity: 0,
-      duration: 0.5,
-      ease: 'power2.in',
-    },
-    '-=0.15',
-  )
 
   // Image sharpens fully as loader wipes
   if (bgImgEl.value) {
@@ -243,22 +221,7 @@ onMounted(() => {
     }, 0)
   }
 
-  // Phase 2: Brand entrance — cinematic letter-spacing resolve
-  if (brandEl.value) {
-    entranceTl.fromTo(brandEl.value, {
-      opacity: 0,
-      letterSpacing: '0.8em',
-      scale: 0.95,
-    }, {
-      opacity: 1,
-      letterSpacing: '0.3em',
-      scale: 1,
-      duration: 0.7,
-      ease: 'power3.out',
-    }, 0.3)
-  }
-
-  // Phase 2b: Tagline slides in from above
+  // Phase 2: Tagline slides in from above
   if (taglineEl.value) {
     entranceTl.fromTo(taglineEl.value, {
       opacity: 0,

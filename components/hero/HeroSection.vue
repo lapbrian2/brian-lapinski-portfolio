@@ -110,8 +110,8 @@ function dismissMonogram(): void {
     opacity: 0,
     scale: 1.15,
     y: -30,
-    duration: 1.0,
-    delay: 0.3,
+    duration: 1.5,
+    delay: 2.5,
     ease: 'power2.inOut',
   })
 }
