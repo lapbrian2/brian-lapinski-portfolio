@@ -167,7 +167,7 @@ onUnmounted(() => {
     <div class="absolute inset-0 z-[4] flex items-center justify-center pointer-events-none">
       <span
         ref="blMonogramEl"
-        class="font-display font-bold text-dark-900/40 leading-none select-none hero-monogram"
+        class="font-display font-bold text-lavender-100/15 leading-none select-none hero-monogram"
       >
         BL
       </span>
