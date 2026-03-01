@@ -105,6 +105,10 @@ function exitSequence() {
   if (barEl.value) barEl.value.style.transform = 'scaleX(1)'
   if (percentEl.value) percentEl.value.textContent = '100%'
 
+  // Signal hero to prep its first image BEFORE the visual exit starts
+  // — gives it a head start while the loader is still fully opaque
+  emit('bridge-ready')
+
   const tl = gsap.timeline({
     onComplete: () => {
       hidden.value = true
@@ -112,10 +116,18 @@ function exitSequence() {
     },
   })
 
-  // Bar + percentage fade
-  tl.to([barEl.value?.parentElement, percentEl.value, loadingLabelEl.value], {
+  // Everything fades out together — simple, fast, unified
+  const fadeTargets = [
+    barEl.value?.parentElement,
+    percentEl.value,
+    loadingLabelEl.value,
+    taglineEl.value,
+    skipHintEl.value,
+  ].filter(Boolean)
+
+  tl.to(fadeTargets, {
     opacity: 0,
-    duration: 0.2,
+    duration: 0.3,
     ease: 'power2.in',
   })
 
@@ -124,44 +136,33 @@ function exitSequence() {
     width: 0,
     duration: 0.3,
     ease: 'power2.in',
-  }, '-=0.1')
-
-  // Tagline fades
-  tl.to(taglineEl.value, {
-    opacity: 0,
-    y: -8,
-    duration: 0.25,
-    ease: 'power2.in',
   }, '-=0.2')
 
-  // Image sharpens fully as loader wipes
+  // Background sharpens + overlay fades to transparent
   if (bgImgEl.value) {
-    tl.to(
-      bgImgEl.value,
-      {
-        filter: 'blur(0px) saturate(1)',
-        scale: 1,
-        opacity: 0.7,
-        duration: 0.6,
-        ease: 'power2.out',
-      },
-      '-=0.5',
-    )
+    tl.to(bgImgEl.value, {
+      filter: 'blur(0px) saturate(1)',
+      scale: 1,
+      opacity: 0.75,
+      duration: 0.5,
+      ease: 'power2.out',
+    }, '-=0.3')
   }
 
-  // Signal hero to start showing its first image before the wipe reveals it
-  tl.call(() => emit('bridge-ready'))
+  if (overlayEl.value) {
+    tl.to(overlayEl.value, {
+      opacity: 0,
+      duration: 0.5,
+      ease: 'power2.out',
+    }, '<')
+  }
 
-  // Curtain wipe — split from center (300ms after bridge-ready)
-  tl.to(
-    loaderEl.value,
-    {
-      clipPath: 'inset(50% 0 50% 0)',
-      duration: 0.6,
-      ease: 'power3.inOut',
-    },
-    '+=0.3',
-  )
+  // Curtain wipe — split from center
+  tl.to(loaderEl.value, {
+    clipPath: 'inset(50% 0 50% 0)',
+    duration: 0.6,
+    ease: 'power3.inOut',
+  }, '+=0.15')
 }
 
 function skip(e?: KeyboardEvent | MouseEvent) {
@@ -181,7 +182,7 @@ onMounted(() => {
 
   loaderEl.value?.focus()
 
-  // Prefetch Splitting.js while user watches loader — eliminates delay when hero text needs it
+  // Prefetch Splitting.js while user watches loader
   import('splitting').catch(() => {})
 
   entranceTl = gsap.timeline()
@@ -246,7 +247,7 @@ onMounted(() => {
     entranceTl.to(skipHintEl.value, { opacity: 1, duration: 0.4 }, 1.2)
   }
 
-  // Progress simulation — slightly faster than before
+  // Progress simulation
   const proxy = { value: 0 }
 
   loadTween = gsap.to(proxy, {
@@ -257,28 +258,25 @@ onMounted(() => {
     onUpdate: () => {
       const progress = proxy.value / 100
 
-      // Progress bar
       if (barEl.value) {
         barEl.value.style.transform = `scaleX(${progress})`
       }
 
-      // Percentage text
       if (percentEl.value) {
         percentEl.value.textContent = `${Math.round(proxy.value)}%`
       }
 
       // Progressively sharpen and saturate the background image
       if (bgImgEl.value) {
-        const blur = 40 - (progress * 32) // 40px -> 8px during load
-        const sat = 0.4 + (progress * 0.4) // 0.4 -> 0.8
-        const scale = 1.2 - (progress * 0.1) // 1.2 -> 1.1
+        const blur = 40 - (progress * 32)
+        const sat = 0.4 + (progress * 0.4)
+        const scale = 1.2 - (progress * 0.1)
         bgImgEl.value.style.filter = `blur(${blur}px) saturate(${sat})`
         bgImgEl.value.style.transform = `scale(${scale})`
       }
 
-      // Overlay lightens subtly
       if (overlayEl.value) {
-        const overlayOpacity = 0.75 - (progress * 0.2) // 0.75 -> 0.55
+        const overlayOpacity = 0.75 - (progress * 0.2)
         overlayEl.value.style.backgroundColor = `rgba(0, 0, 0, ${overlayOpacity})`
       }
     },

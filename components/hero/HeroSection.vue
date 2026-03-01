@@ -30,7 +30,6 @@ const emit = defineEmits<{
 }>()
 
 const heroTextDone = ref(false)
-const blMonogramEl = ref<HTMLElement | null>(null)
 
 const prefersReducedMotion = useReducedMotion()
 const activeIndex = ref(0)
@@ -41,7 +40,6 @@ let cycleStarted = false
 let firstFrameShown = false
 let cycleTimeout: ReturnType<typeof setTimeout> | null = null
 let crossfadeTl: gsap.core.Timeline | null = null
-let monogramTween: gsap.core.Tween | null = null
 
 // Phase A: Immediately bring the first image to target opacity (no Ken Burns yet).
 // This runs as soon as the loader signals bridge-ready, giving the hero a visible
@@ -51,7 +49,7 @@ function showFirstImage(): void {
   firstFrameShown = true
 
   if (!imgEls.value?.length) return
-  imgEls.value.forEach((el, i) => {
+  imgEls.value.forEach((el) => {
     gsap.set(el, { opacity: 0, scale: 1 })
   })
 
@@ -69,7 +67,6 @@ function startCycle(): void {
   if (cycleStarted || imgEls.value.length < 2) return
   cycleStarted = true
 
-  // Ken Burns on first image — quick zoom to feel alive
   kenBurnsTween = gsap.to(imgEls.value[0], { scale: 1.08, duration: 1.6, ease: 'none', force3D: true })
 
   const scheduleNext = () => {
@@ -111,16 +108,6 @@ function tryStart(): void {
   if (!prefersReducedMotion.value) {
     cycleTimeout = setTimeout(startCycle, 400)
   }
-
-  // BL watermark fades in well after hero text has settled
-  if (blMonogramEl.value && !monogramTween) {
-    monogramTween = gsap.to(blMonogramEl.value, {
-      opacity: 1,
-      duration: 2.5,
-      delay: 3,
-      ease: 'power2.out',
-    })
-  }
 }
 
 // Watch both ready prop and imgEls population — for returning visitors,
@@ -133,7 +120,6 @@ onUnmounted(() => {
   crossfadeTl?.kill()
   cycleTl?.kill()
   kenBurnsTween?.kill()
-  monogramTween?.kill()
 })
 </script>
 
@@ -161,17 +147,6 @@ onUnmounted(() => {
 
     <!-- Ambient gradient orbs — subtle color accents on top -->
     <div class="hero-glow absolute inset-0 z-[3] pointer-events-none" />
-
-    <!-- BL monogram — branded watermark, fades in after hero text settles -->
-    <div class="absolute inset-0 z-[4] flex items-center justify-center pointer-events-none">
-      <span
-        ref="blMonogramEl"
-        class="font-display font-bold text-lavender-100/15 leading-none select-none hero-monogram"
-        style="opacity: 0"
-      >
-        BL
-      </span>
-    </div>
 
     <!-- Text overlay -->
     <div class="absolute inset-0 z-20 flex items-center justify-center">
@@ -205,11 +180,6 @@ html.gsap-ready .hero-img:first-child {
   to {
     opacity: 0.65;
   }
-}
-
-.hero-monogram {
-  font-size: clamp(10rem, 30vw, 22rem);
-  letter-spacing: 0.08em;
 }
 
 .hero-overlay {
