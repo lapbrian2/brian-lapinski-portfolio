@@ -30,6 +30,7 @@ const emit = defineEmits<{
 }>()
 
 const heroTextDone = ref(false)
+const blMonogramEl = ref<HTMLElement | null>(null)
 
 const prefersReducedMotion = useReducedMotion()
 const activeIndex = ref(0)
@@ -40,6 +41,7 @@ let cycleStarted = false
 let firstFrameShown = false
 let cycleTimeout: ReturnType<typeof setTimeout> | null = null
 let crossfadeTl: gsap.core.Timeline | null = null
+let monogramTween: gsap.core.Tween | null = null
 
 // Phase A: Immediately bring the first image to target opacity (no Ken Burns yet).
 // This runs as soon as the loader signals bridge-ready, giving the hero a visible
@@ -109,6 +111,16 @@ function tryStart(): void {
   if (!prefersReducedMotion.value) {
     cycleTimeout = setTimeout(startCycle, 400)
   }
+
+  // BL watermark fades in well after hero text has settled
+  if (blMonogramEl.value && !monogramTween) {
+    monogramTween = gsap.to(blMonogramEl.value, {
+      opacity: 1,
+      duration: 2.5,
+      delay: 3,
+      ease: 'power2.out',
+    })
+  }
 }
 
 // Watch both ready prop and imgEls population — for returning visitors,
@@ -121,6 +133,7 @@ onUnmounted(() => {
   crossfadeTl?.kill()
   cycleTl?.kill()
   kenBurnsTween?.kill()
+  monogramTween?.kill()
 })
 </script>
 
@@ -149,10 +162,12 @@ onUnmounted(() => {
     <!-- Ambient gradient orbs — subtle color accents on top -->
     <div class="hero-glow absolute inset-0 z-[3] pointer-events-none" />
 
-    <!-- BL monogram — static branded watermark, always visible behind text -->
+    <!-- BL monogram — branded watermark, fades in after hero text settles -->
     <div class="absolute inset-0 z-[4] flex items-center justify-center pointer-events-none">
       <span
+        ref="blMonogramEl"
         class="font-display font-bold text-lavender-100/15 leading-none select-none hero-monogram"
+        style="opacity: 0"
       >
         BL
       </span>
@@ -195,14 +210,6 @@ html.gsap-ready .hero-img:first-child {
 .hero-monogram {
   font-size: clamp(10rem, 30vw, 22rem);
   letter-spacing: 0.08em;
-  opacity: 0;
-  animation: monogram-fadein 2.5s ease 4s forwards;
-}
-
-@keyframes monogram-fadein {
-  to {
-    opacity: 1;
-  }
 }
 
 .hero-overlay {
