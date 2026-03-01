@@ -55,7 +55,7 @@ function showFirstImage(): void {
 
   gsap.to(imgEls.value[0], {
     opacity: 0.75,
-    duration: 0.3,
+    duration: 1.2,
     ease: 'power2.out',
     onComplete: () => emit('first-frame-ready'),
   })

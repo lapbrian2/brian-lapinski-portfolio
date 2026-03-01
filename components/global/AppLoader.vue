@@ -91,14 +91,12 @@ function exitSequence() {
   // at z-[1..20] while we're at z-[100]. As we dissolve, it bleeds through.
   emit('bridge-ready')
 
-  // Single dissolve — the entire loader fades away as one element.
-  // The hero image + text entrance overlap with this fade,
-  // making it feel like one continuous motion.
+  // Smooth crossfade — loader fades out while hero fades in at the same pace.
+  // No delay, no slow start. power2.out = fast initial reveal then gentle finish.
   gsap.to(loaderEl.value, {
     opacity: 0,
-    duration: 1.0,
-    delay: 0.3,
-    ease: 'power2.inOut',
+    duration: 1.2,
+    ease: 'power2.out',
     onComplete: () => {
       hidden.value = true
       emit('complete')
