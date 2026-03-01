@@ -54,7 +54,7 @@ function showFirstImage(): void {
   })
 
   gsap.to(imgEls.value[0], {
-    opacity: 0.65,
+    opacity: 0.75,
     duration: 0.3,
     ease: 'power2.out',
     onComplete: () => emit('first-frame-ready'),
@@ -93,7 +93,7 @@ function startCycle(): void {
     })
 
     crossfadeTl.to(currentEl, { opacity: 0, duration: 0.5, ease: 'power2.inOut' }, 0)
-    crossfadeTl.to(nextEl, { opacity: 0.65, duration: 0.5, ease: 'power2.inOut' }, 0)
+    crossfadeTl.to(nextEl, { opacity: 0.75, duration: 0.5, ease: 'power2.inOut' }, 0)
     crossfadeTl.to(nextEl, { scale: 1.08, duration: 1.6, ease: 'none', force3D: true }, 0)
   }
 
@@ -179,18 +179,18 @@ html.gsap-ready .hero-img:first-child {
 
 @keyframes hero-css-baseline {
   to {
-    opacity: 0.55;
+    opacity: 0.65;
   }
 }
 
 .hero-overlay {
   background:
     linear-gradient(to bottom,
-      rgba(0, 0, 0, 0.72) 0%,
-      rgba(0, 0, 0, 0.4) 30%,
-      rgba(0, 0, 0, 0.38) 50%,
-      rgba(0, 0, 0, 0.5) 70%,
-      rgba(0, 0, 0, 0.88) 100%
+      rgba(0, 0, 0, 0.68) 0%,
+      rgba(0, 0, 0, 0.32) 30%,
+      rgba(0, 0, 0, 0.28) 50%,
+      rgba(0, 0, 0, 0.42) 70%,
+      rgba(0, 0, 0, 0.85) 100%
     );
 }
 
