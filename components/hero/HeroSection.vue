@@ -30,6 +30,7 @@ const emit = defineEmits<{
 }>()
 
 const heroTextDone = ref(false)
+const blMonogramEl = ref<HTMLElement | null>(null)
 
 const prefersReducedMotion = useReducedMotion()
 const activeIndex = ref(0)
@@ -103,9 +104,22 @@ function startCycle(): void {
 // When ready flips to true, show the first image immediately,
 // then kick off Ken Burns + crossfade cycle after a short beat
 // (skip cycle entirely for reduced-motion users — just show static image).
+function dismissMonogram(): void {
+  if (!blMonogramEl.value || prefersReducedMotion.value) return
+  gsap.to(blMonogramEl.value, {
+    opacity: 0,
+    scale: 1.15,
+    y: -30,
+    duration: 1.0,
+    delay: 0.3,
+    ease: 'power2.inOut',
+  })
+}
+
 function tryStart(): void {
   if (!props.ready || imgEls.value.length < 2) return
   showFirstImage()
+  dismissMonogram()
   if (!prefersReducedMotion.value) {
     cycleTimeout = setTimeout(startCycle, 400)
   }
@@ -149,6 +163,16 @@ onUnmounted(() => {
     <!-- Ambient gradient orbs — subtle color accents on top -->
     <div class="hero-glow absolute inset-0 z-[3] pointer-events-none" />
 
+    <!-- BL monogram — large branded watermark, visible on reveal, fades as text enters -->
+    <div class="absolute inset-0 z-[4] flex items-center justify-center pointer-events-none">
+      <span
+        ref="blMonogramEl"
+        class="font-display font-bold text-dark-900/40 leading-none select-none hero-monogram"
+      >
+        BL
+      </span>
+    </div>
+
     <!-- Text overlay -->
     <div class="absolute inset-0 z-20 flex items-center justify-center">
       <HeroText :ready="ready" style="text-shadow: 0 2px 20px rgba(0,0,0,0.5)" @entrance-complete="heroTextDone = true" />
@@ -181,6 +205,11 @@ html.gsap-ready .hero-img:first-child {
   to {
     opacity: 0.65;
   }
+}
+
+.hero-monogram {
+  font-size: clamp(10rem, 30vw, 22rem);
+  letter-spacing: 0.08em;
 }
 
 .hero-overlay {
