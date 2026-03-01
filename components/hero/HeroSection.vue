@@ -30,7 +30,6 @@ const emit = defineEmits<{
 }>()
 
 const heroTextDone = ref(false)
-const blMonogramEl = ref<HTMLElement | null>(null)
 
 const prefersReducedMotion = useReducedMotion()
 const activeIndex = ref(0)
@@ -41,9 +40,8 @@ let cycleStarted = false
 let firstFrameShown = false
 let cycleTimeout: ReturnType<typeof setTimeout> | null = null
 let crossfadeTl: gsap.core.Timeline | null = null
-let monogramTween: gsap.core.Tween | null = null
 
-// Phase A: Bring the first image and BL monogram to life together.
+// Phase A: Immediately bring the first image to target opacity (no Ken Burns yet).
 // This runs as soon as the loader signals bridge-ready, giving the hero a visible
 // background before the loader's curtain wipe reveals it.
 function showFirstImage(): void {
@@ -61,14 +59,6 @@ function showFirstImage(): void {
     ease: 'power2.out',
     onComplete: () => emit('first-frame-ready'),
   })
-
-  // BL monogram breathes in alongside the hero image
-  if (blMonogramEl.value) {
-    gsap.fromTo(blMonogramEl.value,
-      { opacity: 0, scale: 0.92 },
-      { opacity: 1, scale: 1, duration: 1.0, ease: 'power2.out' },
-    )
-  }
 }
 
 // Phase B: Start the Ken Burns zoom and crossfade cycle.
@@ -113,21 +103,9 @@ function startCycle(): void {
 // When ready flips to true, show the first image immediately,
 // then kick off Ken Burns + crossfade cycle after a short beat
 // (skip cycle entirely for reduced-motion users — just show static image).
-function dismissMonogram(): void {
-  if (!blMonogramEl.value || prefersReducedMotion.value) return
-  monogramTween = gsap.to(blMonogramEl.value, {
-    opacity: 0,
-    scale: 1.06,
-    duration: 1.8,
-    delay: 2.5,
-    ease: 'power2.inOut',
-  })
-}
-
 function tryStart(): void {
   if (!props.ready || imgEls.value.length < 2) return
   showFirstImage()
-  dismissMonogram()
   if (!prefersReducedMotion.value) {
     cycleTimeout = setTimeout(startCycle, 400)
   }
@@ -143,7 +121,6 @@ onUnmounted(() => {
   crossfadeTl?.kill()
   cycleTl?.kill()
   kenBurnsTween?.kill()
-  monogramTween?.kill()
 })
 </script>
 
@@ -172,12 +149,10 @@ onUnmounted(() => {
     <!-- Ambient gradient orbs — subtle color accents on top -->
     <div class="hero-glow absolute inset-0 z-[3] pointer-events-none" />
 
-    <!-- BL monogram — large branded watermark, visible on reveal, fades as text enters -->
+    <!-- BL monogram — static branded watermark, always visible behind text -->
     <div class="absolute inset-0 z-[4] flex items-center justify-center pointer-events-none">
       <span
-        ref="blMonogramEl"
         class="font-display font-bold text-lavender-100/15 leading-none select-none hero-monogram"
-        style="opacity: 0"
       >
         BL
       </span>
