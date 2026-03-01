@@ -2,7 +2,7 @@
   <footer ref="footerEl" class="relative bg-dark-900 pt-12 pb-12 px-6 md:px-12 overflow-hidden" aria-label="Site footer">
     <!-- BL watermark -->
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 select-none pointer-events-none">
-      <span ref="watermarkEl" class="font-display text-[12rem] md:text-[20rem] font-bold text-lavender-100/[0.02] leading-none">
+      <span ref="watermarkEl" class="font-display text-[12rem] md:text-[20rem] font-bold text-lavender-100/[0.06] leading-none">
         BL
       </span>
     </div>

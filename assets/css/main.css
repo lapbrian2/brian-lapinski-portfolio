@@ -417,13 +417,16 @@ html {
 }
 
 /* ─── No-JS / GSAP Failure Safety Net ───────────────────────────── */
+/* If GSAP never loads (blocked script, network error), reveal hidden
+   content after a CSS-only delay. The JS plugin (03.gsap-safety-net)
+   handles the case where GSAP loads but ScrollTrigger doesn't fire. */
 @keyframes gsap-fallback-reveal {
   to {
-    opacity: 1;
-    transform: none;
+    opacity: 1 !important;
+    transform: none !important;
   }
 }
 
-html:not(.gsap-ready) .opacity-0:not([aria-hidden="true"]):not(.sr-only):not(.absolute) {
-  animation: gsap-fallback-reveal 0.5s ease 6s forwards;
+html:not(.gsap-ready) .opacity-0:not([aria-hidden="true"]):not(.sr-only):not(.hero-img) {
+  animation: gsap-fallback-reveal 0.5s ease 4s forwards;
 }

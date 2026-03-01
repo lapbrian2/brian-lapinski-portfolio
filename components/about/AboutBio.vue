@@ -15,6 +15,14 @@
         the belief that creativity, like manufacturing, can be both deeply
         personal and rigorously reproducible.
       </p>
+
+      <!-- Visual break — editorial accent divider -->
+      <div class="flex items-center gap-4 py-2">
+        <div class="h-px flex-1 bg-gradient-to-r from-transparent via-accent-red/20 to-transparent" />
+        <span class="font-display text-xs tracking-[0.2em] text-accent-red/40 uppercase select-none">Method</span>
+        <div class="h-px flex-1 bg-gradient-to-r from-transparent via-accent-red/20 to-transparent" />
+      </div>
+
       <p class="font-body text-base leading-relaxed text-lavender-300">
         That belief became
         <span class="text-lavender-200 font-medium">Style DNA</span> &mdash; my
@@ -24,6 +32,14 @@
         then systematically dialing them until the output matches the intent. The
         methodology behind the output matters as much as the output itself.
       </p>
+
+      <!-- Inline pull quote — breaks the text wall -->
+      <blockquote class="relative pl-6 py-3 border-l-2 border-accent-red/30 my-2">
+        <p class="font-display text-lg md:text-xl text-lavender-100/80 leading-snug italic">
+          Everything I build is meant to be taught, shared, and improved by others.
+        </p>
+      </blockquote>
+
       <p class="font-body text-base leading-relaxed text-lavender-300">
         Today I serve as AI Architect at
         <a
@@ -38,9 +54,14 @@
         <span class="text-lavender-200 font-medium">4D Framework</span>
         . As Creative Partner at ImagineArt and
         Caimera, I bridge the gap between what AI tools can do and what artists
-        actually need. Everything I build is meant to be taught, shared, and
-        improved by others.
+        actually need.
       </p>
+
+      <!-- Visual break — editorial accent divider -->
+      <div class="flex items-center gap-4 py-2">
+        <div class="h-px flex-1 bg-gradient-to-r from-transparent via-lavender-400/10 to-transparent" />
+      </div>
+
       <p class="font-body text-base leading-relaxed text-lavender-300">
         I work from the Pocono region of Pennsylvania, where I live with my wife
         and two children. The quiet out here is good for the work &mdash;
@@ -68,20 +89,21 @@ onMounted(() => {
   if (reducedMotion.value) return
 
   ctx = gsap.context(() => {
-    const paragraphs = bioRef.value!.querySelectorAll('p')
+    // Animate all direct children of the content area (paragraphs, dividers, blockquote)
+    const items = bioRef.value!.querySelectorAll('.space-y-6 > *')
 
-    paragraphs.forEach((p, i) => {
-      gsap.set(p, { opacity: 0, y: 30 + i * 10 })
+    items.forEach((el, i) => {
+      gsap.set(el, { opacity: 0, y: 25 })
       ScrollTrigger.create({
-        trigger: p,
+        trigger: el,
         start: 'top 88%',
         once: true,
         onEnter: () => {
-          gsap.to(p, {
+          gsap.to(el, {
             opacity: 1,
             y: 0,
             duration: 0.8,
-            delay: i * 0.1,
+            delay: i * 0.08,
             ease: 'power2.out',
             force3D: true,
             onComplete() {

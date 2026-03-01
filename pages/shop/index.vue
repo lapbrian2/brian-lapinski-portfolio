@@ -118,6 +118,14 @@
 
     <!-- Empty State: Shop Opening Soon -->
     <template v-else>
+      <!-- Coming Soon badge -->
+      <div class="text-center mb-10 px-6">
+        <span class="inline-flex items-center gap-2 px-5 py-2 rounded-full border border-accent-red/20 bg-accent-red/5">
+          <span class="w-1.5 h-1.5 rounded-full bg-accent-red animate-pulse" />
+          <span class="font-body text-xs uppercase tracking-[0.2em] text-accent-red">Coming Soon</span>
+        </span>
+      </div>
+
       <section ref="cardsEl" class="px-6 md:px-12 pb-16">
         <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
           <!-- Prints Card -->

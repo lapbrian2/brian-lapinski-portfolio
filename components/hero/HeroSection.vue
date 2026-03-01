@@ -166,6 +166,23 @@ onUnmounted(() => {
   will-change: transform, opacity;
 }
 
+/* CSS-only baseline: if GSAP never fires (JS blocked/delayed),
+   fade the first hero image in after 2.5s so the hero isn't black.
+   GSAP's inline opacity style overrides this once it takes control. */
+.hero-img:first-child {
+  animation: hero-css-baseline 1s ease 2.5s forwards;
+}
+
+html.gsap-ready .hero-img:first-child {
+  animation: none;
+}
+
+@keyframes hero-css-baseline {
+  to {
+    opacity: 0.55;
+  }
+}
+
 .hero-overlay {
   background:
     linear-gradient(to bottom,

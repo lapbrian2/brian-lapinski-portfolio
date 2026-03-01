@@ -25,7 +25,7 @@
     </div>
 
     <!-- Responsive grid — no pinned scroll, clean flow -->
-    <div ref="gridEl" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div ref="gridEl" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
       <ProcessStep v-for="step in steps" :key="step.number" :step="step" />
     </div>
   </section>

@@ -1,7 +1,7 @@
 <template>
-  <div class="process-card glass rounded-xl p-8 h-full flex flex-col relative overflow-hidden group hover:-translate-y-1 transition-transform duration-500">
-    <!-- Background number watermark -->
-    <span class="absolute -top-4 -right-2 font-display text-[8rem] font-bold text-lavender-100/[0.02] leading-none select-none pointer-events-none">
+  <div class="process-card glass rounded-xl p-8 md:p-10 h-full flex flex-col relative overflow-hidden group hover:-translate-y-1 transition-transform duration-500">
+    <!-- Background number watermark — large editorial ghost -->
+    <span class="absolute -top-6 -right-3 font-display text-[10rem] md:text-[12rem] font-bold text-lavender-100/[0.035] leading-none select-none pointer-events-none transition-opacity duration-700 group-hover:text-lavender-100/[0.06]">
       {{ step.number }}
     </span>
 
@@ -9,7 +9,7 @@
     <div class="process-card__accent absolute top-0 left-0 right-0 h-[2px] bg-accent-red/40 origin-left" />
 
     <!-- Top: icon + number -->
-    <div class="flex items-center gap-4 mb-6">
+    <div class="flex items-center gap-4 mb-8">
       <div class="process-card__icon flex-shrink-0 w-10 h-10 rounded-full bg-accent-red/8 border border-accent-red/15 flex items-center justify-center transition-all duration-500 group-hover:bg-accent-red/15 group-hover:border-accent-red/30">
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-accent-red/70 group-hover:text-accent-red transition-colors duration-500">
           <!-- Step-specific icon paths -->
@@ -36,18 +36,21 @@
           </template>
         </svg>
       </div>
-      <span class="font-display text-4xl font-bold text-accent-red/50 leading-none">
+      <span class="font-display text-5xl md:text-6xl font-bold text-accent-red/30 leading-none group-hover:text-accent-red/50 transition-colors duration-500">
         {{ step.number }}
       </span>
       <div class="flex-1 h-px bg-gradient-to-r from-accent-red/20 to-transparent" />
     </div>
 
-    <h3 class="font-display text-xl font-semibold text-lavender-100 mb-4 group-hover:text-accent-red transition-colors duration-500">
+    <h3 class="font-display text-xl md:text-2xl font-semibold text-lavender-100 mb-5 group-hover:text-accent-red transition-colors duration-500 leading-tight">
       {{ step.title }}
     </h3>
-    <p class="font-body text-sm leading-relaxed text-lavender-300 flex-1">
+    <p class="font-body text-sm md:text-base leading-relaxed text-lavender-300 flex-1">
       {{ step.description }}
     </p>
+
+    <!-- Subtle hover glow from bottom -->
+    <div class="absolute inset-0 bg-gradient-to-t from-accent-red/[0.03] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
   </div>
 </template>
 
