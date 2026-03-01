@@ -148,6 +148,11 @@ onUnmounted(() => {
     <!-- Ambient gradient orbs — subtle color accents on top -->
     <div class="hero-glow absolute inset-0 z-[3] pointer-events-none" />
 
+    <!-- BL monogram — static branded watermark behind text -->
+    <div class="absolute inset-0 z-[4] flex items-center justify-center pointer-events-none">
+      <span class="font-display font-bold text-lavender-100/15 leading-none select-none hero-monogram">BL</span>
+    </div>
+
     <!-- Text overlay -->
     <div class="absolute inset-0 z-20 flex items-center justify-center">
       <HeroText :ready="ready" style="text-shadow: 0 2px 20px rgba(0,0,0,0.5)" @entrance-complete="heroTextDone = true" />
@@ -180,6 +185,11 @@ html.gsap-ready .hero-img:first-child {
   to {
     opacity: 0.65;
   }
+}
+
+.hero-monogram {
+  font-size: clamp(10rem, 30vw, 22rem);
+  letter-spacing: 0.08em;
 }
 
 .hero-overlay {
