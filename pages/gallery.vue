@@ -588,6 +588,11 @@ useHead({
 watch(artworks, (arts) => {
   if (arts.length) useGallerySchema(arts)
 }, { immediate: true })
+
+useBreadcrumbSchema([
+  { name: 'Home', path: '/' },
+  { name: 'Gallery', path: '/gallery' },
+])
 </script>
 
 <style scoped>

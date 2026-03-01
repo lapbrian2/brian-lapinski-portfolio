@@ -386,6 +386,13 @@ useHead({
 
 // JSON-LD structured data — watch artwork ref to update on navigation
 watch(artwork, (a) => {
-  if (a) useArtworkSchema(a)
+  if (a) {
+    useArtworkSchema(a)
+    useBreadcrumbSchema([
+      { name: 'Home', path: '/' },
+      { name: 'Gallery', path: '/gallery' },
+      { name: a.title, path: `/artwork/${a.id}` },
+    ])
+  }
 }, { immediate: true })
 </script>

@@ -60,6 +60,25 @@
       <div class="text-lavender-400 font-body text-sm">Loading prints...</div>
     </div>
 
+    <!-- Error state -->
+    <section v-else-if="error" class="px-6 md:px-12 pb-24">
+      <div class="max-w-md mx-auto text-center py-16">
+        <div class="w-14 h-14 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center mx-auto mb-5">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+        </div>
+        <h2 class="font-display text-xl text-lavender-100 mb-2">Failed to Load Shop</h2>
+        <p class="font-body text-sm text-lavender-400 mb-6">Something went wrong loading the products. Please try again.</p>
+        <button
+          class="inline-flex items-center gap-2 px-6 py-3 bg-accent-red hover:bg-accent-red-hover text-white text-sm font-medium rounded-sm transition-colors"
+          @click="refresh()"
+        >
+          Retry
+        </button>
+      </div>
+    </section>
+
     <!-- Product Grid -->
     <section v-else-if="products.length > 0" ref="gridEl" class="px-6 md:px-12 pb-16">
       <div class="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-3 gap-5 md:gap-6">
@@ -230,7 +249,7 @@ definePageMeta({ layout: false })
 const cart = useCart()
 
 // Fetch products
-const { data: productsData, pending } = useFetch<{ data: PrintProduct[] }>('/api/shop/products', {
+const { data: productsData, pending, error, refresh } = useFetch<{ data: PrintProduct[] }>('/api/shop/products', {
   key: 'shop-products',
 })
 
@@ -422,6 +441,11 @@ useHead({
   ],
   link: [{ rel: 'canonical', href: 'https://lapinski.art/shop' }],
 })
+
+useBreadcrumbSchema([
+  { name: 'Home', path: '/' },
+  { name: 'Print Shop', path: '/shop' },
+])
 </script>
 
 <style scoped>

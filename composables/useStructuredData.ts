@@ -237,6 +237,64 @@ export function useGallerySchema(artworks: Artwork[]) {
   return schema
 }
 
+/** BreadcrumbList schema for navigational hierarchy in search results */
+export function useBreadcrumbSchema(
+  items: Array<{ name: string; path: string }>,
+) {
+  const baseUrl = getBaseUrl()
+
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((item, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: item.name,
+      item: `${baseUrl}${item.path}`,
+    })),
+  }
+
+  useHead({
+    script: [
+      {
+        key: 'ld-breadcrumb',
+        type: 'application/ld+json',
+        innerHTML: JSON.stringify(schema),
+      },
+    ],
+  })
+
+  return schema
+}
+
+/** Person schema for the about page */
+export function usePersonSchema() {
+  const baseUrl = getBaseUrl()
+  const creator = getCreator()
+
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    name: creator.name,
+    url: baseUrl,
+    sameAs: creator.sameAs,
+    jobTitle: 'AI Artist',
+    description: 'Exploring what it means to be human through images. AI artist, educator, and Creative Partner.',
+  }
+
+  useHead({
+    script: [
+      {
+        key: 'ld-person',
+        type: 'application/ld+json',
+        innerHTML: JSON.stringify(schema),
+      },
+    ],
+  })
+
+  return schema
+}
+
 /** Product schema for shop product detail pages */
 export function useProductSchema(
   product: { artworkTitle?: string | null; artworkSrc?: string | null; id: string },

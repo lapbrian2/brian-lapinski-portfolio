@@ -261,21 +261,10 @@ useHead({
   link: [{ rel: 'canonical', href: 'https://lapinski.art/about' }],
 })
 
-// Structured data: Person schema
-useHead({
-  script: [
-    {
-      type: 'application/ld+json',
-      innerHTML: JSON.stringify({
-        '@context': 'https://schema.org',
-        '@type': 'Person',
-        name: 'Brian Lapinski',
-        url: 'https://lapinski.art',
-        sameAs: ['https://twitter.com/Lapbrian2'],
-        jobTitle: 'AI Artist',
-        description: 'Exploring what it means to be human through images. AI artist, educator, and Creative Partner.',
-      }),
-    },
-  ],
-})
+// Structured data: Person schema + Breadcrumb
+usePersonSchema()
+useBreadcrumbSchema([
+  { name: 'Home', path: '/' },
+  { name: 'About', path: '/about' },
+])
 </script>
