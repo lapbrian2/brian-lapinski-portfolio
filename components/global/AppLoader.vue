@@ -3,26 +3,10 @@
     v-if="!hidden"
     ref="loaderEl"
     tabindex="0"
-    class="fixed inset-0 z-[100] flex flex-col items-center justify-center cursor-pointer overflow-hidden"
+    class="fixed inset-0 z-[100] flex flex-col items-center justify-center cursor-pointer overflow-hidden bg-dark-900"
     @click="skip"
     @keydown="skip"
   >
-    <!-- Blurred artwork background that sharpens as loading progresses -->
-    <div class="absolute inset-0">
-      <img
-        ref="bgImgEl"
-        src="/images/artworks/red-shift.webp"
-        alt=""
-        class="absolute inset-0 w-full h-full object-cover will-change-transform"
-        style="filter: blur(40px) saturate(0.4); transform: scale(1.2); opacity: 0"
-        loading="eager"
-        draggable="false"
-      />
-    </div>
-
-    <!-- Dark overlay for text contrast -->
-    <div ref="overlayEl" class="absolute inset-0 bg-dark-900" />
-
     <!-- Decorative lines — cinematic framing -->
     <div ref="lineTopEl" class="absolute top-[20%] left-1/2 -translate-x-1/2 z-10 w-0 h-px bg-gradient-to-r from-transparent via-accent-red/40 to-transparent" />
     <div ref="lineBottomEl" class="absolute bottom-[20%] left-1/2 -translate-x-1/2 z-10 w-0 h-px bg-gradient-to-r from-transparent via-lavender-400/20 to-transparent" />
@@ -82,8 +66,6 @@ const barEl = ref<HTMLElement | null>(null)
 const percentEl = ref<HTMLElement | null>(null)
 const loadingLabelEl = ref<HTMLElement | null>(null)
 const skipHintEl = ref<HTMLElement | null>(null)
-const bgImgEl = ref<HTMLElement | null>(null)
-const overlayEl = ref<HTMLElement | null>(null)
 const lineTopEl = ref<HTMLElement | null>(null)
 const lineBottomEl = ref<HTMLElement | null>(null)
 
@@ -110,8 +92,8 @@ function exitSequence() {
   emit('bridge-ready')
 
   // Single dissolve — the entire loader fades away as one element.
-  // No curtain wipe, no staged exits. The hero image + text entrance
-  // overlap with this fade, making it feel like one continuous motion.
+  // The hero image + text entrance overlap with this fade,
+  // making it feel like one continuous motion.
   gsap.to(loaderEl.value, {
     opacity: 0,
     duration: 1.0,
@@ -146,24 +128,7 @@ onMounted(() => {
 
   entranceTl = gsap.timeline()
 
-  // Phase 1: Dark scene — overlay fades down, bg image fades in blurred
-  if (bgImgEl.value) {
-    entranceTl.to(bgImgEl.value, {
-      opacity: 0.5,
-      duration: 0.8,
-      ease: 'power2.out',
-    }, 0)
-  }
-
-  if (overlayEl.value) {
-    entranceTl.to(overlayEl.value, {
-      backgroundColor: 'rgba(0, 0, 0, 0.75)',
-      duration: 0.8,
-      ease: 'power2.out',
-    }, 0)
-  }
-
-  // Phase 2: Tagline slides in
+  // Phase 1: Tagline slides in
   if (taglineEl.value) {
     entranceTl.fromTo(taglineEl.value, {
       opacity: 0,
@@ -173,16 +138,16 @@ onMounted(() => {
       y: 0,
       duration: 0.5,
       ease: 'power2.out',
-    }, 0.5)
+    }, 0.3)
   }
 
-  // Phase 3: Decorative lines expand
+  // Phase 2: Decorative lines expand
   if (lineTopEl.value) {
     entranceTl.to(lineTopEl.value, {
       width: '200px',
       duration: 0.6,
       ease: 'power2.out',
-    }, 0.5)
+    }, 0.3)
   }
 
   if (lineBottomEl.value) {
@@ -190,23 +155,23 @@ onMounted(() => {
       width: '160px',
       duration: 0.6,
       ease: 'power2.out',
-    }, 0.6)
+    }, 0.4)
   }
 
-  // Phase 4: Loading bar + labels appear
+  // Phase 3: Loading bar + labels appear
   if (percentEl.value) {
-    entranceTl.to(percentEl.value, { opacity: 1, duration: 0.3 }, 0.7)
+    entranceTl.to(percentEl.value, { opacity: 1, duration: 0.3 }, 0.5)
   }
   if (loadingLabelEl.value) {
-    entranceTl.to(loadingLabelEl.value, { opacity: 1, duration: 0.3 }, 0.7)
+    entranceTl.to(loadingLabelEl.value, { opacity: 1, duration: 0.3 }, 0.5)
   }
 
   // Show skip hint after a beat
   if (skipHintEl.value) {
-    entranceTl.to(skipHintEl.value, { opacity: 1, duration: 0.4 }, 1.2)
+    entranceTl.to(skipHintEl.value, { opacity: 1, duration: 0.4 }, 1.0)
   }
 
-  // Progress simulation
+  // Progress simulation — bar fills over 1.8s
   const proxy = { value: 0 }
 
   loadTween = gsap.to(proxy, {
@@ -215,28 +180,12 @@ onMounted(() => {
     ease: 'power1.inOut',
     delay: 0.5,
     onUpdate: () => {
-      const progress = proxy.value / 100
-
       if (barEl.value) {
-        barEl.value.style.transform = `scaleX(${progress})`
+        barEl.value.style.transform = `scaleX(${proxy.value / 100})`
       }
 
       if (percentEl.value) {
         percentEl.value.textContent = `${Math.round(proxy.value)}%`
-      }
-
-      // Progressively sharpen and saturate the background image
-      if (bgImgEl.value) {
-        const blur = 40 - (progress * 32)
-        const sat = 0.4 + (progress * 0.4)
-        const scale = 1.2 - (progress * 0.1)
-        bgImgEl.value.style.filter = `blur(${blur}px) saturate(${sat})`
-        bgImgEl.value.style.transform = `scale(${scale})`
-      }
-
-      if (overlayEl.value) {
-        const overlayOpacity = 0.75 - (progress * 0.2)
-        overlayEl.value.style.backgroundColor = `rgba(0, 0, 0, ${overlayOpacity})`
       }
     },
     onComplete: () => {
