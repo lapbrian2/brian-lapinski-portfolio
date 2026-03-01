@@ -44,6 +44,25 @@
       <div class="text-lavender-400 font-body text-sm">Loading product...</div>
     </div>
 
+    <!-- Error State -->
+    <div v-else-if="error" class="flex flex-col items-center justify-center pt-40 pb-20 px-6 text-center">
+      <div class="max-w-md mx-auto">
+        <div class="w-14 h-14 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center mx-auto mb-5">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+        </div>
+        <h1 class="font-display text-xl text-lavender-100 mb-2">Failed to Load Product</h1>
+        <p class="font-body text-sm text-lavender-400 mb-6">Something went wrong loading this product. Please try again.</p>
+        <button
+          class="inline-flex items-center gap-2 px-6 py-3 bg-accent-red hover:bg-accent-red-hover text-white text-sm font-medium rounded-sm transition-colors"
+          @click="refresh()"
+        >
+          Retry
+        </button>
+      </div>
+    </div>
+
     <!-- Not Found -->
     <div v-else-if="!product" class="flex flex-col items-center justify-center pt-40 pb-20 px-6 text-center">
       <h1 class="font-display text-4xl font-bold text-lavender-100 mb-4">Product Not Found</h1>
@@ -205,7 +224,7 @@ const imageEl = ref<HTMLElement | null>(null)
 const detailsEl = ref<HTMLElement | null>(null)
 const relatedEl = ref<HTMLElement | null>(null)
 
-const { data: productData, pending } = useFetch<{ data: PrintProduct }>(
+const { data: productData, pending, error, refresh } = useFetch<{ data: PrintProduct }>(
   () => `/api/shop/products/${productId.value}`,
   { key: `product-${productId.value}` },
 )
@@ -343,10 +362,15 @@ useHead({
   }),
 })
 
-// JSON-LD Product structured data
+// JSON-LD Product structured data + breadcrumb
 watch(product, (p) => {
   if (p?.variants) {
     useProductSchema(p, p.variants)
+    useBreadcrumbSchema([
+      { name: 'Home', path: '/' },
+      { name: 'Shop', path: '/shop' },
+      { name: p.artworkTitle || 'Print', path: `/shop/${p.id}` },
+    ])
   }
 }, { immediate: true })
 </script>

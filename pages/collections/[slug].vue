@@ -227,6 +227,17 @@ onUnmounted(() => {
   ctx?.revert()
 })
 
+// Breadcrumb schema
+watch(collection, (c) => {
+  if (c) {
+    useBreadcrumbSchema([
+      { name: 'Home', path: '/' },
+      { name: 'Collections', path: '/collections' },
+      { name: c.title, path: `/collections/${c.slug}` },
+    ])
+  }
+}, { immediate: true })
+
 // SEO
 const config = useRuntimeConfig()
 const baseUrl = (config.public.siteUrl as string) || 'https://lapinski.art'
