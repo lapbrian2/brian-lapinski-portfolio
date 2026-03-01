@@ -27,22 +27,13 @@
     <div ref="lineTopEl" class="absolute top-[20%] left-1/2 -translate-x-1/2 z-10 w-0 h-px bg-gradient-to-r from-transparent via-accent-red/40 to-transparent" />
     <div ref="lineBottomEl" class="absolute bottom-[20%] left-1/2 -translate-x-1/2 z-10 w-0 h-px bg-gradient-to-r from-transparent via-lavender-400/20 to-transparent" />
 
-    <!-- Brand mark with letter-spacing animation -->
+    <!-- Brand label -->
     <div class="relative z-10 flex flex-col items-center">
-      <!-- Tagline above -->
       <span
         ref="taglineEl"
-        class="font-body text-[9px] md:text-[10px] uppercase tracking-[0.4em] text-accent-red/80 mb-5 opacity-0"
+        class="font-body text-[9px] md:text-[10px] uppercase tracking-[0.4em] text-accent-red/80 opacity-0"
       >
         AI Art Portfolio
-      </span>
-
-      <!-- Name -->
-      <span
-        ref="nameEl"
-        class="font-display text-sm md:text-base font-medium text-lavender-300/70 tracking-[0.25em] mt-1 opacity-0 uppercase"
-      >
-        Brian Lapinski
       </span>
     </div>
 
@@ -86,7 +77,6 @@
 import gsap from 'gsap'
 
 const loaderEl = ref<HTMLElement | null>(null)
-const nameEl = ref<HTMLElement | null>(null)
 const taglineEl = ref<HTMLElement | null>(null)
 const barEl = ref<HTMLElement | null>(null)
 const percentEl = ref<HTMLElement | null>(null)
@@ -143,14 +133,6 @@ function exitSequence() {
     duration: 0.25,
     ease: 'power2.in',
   }, '-=0.2')
-
-  // Name fades
-  tl.to(nameEl.value, {
-    opacity: 0,
-    y: 8,
-    duration: 0.25,
-    ease: 'power2.in',
-  }, '-=0.25')
 
   // Image sharpens fully as loader wipes
   if (bgImgEl.value) {
@@ -221,7 +203,7 @@ onMounted(() => {
     }, 0)
   }
 
-  // Phase 2: Tagline slides in from above
+  // Phase 2: Tagline slides in
   if (taglineEl.value) {
     entranceTl.fromTo(taglineEl.value, {
       opacity: 0,
@@ -232,19 +214,6 @@ onMounted(() => {
       duration: 0.5,
       ease: 'power2.out',
     }, 0.5)
-  }
-
-  // Phase 2c: Name slides in from below
-  if (nameEl.value) {
-    entranceTl.fromTo(nameEl.value, {
-      opacity: 0,
-      y: 10,
-    }, {
-      opacity: 1,
-      y: 0,
-      duration: 0.5,
-      ease: 'power2.out',
-    }, 0.6)
   }
 
   // Phase 3: Decorative lines expand
